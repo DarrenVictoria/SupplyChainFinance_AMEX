@@ -1,0 +1,51 @@
+<!-- sidebar.component.html -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"/>
+
+<nav class="sidebar">
+  <!-- Logo -->
+  <div class="logo">
+    <img src="../../../../amex-logo.png" alt="American Express" class="logo-image">
+  </div>
+
+  <!-- Main Navigation -->
+  <ul class="nav-list">
+    <li class="nav-item" *ngFor="let tab of tabs">
+      <a (click)="setActiveTab(tab)" class="nav-link" [ngClass]="{ 'active': activeTab === tab }">
+        <span class="material-icons icon">{{ tab.iconType }}</span>
+        <span>{{ tab.text }}</span>
+      </a>
+      <!-- Sub-navigation for items with subTabs -->
+      <ul class="sub-nav" *ngIf="tab.subTabs && activeTab === tab">
+        <li *ngFor="let subTab of tab.subTabs">
+          <a (click)="navigateToSubTab(subTab)" class="sub-nav-link">{{ subTab.text }}</a>
+        </li>
+      </ul>
+    </li>
+
+    <!-- Settings Title Section -->
+    <li class="settings-title">
+      <span>Settings</span>
+    </li>
+
+    <!-- Settings Tabs -->
+    <li class="nav-item" *ngFor="let settingTab of settingsTabs">
+      <a (click)="setActiveTab(settingTab)" class="nav-link" [ngClass]="{ 'active': activeTab === settingTab }">
+        <span class="material-icons icon">{{ settingTab.iconType }}</span>
+        <span>{{ settingTab.text }}</span>
+      </a>
+    </li>
+  </ul>
+
+  <!-- User Profile -->
+  <div class="user-profile">
+    <div class="profile-info">
+      <img [src]="profileImageUrl" alt="Profile" class="profile-image">
+      <div class="profile-text">
+        <span class="profile-name">John Doe</span>
+        <span class="profile-email">john&#64;amex.com</span>
+      </div>
+    </div>
+    <button class="logout-btn" (click)="logout()">Logout</button>
+  </div>
+</nav>
+
