@@ -4,6 +4,8 @@ import { AuthLayoutComponent } from './layout/auth-layout/auth-layout.component'
 import { MainLayoutComponent } from './layout/layout.component';
 import { LoginComponent } from './auth/login.component';
 import { PlaceholderComponent } from './placeholder/placeholder.component';
+import { BuyersComponent } from './views/customers/buyers/buyers.component';
+import { MerchantsComponent } from './views/customers/merchants/merchants.component';
 
 export const routes: Routes = [
   {
@@ -17,7 +19,7 @@ export const routes: Routes = [
       },
       {
         path: 'customers',
-        component: PlaceholderComponent, // Temporary placeholder
+        component: BuyersComponent // Use the BuyersComponent here
       },
       {
         path: 'payments',
@@ -36,12 +38,12 @@ export const routes: Routes = [
         component: PlaceholderComponent, // Temporary placeholder
       },
       {
-        path: 'customers/buyers',
-        component: PlaceholderComponent, // Temporary placeholder
+        path: 'buyers',
+        component: BuyersComponent // Use the BuyersComponent here
       },
       {
-        path: 'customers/merchants',
-        component: PlaceholderComponent, // Temporary placeholder
+        path: 'merchants',
+        component: MerchantsComponent, // Temporary placeholder
       },
       {
         path: 'supplier-registration/company-types',

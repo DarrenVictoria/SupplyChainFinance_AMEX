@@ -1,0 +1,196 @@
+<div class="container">
+  <!-- Header with Title and Tabs -->
+  <div class="header-section">
+    <h1 class="text-3xl font-bold mb-8">Buyers</h1>
+
+    <!-- <mat-tab-group 
+      class="buyers-tabs"
+      [(selectedIndex)]="activeTabIndex"
+      (selectedTabChange)="onTabChange($event)"
+    >
+      <mat-tab label="BUYERS"></mat-tab>
+      <mat-tab label="APPROVE BUYERS"></mat-tab>
+      <mat-tab label="MANAGE BUYERS"></mat-tab>
+      <mat-tab label="APPROVE REQUEST CONFIGURATION"></mat-tab>
+    </mat-tab-group> -->
+  </div>
+
+  <!-- Tab Content -->
+  <div class="tab-content">
+    <!-- Buyers Tab Content -->
+    <div *ngIf="showBuyersContent">
+      <!-- Filter Section -->
+      <form [formGroup]="filterForm" class="filter-section mt-6">
+        <div class="filter-header">
+          <h2 class="text-xl">Filter Buyer</h2>
+        </div>
+        
+        <div class="filter-controls">
+          <mat-form-field>
+            <mat-label>From Created Date</mat-label>
+            <input matInput [matDatepicker]="fromPicker" formControlName="fromDate">
+            <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+            <mat-datepicker #fromPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>To Created Date</mat-label>
+            <input matInput [matDatepicker]="toPicker" formControlName="toDate">
+            <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+            <mat-datepicker #toPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Status</mat-label>
+            <mat-select formControlName="status">
+              <mat-option *ngFor="let option of statusOptions" [value]="option.value">
+                {{option.label}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <div class="search-section">
+            <mat-form-field>
+              <mat-label>Search by</mat-label>
+              <mat-select formControlName="searchType">
+                <mat-option value="name">Buyer Name</mat-option>
+                <mat-option value="users">No of Users</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field class="search-input">
+              <input matInput placeholder="Search..." formControlName="searchTerm">
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- New Reset Button Section -->
+        <div class="filter-actions">
+          <button 
+            mat-raised-button 
+            color="primary" 
+            class="reset-button" 
+            (click)="resetFilters()"
+            *ngIf="isFiltersApplied"
+          >
+            <mat-icon>refresh</mat-icon>
+            Reset Filters
+          </button>
+        </div>
+      </form>
+
+      <!-- Status Keys and Add Button -->
+      <div class="status-section">
+        <div class="status-chips">
+          <mat-chip-listbox>
+            <mat-chip color="primary" class="approved">Approved</mat-chip>
+            <mat-chip color="warn" class="rejected">Rejected</mat-chip>
+            <mat-chip color="accent" class="review">Review</mat-chip>
+            <mat-chip color="primary" class="pending-approval">Pending Approval</mat-chip>
+            <mat-chip color="accent" class="incomplete">Incomplete</mat-chip>
+          </mat-chip-listbox>
+        </div>
+        <!-- <button mat-raised-button color="primary" class="add-button" style="padding: 1.95rem;">
+          + Add Buyer
+        </button> -->
+      </div>
+
+      <!-- Table -->
+      <div class="table-container">
+        <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+          <!-- ID Column -->
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Buyer ID </th>
+            <td mat-cell *matCellDef="let buyer"> {{buyer.id}} </td>
+          </ng-container>
+
+          <!-- Name Column -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Buyer Name </th>
+            <td mat-cell *matCellDef="let buyer"> {{buyer.name}} </td>
+          </ng-container>
+
+          <!-- Date Created Column -->
+          <ng-container matColumnDef="dateCreated">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Date Created </th>
+            <td mat-cell *matCellDef="let buyer"> {{buyer.dateCreated | date}} </td>
+          </ng-container>
+
+          <!-- Created By Column -->
+          <ng-container matColumnDef="createdBy">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Created By </th>
+            <td mat-cell *matCellDef="let buyer"> {{buyer.createdBy}} </td>
+          </ng-container>
+
+          <!-- Account Manager Column -->
+          <ng-container matColumnDef="accountManager">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Account Manager </th>
+            <td mat-cell *matCellDef="let buyer"> {{buyer.accountManager}} </td>
+          </ng-container>
+
+          <!-- Number of Users Column -->
+          <ng-container matColumnDef="noOfUsers">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> No of Users </th>
+            <td mat-cell *matCellDef="let buyer"> {{buyer.noOfUsers}} </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+            <td mat-cell *matCellDef="let buyer">
+              <mat-chip [ngClass]="getStatusClass(buyer.status)" selected>
+                {{ buyer.status }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef> Actions </th>
+            <td mat-cell *matCellDef="let buyer">
+              <button mat-icon-button [matMenuTriggerFor]="menu">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu">
+                <button mat-menu-item>
+                  <mat-icon>visibility</mat-icon>
+                  <span>View</span>
+                </button>
+                <button mat-menu-item>
+                  <mat-icon>edit</mat-icon>
+                  <span>Change Account Manager</span>
+                </button>
+                <button mat-menu-item>
+                  <mat-icon>difference</mat-icon>
+                  <span>Audit</span>
+                </button>
+              </mat-menu>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <mat-paginator 
+          [pageSizeOptions]="[5, 10, 20]"
+          showFirstLastButtons
+          aria-label="Select page of buyers">
+        </mat-paginator>
+      </div>
+    </div>
+
+    <!-- Other tab contents -->
+    <div *ngIf="showApproveBuyersContent">
+      <p class="coming-text">Approve Buyers content coming soon...</p>
+    </div>
+
+    <div *ngIf="showManageBuyersContent">
+      <p class="coming-text">Manage Buyers content coming soon...</p>
+    </div>
+
+    <div *ngIf="showApproveRequestContent">
+      <p class="coming-text">Approve Request Configuration content coming soon...</p>
+    </div>
+  </div>
+</div>

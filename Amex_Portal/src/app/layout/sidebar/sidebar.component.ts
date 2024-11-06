@@ -27,8 +27,8 @@ export class SidebarComponent implements OnInit {
       text: 'Customers', 
       route: '/customers', 
       subTabs: [
-        { text: 'Buyers', route: '/customers/buyers' },
-        { text: 'Merchants', route: '/customers/merchants' }
+        { text: 'Buyers', route: '/buyers' },
+        { text: 'Merchants', route: '/merchants' }
       ]
     },
     { iconType: 'credit_card', text: 'Payments', route: '/payments' },
@@ -55,9 +55,15 @@ export class SidebarComponent implements OnInit {
   }
 
   setActiveTab(tab: Tab): void {
-    this.activeTab = tab;
-    this.router.navigate([tab.route]);
+    if (tab.subTabs) {
+      // Toggle activeTab for tabs with sub-tabs
+      this.activeTab = this.activeTab === tab ? null : tab;
+    } else {
+      this.activeTab = tab;
+      this.router.navigate([tab.route]);
+    }
   }
+  
 
   navigateToSubTab(subTab: { text: string; route: string }): void {
     this.router.navigate([subTab.route]);
