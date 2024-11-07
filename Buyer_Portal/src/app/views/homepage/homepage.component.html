@@ -1,0 +1,124 @@
+<div class="page-container">
+    <mat-card class="company-card">
+      <mat-card-header>
+        <mat-card-title class="company-title">You are in {{ companyData.companyName }}</mat-card-title>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <!-- Basic Details Section -->
+        <mat-expansion-panel expanded>
+          <mat-expansion-panel-header>
+            <mat-panel-title>Basic Details</mat-panel-title>
+          </mat-expansion-panel-header>
+          
+          <div class="details-grid">
+            <div class="form-field">
+              <mat-form-field>
+                <mat-label>Company Type</mat-label>
+                <input matInput [value]="companyData.basicDetails.companyType" readonly>
+              </mat-form-field>
+            </div>
+            
+            <div class="form-field">
+              <mat-form-field>
+                <mat-label>Registration / Incorporation No.</mat-label>
+                <input matInput [value]="companyData.basicDetails.registrationNo" readonly>
+              </mat-form-field>
+            </div>
+            
+            <div class="form-field">
+              <mat-form-field>
+                <mat-label>Company Email</mat-label>
+                <input matInput [value]="companyData.basicDetails.email" readonly>
+              </mat-form-field>
+            </div>
+            
+            <div class="form-field">
+              <mat-form-field>
+                <mat-label>Company Phone No.</mat-label>
+                <input matInput [value]="companyData.basicDetails.phone" readonly>
+              </mat-form-field>
+            </div>
+            
+            <div class="form-field full-width">
+              <mat-form-field>
+                <mat-label>Company Address</mat-label>
+                <textarea matInput [value]="companyData.basicDetails.address" readonly rows="3"></textarea>
+              </mat-form-field>
+            </div>
+          </div>
+        </mat-expansion-panel>
+  
+        <!-- Account Details Section -->
+        <mat-expansion-panel expanded class="mt-4">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Account Details</mat-panel-title>
+          </mat-expansion-panel-header>
+          
+          <mat-expansion-panel class="account-details-inner" expanded>
+            <mat-expansion-panel-header class="hidden-header">
+              <mat-panel-title>Account Information</mat-panel-title>
+            </mat-expansion-panel-header>
+            
+            <div class="account-details-container">
+              <div class="account-box">
+                <div class="account-info">
+                  <div class="label">Card Number</div>
+                  <div class="value card-number">{{ companyData.accountDetails.cardNumber }}</div>
+                </div>
+              </div>
+              
+              <div class="account-box">
+                <div class="account-info">
+                  <div class="label">Total Credit Limit</div>
+                  <div class="value credit-limit">{{ companyData.accountDetails.totalCreditLimit }}</div>
+                  <div class="sublabel">
+                    Available Credit Limit {{ companyData.accountDetails.availableCreditLimit }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-expansion-panel>
+        </mat-expansion-panel>
+  
+        <!-- Documents Section -->
+        <mat-expansion-panel expanded class="mt-4">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Documents Uploaded</mat-panel-title>
+          </mat-expansion-panel-header>
+          
+          <mat-list role="list">
+            <mat-list-item *ngFor="let doc of companyData.documents; let i = index" role="listitem">
+              <div class="document-item">
+                <!-- Document name label for larger screens -->
+                <span class="document-name md:block hidden">{{ doc.name }} - {{ doc.fileName }}</span>
+          
+                <!-- Button with conditional text for mobile view -->
+                <button
+                  mat-stroked-button
+                  color="primary"
+                  (click)="viewDocument(i)"
+                  class="w-full text-xs md:text-base view-attachment-button"
+                >
+                  <!-- Mobile view: show document name inside the button -->
+                  <span class="block md:hidden">View {{ doc.name }}</span>
+                  
+                  <!-- Larger screens: show 'View Attachment' -->
+                  <!-- <span class="hidden md:block">View Attachment</span> -->
+                </button>
+              </div>
+            </mat-list-item>
+          </mat-list>
+          
+          
+          
+          <div class="view-all-container">
+            <button mat-raised-button color="primary" (click)="viewAllDocuments()">
+              View All Attachments
+            </button>
+          </div>
+          
+        </mat-expansion-panel>
+      </mat-card-content>
+    </mat-card>
+  </div>

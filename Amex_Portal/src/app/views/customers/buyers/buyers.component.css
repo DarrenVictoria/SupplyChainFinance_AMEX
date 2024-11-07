@@ -115,9 +115,13 @@
   background: white;
   border-radius: 4px;
   overflow: hidden;
+  width: 100%;
+overflow-x: auto;  /* Allow horizontal scroll */
+-webkit-overflow-scrolling: touch;  /* For smooth scrolling on iOS */
 
   table {
     width: 100%;
+    min-width: 600px;
   }
 
   th.mat-header-cell,
@@ -134,6 +138,16 @@
 
   tr.mat-row:hover {
     background-color: #f5f5f5;
+  }
+
+  @media (max-width: 768px) {
+      .table-container {
+        padding: 0 15px; /* Optional: Add some padding on small screens */
+      }
+    
+      table {
+        min-width: 800px;  /* Adjust the min-width to be appropriate for your table's columns */
+      }
   }
 }
 

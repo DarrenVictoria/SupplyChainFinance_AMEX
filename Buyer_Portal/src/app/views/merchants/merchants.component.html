@@ -1,8 +1,8 @@
 <div class="container">
     <!-- Header with Title and Tabs -->
     <div class="header-section">
-      <h1 class="text-3xl font-bold mb-8">Merchants</h1>
-      
+      <h1>Merchants</h1>
+  
       <mat-tab-group 
         class="merchants-tabs"
         [(selectedIndex)]="activeTabIndex"
@@ -20,24 +20,10 @@
         <!-- Filter Section -->
         <form [formGroup]="filterForm" class="filter-section mt-6">
           <div class="filter-header">
-            <h2 class="text-xl">Filter Merchant</h2>
+            <h2>Filter Merchant</h2>
           </div>
           
           <div class="filter-controls">
-            <mat-form-field>
-              <mat-label>From Created Date</mat-label>
-              <input matInput [matDatepicker]="fromPicker" formControlName="fromDate">
-              <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
-              <mat-datepicker #fromPicker></mat-datepicker>
-            </mat-form-field>
-  
-            <mat-form-field>
-              <mat-label>To Created Date</mat-label>
-              <input matInput [matDatepicker]="toPicker" formControlName="toDate">
-              <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
-              <mat-datepicker #toPicker></mat-datepicker>
-            </mat-form-field>
-  
             <mat-form-field>
               <mat-label>Status</mat-label>
               <mat-select formControlName="status">
@@ -47,19 +33,9 @@
               </mat-select>
             </mat-form-field>
   
-            <div class="search-section">
-              <mat-form-field>
-                <mat-label>Search by</mat-label>
-                <mat-select formControlName="searchType">
-                  <mat-option value="name">Merchant Name</mat-option>
-                  
-                </mat-select>
-              </mat-form-field>
-  
-              <mat-form-field class="search-input">
-                <input matInput placeholder="Search..." formControlName="searchTerm">
-              </mat-form-field>
-            </div>
+            <mat-form-field class="search-input">
+              <input matInput placeholder="Search by merchant name..." formControlName="searchTerm">
+            </mat-form-field>
           </div>
   
           <!-- Reset Button Section -->
@@ -81,60 +57,89 @@
         <div class="status-section">
           <div class="status-chips">
             <mat-chip-listbox>
-              <mat-chip color="primary" class="approved">Accepted</mat-chip>
-              <mat-chip color="warn" class="rejected">Rejected</mat-chip>
+              <mat-chip color="primary" class="approved">Approved</mat-chip>
               <mat-chip color="primary" class="pending-approval">Pending Approval</mat-chip>
             </mat-chip-listbox>
           </div>
         </div>
+
+        <!-- Invite Merchant Button -->
+        <div class="filter-actions">
+            <button 
+            mat-raised-button 
+            color="primary" 
+            class="invite-merchant-button"
+            (click)="inviteMerchant()"
+            >
+            <mat-icon>person_add</mat-icon>
+            Invite Merchant
+            </button>
+            
+            
+        </div>
+
+        
   
         <!-- Table -->
         <div class="table-container">
           <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+            <!-- ID Column -->
             <ng-container matColumnDef="id">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Merchant ID </th>
-              <td mat-cell *matCellDef="let merchant"> {{merchant.id}} </td>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Merchant ID</th>
+              <td mat-cell *matCellDef="let merchant">{{merchant.id}}</td>
             </ng-container>
   
-            <ng-container matColumnDef="name">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Merchant Name </th>
-              <td mat-cell *matCellDef="let merchant"> {{merchant.name}} </td>
+            <!-- Merchant Name Column -->
+            <ng-container matColumnDef="merchantName">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Merchant Name</th>
+              <td mat-cell *matCellDef="let merchant">{{merchant.merchantName}}</td>
             </ng-container>
   
-            <ng-container matColumnDef="dateCreated">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Date Created </th>
-              <td mat-cell *matCellDef="let merchant"> {{merchant.dateCreated | date}} </td>
+            <!-- Contact Person Column -->
+            <ng-container matColumnDef="contactPerson">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Contact Person</th>
+              <td mat-cell *matCellDef="let merchant">{{merchant.contactPerson}}</td>
             </ng-container>
   
-            <ng-container matColumnDef="createdBy">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Created By </th>
-              <td mat-cell *matCellDef="let merchant"> {{merchant.createdBy}} </td>
+            <!-- Mobile No Column -->
+            <ng-container matColumnDef="mobileNo">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Mobile No</th>
+              <td mat-cell *matCellDef="let merchant">{{merchant.mobileNo}}</td>
             </ng-container>
   
-            <ng-container matColumnDef="registeredBuyer">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Registered Buyer </th>
-              <td mat-cell *matCellDef="let merchant"> {{merchant.registeredBuyer}} </td>
+            <!-- Email Column -->
+            <ng-container matColumnDef="email">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Email</th>
+              <td mat-cell *matCellDef="let merchant">{{merchant.email}}</td>
             </ng-container>
   
+            <!-- Address Column -->
+            <ng-container matColumnDef="address">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Address</th>
+              <td mat-cell *matCellDef="let merchant">{{merchant.address}}</td>
+            </ng-container>
+  
+            <!-- Status Column -->
             <ng-container matColumnDef="status">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
               <td mat-cell *matCellDef="let merchant">
                 <mat-chip [ngClass]="getStatusClass(merchant.status)" selected>
-                  {{ merchant.status }}
+                  {{merchant.status}}
                 </mat-chip>
               </td>
             </ng-container>
   
+            <!-- Actions Column -->
             <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef> Actions </th>
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
               <td mat-cell *matCellDef="let merchant">
                 <button mat-icon-button [matMenuTriggerFor]="menu">
                   <mat-icon>more_vert</mat-icon>
                 </button>
                 <mat-menu #menu="matMenu">
                   <button mat-menu-item>
-                    <mat-icon>remove_red_eye</mat-icon>
-                    <span>View</span>
+                    <mat-icon>edit</mat-icon>
+                    <span>Edit</span>
                   </button>
                 </mat-menu>
               </td>

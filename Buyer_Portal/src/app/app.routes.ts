@@ -4,8 +4,9 @@ import { AuthLayoutComponent } from './layout/auth-layout/auth-layout.component'
 import { MainLayoutComponent } from './layout/layout.component';
 import { LoginComponent } from './auth/login.component';
 import { PlaceholderComponent } from './placeholder/placeholder.component';
-import { BuyersComponent } from './views/customers/buyers/buyers.component';
-import { MerchantsComponent } from './views/customers/merchants/merchants.component';
+import { MerchantsComponent } from './views/merchants/merchants.component';
+import { HomepageComponent } from './views/homepage/homepage.component';
+import { PaymentsComponent } from './views/payments/payments.component';
 
 export const routes: Routes = [
   {
@@ -14,7 +15,7 @@ export const routes: Routes = [
     children: [
       {
         path: 'homepage',
-        component: PlaceholderComponent
+        component: HomepageComponent
       },
       {
         path: 'dashboard',
@@ -22,7 +23,7 @@ export const routes: Routes = [
       },
       {
         path: 'merchants',
-        component: PlaceholderComponent
+        component:  MerchantsComponent
       },
       {
         path: 'requests',
@@ -39,7 +40,7 @@ export const routes: Routes = [
       },
       {
         path: 'payments',
-        component: PlaceholderComponent
+        component: PaymentsComponent
       },
       {
         path: 'financial',
