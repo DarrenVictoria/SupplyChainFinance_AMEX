@@ -1,0 +1,145 @@
+.container {
+    padding: 20px;
+  }
+  
+  .header-section {
+    h1 {
+     margin-bottom:2rem;
+     font-size: 2rem;
+    }
+  }
+  
+  .filter-section {
+    background-color: #dedfe3;
+    padding: 20px;
+    border-radius: 0 1rem 0 1rem;
+    margin-bottom: 20px;
+  
+    .filter-header {
+      margin-bottom: 20px;
+    }
+  
+    .filter-controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+  }
+  
+  .filter-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+    
+    .reset-button {
+      background-color: rgb(74, 74, 178);
+      color: white;
+      border-radius: 0 1rem 0 1rem;
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+  
+      &:hover {
+        background-color: rgb(61, 61, 148);
+      }
+    }
+  }
+
+  .search-section {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .status-section {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 20px;
+    
+  
+    .status-chips {
+      .mat-chip {
+        margin-right: 8px;
+        
+        
+      }
+    }
+  }
+  
+  .table-container {
+    background: white;
+    border-radius: 4px;
+    overflow: hidden;
+    width: 100%;
+  overflow-x: auto;  /* Allow horizontal scroll */
+  -webkit-overflow-scrolling: touch;  /* For smooth scrolling on iOS */
+  
+    table {
+      width: 100%;
+      min-width: 800px;
+    }
+  
+    th.mat-header-cell,
+    td.mat-cell {
+      padding: 16px;
+      text-align: left;
+    }
+  
+    th.mat-header-cell {
+      background-color: #e0e0e0;
+      font-weight: bold;
+      color: #424242;
+    }
+  
+    tr.mat-row:hover {
+      background-color: #f5f5f5;
+    }
+  
+    @media (max-width: 768px) {
+        .table-container {
+          padding: 0 15px; /* Optional: Add some padding on small screens */
+        }
+      
+        table {
+          min-width: 800px;  /* Adjust the min-width to be appropriate for your table's columns */
+        }
+    }
+  }
+  
+  
+  ::ng-deep {
+    .mat-form-field {
+      width: 100%;
+    }
+  }
+  
+  .status-chip {
+    padding: 4px 8px;
+    border-radius: 20px;
+    color: white;
+    font-weight: bold;
+    margin-right: 5px;
+  }
+  
+  ::ng-deep .approved {
+    background-color: #4CAF50 !important; /* green */
+    color: white !important;
+  }
+  
+  ::ng-deep .pending {
+    background-color: #D32F2F !important; /* red */
+    color: white !important;
+  }
+  
+  ::ng-deep .late {
+    background-color: #F57C00 !important; /* orange */
+    color: white !important;
+  }

@@ -1,0 +1,164 @@
+<div class="container">
+    <!-- Header with Title and Tabs -->
+    <div class="header-section">
+      <h1 class="text-3xl font-bold mb-8">Payments</h1>
+    </div>
+  
+    <!-- Filter Section -->
+    <form [formGroup]="filterForm" class="filter-section mt-6">
+      <div class="filter-header">
+        <h2 class="text-xl">Filter Payments</h2>
+      </div>
+      
+      <div class="filter-controls">
+        <mat-form-field>
+            <mat-label>From Created Date</mat-label>
+            <input matInput [matDatepicker]="fromPicker" formControlName="fromDate">
+            <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+            <mat-datepicker #fromPicker></mat-datepicker>
+          </mat-form-field>
+          
+          <mat-form-field>
+            <mat-label>To Created Date</mat-label>
+            <input matInput [matDatepicker]="toPicker" formControlName="toDate">
+            <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+            <mat-datepicker #toPicker></mat-datepicker>
+          </mat-form-field>
+  
+        <mat-form-field>
+          <mat-label>Status</mat-label>
+          <mat-select formControlName="status">
+            <mat-option value="">Any</mat-option>
+            <mat-option value="received">Received</mat-option>
+            <mat-option value="pending">Pending</mat-option>
+            <mat-option value="late">Late</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="search-section">
+        <mat-form-field>
+            <mat-label>Search by</mat-label>
+            <mat-select formControlName="searchType">
+              <mat-option value="merchant">Merchant</mat-option>
+              <mat-option value="model">Model</mat-option>
+            </mat-select>
+          </mat-form-field>
+      
+        <mat-form-field class="search-input">
+          <input matInput placeholder="Search..." formControlName="searchTerm">
+        </mat-form-field>
+      </div>
+  
+      <!-- New Reset Button Section -->
+      <div class="filter-actions">
+        <button 
+          mat-raised-button 
+          color="primary" 
+          class="reset-button" 
+          (click)="resetFilters()"
+          *ngIf="isFiltersApplied"
+        >
+          <mat-icon>refresh</mat-icon>
+          Reset Filters
+        </button>
+      </div>
+    </form>
+  
+    <!-- Status Keys -->
+    <div class="status-section">
+      <div class="status-chips">
+        <mat-chip class="status-chip approved">Received</mat-chip>
+        <mat-chip class="status-chip pending">Pending</mat-chip>
+        <mat-chip class="status-chip late">Late</mat-chip>
+      </div>
+    </div>
+  
+    <!-- Table -->
+    <div class="table-container">
+      <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+        <!-- ID Column -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
+          <td mat-cell *matCellDef="let payment"> {{payment.id}} </td>
+        </ng-container>
+  
+        <!-- Date Created Column -->
+        <ng-container matColumnDef="dateCreated">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Date Created </th>
+          <td mat-cell *matCellDef="let payment"> {{payment.dateCreated | date}} </td>
+        </ng-container>
+  
+        <!-- Created By Column -->
+        <ng-container matColumnDef="createdBy">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Created By </th>
+          <td mat-cell *matCellDef="let payment"> {{payment.createdBy}} </td>
+        </ng-container>
+  
+        <!-- Merchant Column -->
+        <ng-container matColumnDef="merchant">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Merchant </th>
+          <td mat-cell *matCellDef="let payment"> {{payment.merchant}} </td>
+        </ng-container>
+  
+        <!-- Model Column -->
+        <ng-container matColumnDef="model">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Model </th>
+          <td mat-cell *matCellDef="let payment"> {{payment.model}} </td>
+        </ng-container>
+  
+        <!-- Total Credit Provided Column -->
+        <ng-container matColumnDef="totalCreditProvided">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Total Credit Provided </th>
+          <td mat-cell *matCellDef="let payment"> {{payment.totalCreditProvided}} </td>
+        </ng-container>
+  
+        <!-- Total Received Column -->
+        <ng-container matColumnDef="totalReceived">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Total Received </th>
+          <td mat-cell *matCellDef="let payment"> {{payment.totalReceived}} </td>
+        </ng-container>
+  
+        <!-- Status Column -->
+        <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+            <td mat-cell *matCellDef="let payment">
+              <mat-chip [ngClass]="getStatusClass(payment.status)" selected class="status-chip">
+                {{ payment.status }}
+              </mat-chip>
+              <mat-icon *ngIf="payment.status.toLowerCase() === 'late'" style="font-size: 1rem; padding-top: 0.7rem;" >warning</mat-icon>
+            </td>
+          </ng-container>
+          
+  
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef> Actions </th>
+          <td mat-cell *matCellDef="let payment">
+            <button mat-icon-button [matMenuTriggerFor]="menu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item>
+                <mat-icon>visibility</mat-icon>
+                <span>View</span>
+              </button>
+              <button mat-menu-item>
+                <mat-icon>difference</mat-icon>
+                <span>Audit</span>
+              </button>
+            </mat-menu>
+          </td>
+        </ng-container>
+  
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+  
+      <mat-paginator 
+        [pageSizeOptions]="[5, 10, 20]"
+        showFirstLastButtons
+        aria-label="Select page of payments">
+      </mat-paginator>
+    </div>
+  </div>

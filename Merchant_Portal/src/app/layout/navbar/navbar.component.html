@@ -1,0 +1,36 @@
+<mat-toolbar class="amex-navbar">
+    <button mat-icon-button (click)="toggleSidenav.emit()" class="menu-button">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <span class="spacer"></span>
+    <app-badge [count]="notificationCount">
+      <button mat-icon-button [matMenuTriggerFor]="notificationsMenu" class="notification-button">
+        <mat-icon class="notification-icon">notifications</mat-icon>
+      </button>
+    </app-badge>
+    <span class="date-time">{{currentDate | date:'medium'}}</span>
+    <a [routerLink]="['/profile']">
+      <img [src]="profileImageUrl" alt="Profile" class="profile-image">
+    </a>
+  </mat-toolbar>
+  
+  <mat-menu #notificationsMenu="matMenu" class="notifications-menu">
+    <div class="notifications-list">
+      <ng-container *ngIf="notifications.length; else noNotifications">
+        <mat-card *ngFor="let notification of notifications" class="notification-card">
+          <mat-card-title>{{ notification.title }}</mat-card-title>
+          <mat-card-content>
+            <p>{{ notification.description }}</p>
+          </mat-card-content>
+          <mat-card-actions *ngIf="notification.action">
+            <button mat-button class="action-button">{{ notification.action }}</button>
+          </mat-card-actions>
+        </mat-card>
+      </ng-container>
+      <ng-template #noNotifications>
+        <mat-card class="notification-card">
+          <mat-card-content>No notifications</mat-card-content>
+        </mat-card>
+      </ng-template>
+    </div>
+  </mat-menu>

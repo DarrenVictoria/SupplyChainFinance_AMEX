@@ -1,0 +1,165 @@
+<div class="container">
+    <!-- Header with Title and Tabs -->
+    <div class="header-section">
+      <h1>Merchants</h1>
+  
+      <mat-tab-group 
+        class="merchants-tabs"
+        [(selectedIndex)]="activeTabIndex"
+        (selectedTabChange)="onTabChange($event)"
+      >
+        <mat-tab label="MERCHANTS"></mat-tab>
+        <mat-tab label="APPROVE MERCHANTS"></mat-tab>
+      </mat-tab-group>
+    </div>
+  
+    <!-- Tab Content -->
+    <div class="tab-content">
+      <!-- Merchants Tab Content -->
+      <div *ngIf="showMerchantsContent">
+        <!-- Filter Section -->
+        <form [formGroup]="filterForm" class="filter-section mt-6">
+          <div class="filter-header">
+            <h2>Filter Merchant</h2>
+          </div>
+          
+          <div class="filter-controls">
+            <mat-form-field>
+              <mat-label>Status</mat-label>
+              <mat-select formControlName="status">
+                <mat-option *ngFor="let option of statusOptions" [value]="option.value">
+                  {{option.label}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+  
+            <mat-form-field class="search-input">
+              <input matInput placeholder="Search by merchant name..." formControlName="searchTerm">
+            </mat-form-field>
+          </div>
+  
+          <!-- Reset Button Section -->
+          <div class="filter-actions">
+            <button 
+              mat-raised-button 
+              color="primary" 
+              class="reset-button" 
+              (click)="resetFilters()"
+              *ngIf="isFiltersApplied"
+            >
+              <mat-icon>refresh</mat-icon>
+              Reset Filters
+            </button>
+          </div>
+        </form>
+  
+        <!-- Status Keys -->
+        <div class="status-section">
+          <div class="status-chips">
+            <mat-chip-listbox>
+              <mat-chip color="primary" class="approved">Approved</mat-chip>
+              <mat-chip color="primary" class="pending-approval">Pending Approval</mat-chip>
+            </mat-chip-listbox>
+          </div>
+        </div>
+
+        <!-- Invite Merchant Button -->
+        <div class="filter-actions">
+            <button 
+            mat-raised-button 
+            color="primary" 
+            class="invite-merchant-button"
+            (click)="inviteMerchant()"
+            >
+            <mat-icon>person_add</mat-icon>
+            Invite Merchant
+            </button>
+            
+            
+        </div>
+
+        
+  
+        <!-- Table -->
+        <div class="table-container">
+          <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+            <!-- ID Column -->
+            <ng-container matColumnDef="id">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Merchant ID</th>
+              <td mat-cell *matCellDef="let merchant">{{merchant.id}}</td>
+            </ng-container>
+  
+            <!-- Merchant Name Column -->
+            <ng-container matColumnDef="merchantName">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Merchant Name</th>
+              <td mat-cell *matCellDef="let merchant">{{merchant.merchantName}}</td>
+            </ng-container>
+  
+            <!-- Contact Person Column -->
+            <ng-container matColumnDef="contactPerson">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Contact Person</th>
+              <td mat-cell *matCellDef="let merchant">{{merchant.contactPerson}}</td>
+            </ng-container>
+  
+            <!-- Mobile No Column -->
+            <ng-container matColumnDef="mobileNo">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Mobile No</th>
+              <td mat-cell *matCellDef="let merchant">{{merchant.mobileNo}}</td>
+            </ng-container>
+  
+            <!-- Email Column -->
+            <ng-container matColumnDef="email">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Email</th>
+              <td mat-cell *matCellDef="let merchant">{{merchant.email}}</td>
+            </ng-container>
+  
+            <!-- Address Column -->
+            <ng-container matColumnDef="address">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Address</th>
+              <td mat-cell *matCellDef="let merchant">{{merchant.address}}</td>
+            </ng-container>
+  
+            <!-- Status Column -->
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+              <td mat-cell *matCellDef="let merchant">
+                <mat-chip [ngClass]="getStatusClass(merchant.status)" selected>
+                  {{merchant.status}}
+                </mat-chip>
+              </td>
+            </ng-container>
+  
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let merchant">
+                <button mat-icon-button [matMenuTriggerFor]="menu">
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #menu="matMenu">
+                  <button mat-menu-item>
+                    <mat-icon>edit</mat-icon>
+                    <span>Edit</span>
+                  </button>
+                </mat-menu>
+              </td>
+            </ng-container>
+  
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+  
+          <mat-paginator 
+            [pageSizeOptions]="[5, 10, 20]"
+            showFirstLastButtons
+            aria-label="Select page of merchants">
+          </mat-paginator>
+        </div>
+      </div>
+  
+      <!-- Approve Merchants tab content -->
+      <div *ngIf="showApproveMerchantsContent">
+        <p class="coming-text">Approve Merchants content coming soon...</p>
+      </div>
+    </div>
+  </div>
