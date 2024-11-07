@@ -73,35 +73,15 @@ export class BuyersComponent implements OnInit, AfterViewInit {
 
   buyers: Buyer[] = [
     { id: 1, name: 'Skyline Innovations LLC', dateCreated: new Date('2024-01-15'), createdBy: 'Mark Smith', accountManager: 'Mark Smith', noOfUsers: 5, status: 'Approved' },
-    { id: 2, name: 'Vanguard Resource Group LP', dateCreated: new Date('2024-01-17'), createdBy: 'John Bill', accountManager: 'John Bill', noOfUsers: 4, status: 'Review' },
+    { id: 2, name: 'Vanguard Resource Group LP', dateCreated: new Date('2024-01-17'), createdBy: 'John Bill', accountManager: '', noOfUsers: 4, status: 'Review' },
     { id: 3, name: 'Quantum Edge Systems Inc', dateCreated: new Date('2024-01-21'), createdBy: 'Walter Stan', accountManager: 'Walter Stan', noOfUsers: 6, status: 'Rejected' },
-    { id: 4, name: 'Pinnacle Data Solutions', dateCreated: new Date('2024-02-05'), createdBy: 'Sarah Lin', accountManager: 'Sarah Lin', noOfUsers: 8, status: 'Pending Approval' },
+    { id: 4, name: 'Pinnacle Data Solutions', dateCreated: new Date('2024-02-05'), createdBy: 'Sarah Lin', accountManager: '', noOfUsers: 8, status: 'Pending Approval' },
     { id: 5, name: 'Streamline Ventures', dateCreated: new Date('2024-02-19'), createdBy: 'Alice Brown', accountManager: 'Alice Brown', noOfUsers: 7, status: 'Approved' },
-    { id: 6, name: 'Lighthouse Consulting Group', dateCreated: new Date('2024-03-01'), createdBy: 'Michael Chen', accountManager: 'Michael Chen', noOfUsers: 9, status: 'Incomplete' },
+    { id: 6, name: 'Lighthouse Consulting Group', dateCreated: new Date('2024-03-01'), createdBy: 'Michael Chen', accountManager: '', noOfUsers: 9, status: 'Incomplete' },
     { id: 7, name: 'Harbor Technologies', dateCreated: new Date('2024-03-12'), createdBy: 'Emily Tran', accountManager: 'Emily Tran', noOfUsers: 6, status: 'Review' },
     { id: 8, name: 'Everest Management Ltd', dateCreated: new Date('2024-03-25'), createdBy: 'Tom Hanks', accountManager: 'Tom Hanks', noOfUsers: 10, status: 'Approved' },
-    { id: 9, name: 'Orion Global Holdings', dateCreated: new Date('2024-04-04'), createdBy: 'Olivia Carter', accountManager: 'Olivia Carter', noOfUsers: 5, status: 'Rejected' },
-    { id: 10, name: 'Blue Sky Enterprises', dateCreated: new Date('2024-04-18'), createdBy: 'James White', accountManager: 'James White', noOfUsers: 3, status: 'Pending Approval' },
-    { id: 11, name: 'Wavecrest Industries', dateCreated: new Date('2024-05-01'), createdBy: 'Natalie Green', accountManager: 'Natalie Green', noOfUsers: 7, status: 'Incomplete' },
-    { id: 12, name: 'NorthStar Solutions', dateCreated: new Date('2024-05-13'), createdBy: 'Sam Lee', accountManager: 'Sam Lee', noOfUsers: 8, status: 'Approved' },
-    { id: 13, name: 'Zenith Partners', dateCreated: new Date('2024-06-06'), createdBy: 'Dan Kim', accountManager: 'Dan Kim', noOfUsers: 4, status: 'Rejected' },
-    { id: 14, name: 'Beacon Global', dateCreated: new Date('2024-06-20'), createdBy: 'Paul Young', accountManager: 'Paul Young', noOfUsers: 6, status: 'Review' },
-    { id: 15, name: 'Vector Group Ltd', dateCreated: new Date('2024-07-02'), createdBy: 'Rachel Liu', accountManager: 'Rachel Liu', noOfUsers: 5, status: 'Pending Approval' },
-    { id: 16, name: 'Frontier Consulting', dateCreated: new Date('2024-07-15'), createdBy: 'Liam Jones', accountManager: 'Liam Jones', noOfUsers: 7, status: 'Incomplete' },
-    { id: 17, name: 'Nexus Solutions', dateCreated: new Date('2024-07-29'), createdBy: 'Henry Ford', accountManager: 'Henry Ford', noOfUsers: 10, status: 'Approved' },
-    { id: 18, name: 'Atlas Financial Inc', dateCreated: new Date('2024-08-03'), createdBy: 'Jane Austin', accountManager: 'Jane Austin', noOfUsers: 3, status: 'Rejected' },
-    { id: 19, name: 'Summit Edge Technologies', dateCreated: new Date('2024-08-18'), createdBy: 'Grace Park', accountManager: 'Grace Park', noOfUsers: 9, status: 'Review' },
-    { id: 20, name: 'Apex Innovations', dateCreated: new Date('2024-09-05'), createdBy: 'Mark Wilson', accountManager: 'Mark Wilson', noOfUsers: 6, status: 'Pending Approval' },
-    { id: 21, name: 'Prime Vision Corp', dateCreated: new Date('2024-09-17'), createdBy: 'Alexandra Black', accountManager: 'Alexandra Black', noOfUsers: 4, status: 'Incomplete' },
-    { id: 22, name: 'Infinity Holdings', dateCreated: new Date('2024-10-01'), createdBy: 'Eric Woods', accountManager: 'Eric Woods', noOfUsers: 8, status: 'Approved' },
-    { id: 23, name: 'Impact Advisory Group', dateCreated: new Date('2024-10-14'), createdBy: 'Nina Clark', accountManager: 'Nina Clark', noOfUsers: 6, status: 'Review' },
-    { id: 24, name: 'Global Reach LLC', dateCreated: new Date('2024-10-28'), createdBy: 'Bryan Cox', accountManager: 'Bryan Cox', noOfUsers: 5, status: 'Rejected' },
-    { id: 25, name: 'Fusion Tech Partners', dateCreated: new Date('2024-11-10'), createdBy: 'Chloe Zhao', accountManager: 'Chloe Zhao', noOfUsers: 10, status: 'Pending Approval' },
-    { id: 26, name: 'SilverWave Advisors', dateCreated: new Date('2024-11-23'), createdBy: 'Danny Kim', accountManager: 'Danny Kim', noOfUsers: 7, status: 'Incomplete' },
-    { id: 27, name: 'BrightFuture Inc', dateCreated: new Date('2024-12-03'), createdBy: 'Tina Hill', accountManager: 'Tina Hill', noOfUsers: 8, status: 'Approved' },
-    { id: 28, name: 'Phoenix Rising Ltd', dateCreated: new Date('2024-12-12'), createdBy: 'Victor Ng', accountManager: 'Victor Ng', noOfUsers: 4, status: 'Rejected' },
-    { id: 29, name: 'NextWave Consulting', dateCreated: new Date('2024-12-21'), createdBy: 'Sophie West', accountManager: 'Sophie West', noOfUsers: 9, status: 'Review' },
-    { id: 30, name: 'OpenHorizons LLC', dateCreated: new Date('2024-12-31'), createdBy: 'Leonardo Brown', accountManager: 'Leonardo Brown', noOfUsers: 5, status: 'Pending Approval' }
+    { id: 9, name: 'Orion Global Holdings', dateCreated: new Date('2024-04-04'), createdBy: 'Olivia Carter', accountManager: '', noOfUsers: 5, status: 'Rejected' },
+    { id: 10, name: 'Blue Sky Enterprises', dateCreated: new Date('2024-04-18'), createdBy: 'James White', accountManager: '', noOfUsers: 3, status: 'Pending Approval' }
   ];
 
   displayedColumns: string[] = [
@@ -241,5 +221,13 @@ export class BuyersComponent implements OnInit, AfterViewInit {
       default:
         return '';
     }
+  }
+
+  getAccountManagerActionLabel(accountManager: string): string {
+    return accountManager ? 'Change Account Manager' : 'Assign Account Manager';
+  }
+
+  getAccountManagerActionIcon(accountManager: string): string {
+    return accountManager ? 'edit' : 'person_add';
   }
 }

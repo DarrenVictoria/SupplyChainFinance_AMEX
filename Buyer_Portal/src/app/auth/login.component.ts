@@ -234,7 +234,7 @@ import { CommonModule } from '@angular/common';
         </div>
 
         <div class="logo-section">
-          <img src="../../../../amex-login.png" alt="American Express">
+          <img src="../../../../logo-login.png" alt="American Express">
         </div>
       </div>
 

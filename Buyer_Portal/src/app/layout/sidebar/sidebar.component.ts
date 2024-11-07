@@ -94,7 +94,7 @@ export class SidebarComponent implements OnInit {
 
   logout(): void {
     console.log('Logout clicked');
-    // Add logout logic here
+    this.router.navigate(['/login']);
   }
 
   setRandomProfileImage(): void {
