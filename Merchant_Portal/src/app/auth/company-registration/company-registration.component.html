@@ -1,0 +1,166 @@
+<div class="container">
+    <h1 class="title">Company Registration Data Lookup</h1>
+    
+    <div class="search-section">
+      <div class="input-group">
+        <label>Company Registration</label>
+        <input type="text" 
+               [(ngModel)]="registrationNumber" 
+               placeholder="Enter Company Registration Number"
+               name="registrationNumber">
+      </div>
+      
+      <div class="date-inputs">
+        <div class="input-group">
+          <label>Registration Issue Date</label>
+          <input type="date" 
+                 [(ngModel)]="registrationDate"
+                 name="registrationDate">
+        </div>
+        
+        <div class="input-group">
+          <label>Registration Query Date</label>
+          <input type="date" 
+                 [(ngModel)]="queryDate"
+                 name="queryDate">
+        </div>
+      </div>
+      
+      <button class="search-button" (click)="searchCompany()">Check Registry</button>
+    </div>
+  
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Searching for company...</p>
+    </div>
+  
+    <!-- Error Message -->
+    <div *ngIf="error" class="error-message">
+      {{error}}
+    </div>
+  
+    <ng-container *ngIf="showResults && company">
+      <div class="results-panel">
+        <div class="panel basic-info">
+          <h2>Basic Info</h2>
+          <div class="info-row">
+            <label>Company Name:</label>
+            <div>
+              <div>{{getCompanyName('arabic')}}</div>
+              <div>{{getCompanyName('english')}}</div>
+            </div>
+          </div>
+          
+          <div class="info-row">
+            <label>Company Type:</label>
+            <div>{{company.basicInfo.companyType || 'N/A'}}</div>
+          </div>
+  
+          <div class="info-row">
+            <label>Legal Entity Type:</label>
+            <div>{{company.basicInfo.legalEntityType || 'N/A'}}</div>
+          </div>
+  
+          <div class="info-row">
+            <label>Company Status:</label>
+            <div>{{company.basicInfo.companyStatus || 'N/A'}}</div>
+          </div>
+  
+          <div class="info-row">
+            <label>Company Address:</label>
+            <div>{{getCompanyAddress()}}</div>
+          </div>
+  
+          <div class="info-row">
+            <label>Owners and Shareholders:</label>
+            <div>
+              <div *ngFor="let owner of company.basicInfo.ownersAndShareholders">
+                {{owner.name}} - {{owner.percentage}}%
+              </div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <label>Business Activities:</label>
+            <div>
+              <div *ngFor="let activity of company.basicInfo.businessActivities">
+                {{activity}}
+              </div>
+            </div>
+          </div>
+          
+          <div class="info-row">
+            <label>Branches:</label>
+            <div>
+              <div *ngFor="let branch of company.basicInfo.branches">
+                {{branch}}
+              </div>
+            </div>
+          </div>
+  
+          <div class="info-row">
+            <label>VAT Registration:</label>
+            <div>{{company.basicInfo.vatRegistrationNumber || 'N/A'}}</div>
+          </div>
+        </div>
+  
+        <div class="panel license-details">
+          <h2>License Details</h2>
+          <div class="info-row">
+            <label>Environmental License:</label>
+            <div>{{company.licenseDetails.environmentalTechnologyLicense || 'N/A'}}</div>
+          </div>
+  
+          <div class="info-row">
+            <label>IT Services License:</label>
+            <div>{{company.licenseDetails.itServicesLicense || 'N/A'}}</div>
+          </div>
+  
+          <div class="info-row">
+            <label>Authorized Capital:</label>
+            <div>{{formatCurrency(company.licenseDetails.capitalInformation.authorizedCapital)}}</div>
+          </div>
+  
+          <div class="info-row">
+            <label>Paid-up Capital:</label>
+            <div>{{formatCurrency(company.licenseDetails.capitalInformation.paidUpCapital)}}</div>
+          </div>
+        </div>
+  
+        <div class="panel contact-info">
+          <h2>Company Contact Information</h2>
+          <div class="info-row">
+            <label>Phone:</label>
+            <div>{{company.contactInformation.phone || 'N/A'}}</div>
+          </div>
+  
+          <div class="info-row">
+            <label>Email:</label>
+            <div>{{company.contactInformation.email || 'N/A'}}</div>
+          </div>
+  
+          <div class="info-row">
+            <label>Establishment Date:</label>
+            <div>{{company.contactInformation.establishmentDate || 'N/A'}}</div>
+          </div>
+  
+          <div class="info-row">
+            <label>Board Members:</label>
+            <div>
+              <div *ngFor="let member of company.boardMembers">
+                {{member.name}} - {{member.position}}
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Registration Button Section -->
+        <div class="registration-section">
+          <button class="register-button" (click)="registerWithCompany()">
+            Register with Company
+          </button>
+        </div>
+      </div>
+    </ng-container>
+  </div>

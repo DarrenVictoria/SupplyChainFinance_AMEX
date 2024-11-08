@@ -1,1 +1,60 @@
-<p>dashboard works!</p>
+<div class="dashboard-container">
+    <!-- Header -->
+    <div class="header">
+      <h1>You are in <span style="font-weight: bold;"> {{dashboardData.companyName}}</span></h1>
+      <div class="status-indicator">
+        <span class="status-dot" [class.active]="dashboardData.isLive"></span>
+        <span class="status-text">{{dashboardData.statusMessage}}</span>
+      </div>
+    </div>
+  
+    <!-- Requests Section -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>Requests</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stats-container">
+          <mat-card class="stat-card">
+            <mat-icon>schedule</mat-icon>
+            <h2>{{dashboardData.requests.ongoing}}</h2>
+            <p>Ongoing</p>
+          </mat-card>
+  
+          <mat-card class="stat-card">
+            <mat-icon>check_circle</mat-icon>
+            <h2>{{dashboardData.requests.completed}}</h2>
+            <p>Completed</p>
+          </mat-card>
+  
+          <mat-card class="stat-card">
+            <mat-icon>more_horiz</mat-icon>
+            <h2>{{dashboardData.requests.pending}}</h2>
+            <p>Pending</p>
+          </mat-card>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  
+    <!-- Payments Section -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>Payments</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="payment-stats-container">
+          <mat-card class="stat-card">
+            <mat-icon>payments</mat-icon>
+            <h2>{{dashboardData.payments.received}}</h2>
+            <p>Received Payments</p>
+          </mat-card>
+  
+          <mat-card class="stat-card">
+            <mat-icon>description</mat-icon>
+            <h2>{{dashboardData.payments.pendingInvoices}}</h2>
+            <p>Pending Invoices</p>
+          </mat-card>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>

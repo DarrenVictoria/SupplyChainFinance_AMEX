@@ -5,40 +5,21 @@
   <!-- Logo -->
   <div class="logo">
     <img src="../../../../logo-sidebar.png" alt="American Express" class="logo-image">
-    <h3 style="margin-right: 3.25rem; margin-top: -0.15rem;">Buyer Portal</h3>
+    <div class="merchant-info">
+      <h3 class="portal-title">Merchant Portal</h3>
+      <span class="merchant-id">Merchant ID: {{ merchantInfo.id }}</span>
+    </div>
   </div>
 
  <!-- Main Navigation -->
 <ul class="nav-list">
   <li class="nav-item" *ngFor="let tab of tabs">
-    <a (click)="setActiveTab(tab)" class="nav-link" [ngClass]="{ 'active': activeTab === tab }">
+    <a (click)="setActiveTab(tab)" 
+       class="nav-link" 
+       [ngClass]="{ 'active': activeTab === tab }">
       <span class="material-icons icon">{{ tab.iconType }}</span>
-      <span>{{ tab.text }}</span>
+      <span class="nav-text">{{ tab.text }}</span>
     </a>
-    <!-- Sub-navigation for items with subTabs -->
-    <ul class="sub-nav" *ngIf="tab.subTabs && activeTab === tab">
-      <li *ngFor="let subTab of tab.subTabs">
-        <a (click)="navigateToSubTab(subTab)" class="sub-nav-link">{{ subTab.text }}</a>
-      </li>
-    </ul>
-  </li>
-  
-  <!-- Settings Title Section -->
-  <li class="settings-title">
-    <span>Settings</span>
-  </li>
-
-  <!-- Settings Tabs -->
-  <li class="nav-item" *ngFor="let settingTab of settingsTabs">
-    <a (click)="setActiveTab(settingTab)" class="nav-link" [ngClass]="{ 'active': activeTab === settingTab }">
-      <span class="material-icons icon">{{ settingTab.iconType }}</span>
-      <span>{{ settingTab.text }}</span>
-    </a>
-    <ul class="sub-nav" *ngIf="settingTab.subTabs && activeTab === settingTab">
-      <li *ngFor="let subTab of settingTab.subTabs">
-        <a (click)="navigateToSubTab(subTab)" class="sub-nav-link">{{ subTab.text }}</a>
-      </li>
-    </ul>
   </li>
 </ul>
 

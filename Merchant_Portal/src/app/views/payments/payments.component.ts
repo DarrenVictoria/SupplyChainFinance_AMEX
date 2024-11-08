@@ -21,13 +21,13 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 
 interface Payment {
-  id: number;
+  id: string;
   dateCreated: Date;
   createdBy: string;
-  merchant: string;
+  buyer: string;
   model: string;
-  totalCreditProvided: number;
-  totalReceived: number;
+  creditGiven: number;
+  remainingBalance: number;
   status: string;
 }
 
@@ -66,72 +66,91 @@ export class PaymentsComponent implements OnInit, AfterViewInit {
   dataSource: MatTableDataSource<Payment>;
   isFiltersApplied = false;
 
- payments: Payment[] = [
-  {
-    id: 576,
-    dateCreated: new Date("2024-11-09"),
-    createdBy: "Mark Smith",
-    merchant: "Compu Smart",
-    model: "Reverse Factoring",
-    totalCreditProvided: 10000,
-    totalReceived: 10000,
-    status: "Received"
-  },
-  {
-    id: 577,
-    dateCreated: new Date("2024-11-09"),
-    createdBy: "Mark Smith",
-    merchant: "Compu Smart",
-    model: "Reverse Factoring",
-    totalCreditProvided: 100000,
-    totalReceived: 10000,
-    status: "Pending"
-  },
-  {
-    id: 578,
-    dateCreated: new Date("2024-11-09"),
-    createdBy: "Mark Smith",
-    merchant: "Compu Smart, Hospi Aid",
-    model: "Reverse Factoring",
-    totalCreditProvided: 50000,
-    totalReceived: 50000,
-    status: "Received"
-  },
-  {
-    id: 579,
-    dateCreated: new Date("2024-11-09"),
-    createdBy: "Will Black",
-    merchant: "Compu Smart, Hospi Aid",
-    model: "Reverse Factoring",
-    totalCreditProvided: 20000,
-    totalReceived: 10000,
-    status: "Late"
-  },
-  {
-    id: 340,
-    dateCreated: new Date("2024-11-09"),
-    createdBy: "Mark Smith",
-    merchant: "Hospi Aid",
-    model: "Reverse Factoring",
-    totalCreditProvided: 40000,
-    totalReceived: 40000,
-    status: "Received"
-  },
-  {
-    id: 341,
-    dateCreated: new Date("2024-11-09"),
-    createdBy: "Will Black",
-    merchant: "Hospi Aid",
-    model: "Reverse Factoring",
-    totalCreditProvided: 150000,
-    totalReceived: 60000,
-    status: "Pending"
-  }
-];
-
+  payments: Payment[] = [
+    {
+      id: 'REQ-CS-576',
+      dateCreated: new Date("2024-11-09"),
+      createdBy: "Mark Smith",
+      buyer: "Brooks Holdings",
+      model: "Reverse Factoring",
+      creditGiven: 50000.00,
+      remainingBalance: 0.00,
+      status: "Completed"
+    },
+    {
+      id: 'REQ-CS-577',
+      dateCreated: new Date("2024-11-09"),
+      createdBy: "Mark Smith",
+      buyer: "Tytan Holdings",
+      model: "Reverse Factoring",
+      creditGiven: 75000.00,
+      remainingBalance: 30000.00,
+      status: "Pending"
+    },
+    {
+      id: 'REQ-CS-578',
+      dateCreated: new Date("2024-11-09"),
+      createdBy: "Mark Smith",
+      buyer: "Tytan Holdings",
+      model: "Reverse Factoring",
+      creditGiven: 60000.00,
+      remainingBalance: 0.00,
+      status: "Completed"
+    },
+    {
+      id: 'REQ-CS-579',
+      dateCreated: new Date("2024-11-09"),
+      createdBy: "Will Black",
+      buyer: "Tytan Holdings",
+      model: "Reverse Factoring",
+      creditGiven: 50500.50,
+      remainingBalance: 10000.00,
+      status: "Delayed"
+    },
+    {
+      id: 'REQ-HA-340',
+      dateCreated: new Date("2024-11-09"),
+      createdBy: "Mark Smith",
+      buyer: "Tytan Holdings",
+      model: "Reverse Factoring",
+      creditGiven: 70000.00,
+      remainingBalance: 0.00,
+      status: "Completed"
+    },
+    {
+      id: 'REQ-HA-341',
+      dateCreated: new Date("2024-11-09"),
+      createdBy: "Will Black",
+      buyer: "Zulify Enterprises",
+      model: "Reverse Factoring",
+      creditGiven: 30500.00,
+      remainingBalance: 25000.00,
+      status: "Pending"
+    },
+    {
+      id: 'REQ-HA-340',
+      dateCreated: new Date("2024-11-09"),
+      createdBy: "Mark Smith",
+      buyer: "Tytan Holdings",
+      model: "Reverse Factoring",
+      creditGiven: 70000.00,
+      remainingBalance: 0.00,
+      status: "Completed"
+    },
+    {
+      id: 'REQ-HA-341',
+      dateCreated: new Date("2024-11-09"),
+      createdBy: "Will Black",
+      buyer: "Zulify Enterprises",
+      model: "Reverse Factoring",
+      creditGiven: 30500.00,
+      remainingBalance: 25000.00,
+      status: "Pending"
+    }
+  ];
 
   displayedColumns: string[] = [
-    'id', 'dateCreated', 'createdBy', 'merchant', 'model', 'totalCreditProvided', 'totalReceived', 'status', 'actions'
+    'id', 'dateCreated', 'createdBy', 'buyer', 'model', 'creditGiven', 'remainingBalance', 'status', 'actions'
   ];
 
   constructor(private fb: FormBuilder) {
@@ -139,7 +158,7 @@ export class PaymentsComponent implements OnInit, AfterViewInit {
       fromDate: [''],
       toDate: [''],
       status: [''],
-      searchType: ['merchant'],
+      searchType: ['buyer'],
       searchTerm: ['']
     });
 
@@ -148,8 +167,8 @@ export class PaymentsComponent implements OnInit, AfterViewInit {
     this.dataSource.sortingDataAccessor = (item, property) => {
       switch(property) {
         case 'dateCreated': return new Date(item.dateCreated).getTime();
-        case 'totalCreditProvided': return item.totalCreditProvided;
-        case 'totalReceived': return item.totalReceived;
+        case 'creditGiven': return item.creditGiven;
+        case 'remainingBalance': return item.remainingBalance;
         default: return (item as any)[property];
       }
     };
@@ -212,8 +231,8 @@ export class PaymentsComponent implements OnInit, AfterViewInit {
   
     if (filters.searchTerm) {
       filtered = filtered.filter(payment => {
-        if (filters.searchType === 'merchant') {
-          return payment.merchant.toLowerCase().includes(filters.searchTerm.toLowerCase());
+        if (filters.searchType === 'buyer') {
+          return payment.buyer.toLowerCase().includes(filters.searchTerm.toLowerCase());
         } else if (filters.searchType === 'model') {
           return payment.model.toLowerCase().includes(filters.searchTerm.toLowerCase());
         }
@@ -223,7 +242,6 @@ export class PaymentsComponent implements OnInit, AfterViewInit {
   
     this.dataSource.data = filtered;
     
-    // Reset to first page when filters are applied
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
@@ -231,11 +249,11 @@ export class PaymentsComponent implements OnInit, AfterViewInit {
 
   getStatusClass(status: string): string {
     switch (status.toLowerCase()) {
-      case 'received':
+      case 'completed':
         return 'approved';
       case 'pending':
         return 'pending';
-      case 'late':
+      case 'delayed':
         return 'late';
       default:
         return '';

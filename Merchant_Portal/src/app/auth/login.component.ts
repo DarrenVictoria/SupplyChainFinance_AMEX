@@ -227,9 +227,14 @@ import { CommonModule } from '@angular/common';
               </button>
 
               <div class="forgot-password space-y-2">
-                  <a href="#" class="block">Forgot Password?</a>
-                  <a href="/register" class="block">Not a member? Register Now</a>
-                </div>
+  <a href="#" class="block">Forgot Password?</a>
+  <br>
+  <a href="/register" class="block">Not a member? Register Now</a>
+</div>
+
+
+
+
 
 
             </form>
@@ -262,7 +267,7 @@ export class LoginComponent {
 
   onSubmit() {
     if (this.loginForm.valid) {
-      this.router.navigate(['/homepage']);
+      this.router.navigate(['/dashboard']);
     }
   }
 }

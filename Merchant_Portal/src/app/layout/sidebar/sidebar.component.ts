@@ -9,6 +9,11 @@ interface Tab {
   subTabs?: { text: string; route: string }[];
 }
 
+interface MerchantInfo {
+  id: string;
+  name: string;
+}
+
 @Component({
   selector: 'app-sidebar',
   standalone: true,
@@ -20,31 +25,23 @@ export class SidebarComponent implements OnInit {
   @Input() isOpen: boolean = true;
   activeTab: Tab | null = null;
   profileImageUrl: string = '';
+  merchantInfo: MerchantInfo;
 
   tabs: Tab[] = [
-    { 
-      iconType: 'house', 
-      text: 'Homepage', 
-      route: '/homepage'
-    },
     {
       iconType: 'bar_chart',
       text: 'Dashboard',
       route: '/dashboard'
     },
     {
-      iconType: 'account_balance',
-      text: 'Merchants',
-      route: '/merchants'
+      iconType: 'apartment',
+      text: 'Buyers',
+      route: '/buyers'
     },
     {
-      iconType: 'assignment_add',
+      iconType: 'request_quote',
       text: 'Requests',
-      subTabs: [
-        { text: 'Creation', route: '/requests/creation' },
-        { text: 'Submission', route: '/requests/submission' }
-      ],
-      route: ''
+      route: '/requests'
     },
     {
       iconType: 'local_atm',
@@ -53,43 +50,20 @@ export class SidebarComponent implements OnInit {
     }
   ];
 
-  settingsTabs: Tab[] = [
-    {
-      iconType: 'payments',
-      text: 'Financial',
-      route: '/financial'
-    },
-    {
-      iconType: 'group',
-      text: 'Users',
-      route: '/users'
-    },
-    {
-      iconType: 'analytics',
-      text: 'Business Activities',
-      route: '/business-activities'
-    }
-  ];
-
-  constructor(private router: Router) { }
+  constructor(private router: Router) {
+    this.merchantInfo = {
+      id: 'MERCH123456',
+      name: 'Sample Merchant'
+    };
+   }
 
   ngOnInit(): void {
     this.setRandomProfileImage();
   }
 
   setActiveTab(tab: Tab): void {
-    if (tab.subTabs) {
-      // Toggle activeTab for tabs with sub-tabs
-      this.activeTab = this.activeTab === tab ? null : tab;
-    } else {
-      this.activeTab = tab;
-      this.router.navigate([tab.route]);
-    }
-  }
-  
-
-  navigateToSubTab(subTab: { text: string; route: string }): void {
-    this.router.navigate([subTab.route]);
+    this.activeTab = tab;
+    this.router.navigate([tab.route]);
   }
 
   logout(): void {

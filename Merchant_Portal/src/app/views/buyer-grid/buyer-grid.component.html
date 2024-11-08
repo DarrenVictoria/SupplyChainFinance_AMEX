@@ -1,0 +1,17 @@
+<div class="buyers-container">
+    <h1>Buyers</h1>
+    <div class="buyer-grid">
+      <mat-card *ngFor="let buyer of buyers" class="buyer-card">
+        <mat-card-content>
+          <div class="logo-container">
+            <img [src]="buyer.logo" [alt]="buyer.name">
+          </div>
+          <button mat-raised-button color="primary" 
+                  class="register-button"
+                  (click)="navigateToBuyer(buyer.redirectLink)">
+            Register
+          </button>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
