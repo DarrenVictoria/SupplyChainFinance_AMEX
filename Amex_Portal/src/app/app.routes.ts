@@ -5,10 +5,10 @@ import { MainLayoutComponent } from './layout/layout.component';
 import { LoginComponent } from './auth/login.component';
 import { PlaceholderComponent } from './placeholder/placeholder.component';
 import { BuyersComponent } from './views/customers/buyers/buyers.component';
-import { MerchantsComponent } from './views/customers/merchants/merchants.component';
+import { MerchantsComponent } from './views/merchants/merchants.component';
 import { AllBuyersComponent } from './views/customers/all-buyers/all-buyers.component';
 import { MyBuyersComponent } from './views/customers/my-buyers/my-buyers.component';
-import { Payments } from './views/customers/payments/payments.component';
+import { Payments } from './views/payments/payments.component';
 
 export const routes: Routes = [
   {
