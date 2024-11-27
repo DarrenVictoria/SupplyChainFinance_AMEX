@@ -6,6 +6,9 @@ import { LoginComponent } from './auth/login.component';
 import { PlaceholderComponent } from './placeholder/placeholder.component';
 import { BuyersComponent } from './views/customers/buyers/buyers.component';
 import { MerchantsComponent } from './views/customers/merchants/merchants.component';
+import { AllBuyersComponent } from './views/customers/all-buyers/all-buyers.component';
+import { MyBuyersComponent } from './views/customers/my-buyers/my-buyers.component';
+import { Payments } from './views/customers/payments/payments.component';
 
 export const routes: Routes = [
   {
@@ -23,18 +26,18 @@ export const routes: Routes = [
       },
       {
         path: 'payments',
-        component: PlaceholderComponent, // Temporary placeholder
+        component: Payments, // Temporary placeholder
       },
       {
-        path: 'users',
-        component: PlaceholderComponent, // Temporary placeholder
+        path: 'all-buyers',
+        component: AllBuyersComponent, // Temporary placeholder
       },
       {
-        path: 'supplier-registration',
-        component: PlaceholderComponent, // Temporary placeholder
+        path: 'my-buyers',
+        component: MyBuyersComponent, // Temporary placeholder
       },
       {
-        path: 'types-of-models',
+        path: 'approvals',
         component: PlaceholderComponent, // Temporary placeholder
       },
       {
@@ -45,14 +48,7 @@ export const routes: Routes = [
         path: 'merchants',
         component: MerchantsComponent, // Temporary placeholder
       },
-      {
-        path: 'supplier-registration/company-types',
-        component: PlaceholderComponent, // Temporary placeholder
-      },
-      {
-        path: 'supplier-registration/registration-documents',
-        component: PlaceholderComponent, // Temporary placeholder
-      },
+
       {
         path: '',
         redirectTo: 'dashboard',

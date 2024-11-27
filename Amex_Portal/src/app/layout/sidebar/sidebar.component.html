@@ -1,4 +1,3 @@
-<!-- sidebar.component.html -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"/>
 
 <nav class="sidebar">
@@ -8,39 +7,35 @@
     <h3 style="margin-right: 2.5rem; margin-top: -1.5rem;">Finance Portal</h3>
   </div>
 
- <!-- Main Navigation -->
-<ul class="nav-list">
-  <li class="nav-item" *ngFor="let tab of tabs">
-    <a (click)="setActiveTab(tab)" class="nav-link" [ngClass]="{ 'active': activeTab === tab }">
-      <span class="material-icons icon">{{ tab.iconType }}</span>
-      <span>{{ tab.text }}</span>
-    </a>
-    <!-- Sub-navigation for items with subTabs -->
-    <ul class="sub-nav" *ngIf="tab.subTabs && activeTab === tab">
-      <li *ngFor="let subTab of tab.subTabs">
-        <a (click)="navigateToSubTab(subTab)" class="sub-nav-link">{{ subTab.text }}</a>
-      </li>
-    </ul>
-  </li>
-  
-  <!-- Settings Title Section -->
-  <li class="settings-title">
-    <span>Settings</span>
-  </li>
-
-  <!-- Settings Tabs -->
-  <li class="nav-item" *ngFor="let settingTab of settingsTabs">
-    <a (click)="setActiveTab(settingTab)" class="nav-link" [ngClass]="{ 'active': activeTab === settingTab }">
-      <span class="material-icons icon">{{ settingTab.iconType }}</span>
-      <span>{{ settingTab.text }}</span>
-    </a>
-    <ul class="sub-nav" *ngIf="settingTab.subTabs && activeTab === settingTab">
-      <li *ngFor="let subTab of settingTab.subTabs">
-        <a (click)="navigateToSubTab(subTab)" class="sub-nav-link">{{ subTab.text }}</a>
-      </li>
-    </ul>
-  </li>
-</ul>
+  <!-- Main Navigation -->
+  <ul class="nav-list">
+    <li class="nav-item" *ngFor="let tab of tabs">
+      <a (click)="setActiveTab(tab)" class="nav-link" [ngClass]="{ 'active': tab.isExpanded }">
+        <span class="material-icons icon">{{ tab.iconType }}</span>
+        <span>{{ tab.text }}</span>
+      </a>
+      
+      <!-- First level sub-navigation -->
+      <ul class="sub-nav" *ngIf="tab.subTabs && tab.isExpanded">
+        <li *ngFor="let subTab of tab.subTabs">
+          <a (click)="setActiveSubTab(subTab)" class="sub-nav-link">
+            <span class="material-icons icon">{{ subTab.iconType }}</span>
+            <span>{{ subTab.text }}</span>
+          </a>
+          
+          <!-- Second level sub-navigation -->
+          <ul class="sub-nav" *ngIf="subTab.subTabs && subTab.isExpanded">
+            <li *ngFor="let subSubTab of subTab.subTabs">
+              <a (click)="navigateToSubSubTab(subSubTab)" class="sub-nav-link">
+                <span class="material-icons icon">{{ subSubTab.iconType }}</span>
+                <span>{{ subSubTab.text }}</span>
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
 
   <!-- User Profile -->
   <div class="user-profile">
@@ -54,4 +49,3 @@
     <button class="logout-btn" (click)="logout()">Logout</button>
   </div>
 </nav>
-

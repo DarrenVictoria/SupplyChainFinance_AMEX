@@ -7,8 +7,10 @@ import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatIconModule } from '@angular/material/icon';
+import { MatBadgeModule } from '@angular/material/badge';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatSelectModule } from '@angular/material/select';
+import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -18,18 +20,19 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 
-interface Merchant {
+interface Buyer {
   id: number;
   name: string;
   dateCreated: Date;
   createdBy: string;
-  registeredBuyer: string;
-  status: 'Active' | 'Inactive';
-  approvalStatus: 'Approved' | 'Rejected' | 'Pending Approval';
+  accountManager: string;
+  noOfUsers: number;
+  status: string;
+  creditLimit: number;
 }
 
 @Component({
-  selector: 'app-merchants',
+  selector: 'app-my-buyers',
   standalone: true,
   imports: [
     CommonModule,
@@ -41,8 +44,10 @@ interface Merchant {
     MatTableModule,
     MatPaginatorModule,
     MatIconModule,
+    MatBadgeModule,
     MatTabsModule,
     MatSelectModule,
+    MatToolbarModule,
     MatDatepickerModule,
     MatNativeDateModule,
     MatFormFieldModule,
@@ -50,72 +55,35 @@ interface Merchant {
     MatMenuModule,
     MatSortModule
   ],
-  templateUrl: './merchants.component.html',
-  styleUrls: ['./merchants.component.css']
+  templateUrl: './my-buyers.component.html',
+  styleUrls: ['./my-buyers.component.css']
 })
-export class MerchantsComponent implements OnInit, AfterViewInit {
+export class MyBuyersComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
   filterForm: FormGroup;
   activeTabIndex = 0;
-  dataSource: MatTableDataSource<Merchant>;
+  dataSource: MatTableDataSource<Buyer>;
   isFiltersApplied = false;
 
-  showMerchantsContent = true;
-  showApproveMerchantsContent = false;
+  showBuyersContent = true;
+  showApproveBuyersContent = false;
+  showManageBuyersContent = false;
+  showApproveRequestContent = false;
 
-  merchants: Merchant[] = [
-    {
-      id: 1,
-      name: 'Sunrise Innovations LLC',
-      dateCreated: new Date('2024-01-15'),
-      createdBy: 'Mark Smith',
-      registeredBuyer: 'Tyler Phillips',
-      status: 'Active',
-      approvalStatus: 'Approved'
-    },
-    {
-      id: 2,
-      name: 'Vanguard Resource Group LP',
-      dateCreated: new Date('2024-02-18'),
-      createdBy: 'John Bill',
-      registeredBuyer: 'John Bill',
-      status: 'Inactive',
-      approvalStatus: 'Rejected'
-    },
-    {
-      id: 3,
-      name: 'Quantum Edge Systems Inc',
-      dateCreated: new Date('2024-03-12'),
-      createdBy: 'Walter Stan',
-      registeredBuyer: 'Walter Stan',
-      status: 'Active',
-      approvalStatus: 'Approved'
-    },
-    {
-      id: 4,
-      name: 'Maple Leaf Consulting',
-      dateCreated: new Date('2024-04-05'),
-      createdBy: 'Will Black',
-      registeredBuyer: 'Tyler Phillips',
-      status: 'Inactive',
-      approvalStatus: 'Rejected'
-    },
-    {
-      id: 5,
-      name: 'Blue Horizon Ventures LLC',
-      dateCreated: new Date('2024-04-20'),
-      createdBy: 'Smith Stacker',
-      registeredBuyer: 'Harry J',
-      status: 'Active',
-      approvalStatus: 'Pending Approval'
-    }
+  buyers: Buyer[] = [
+    { id: 1, name: 'Silverline Innovations LLC', dateCreated: new Date('2024-11-09'), createdBy: 'Mark Smith', accountManager: 'Mark Smith', noOfUsers: 5, status: 'Active', creditLimit: 50000 },
+    { id: 2, name: 'Vanguard Resource Group LP', dateCreated: new Date('2024-11-09'), createdBy: 'John Bill', accountManager: '', noOfUsers: 4, status: 'Inactive', creditLimit: 75000 },
+    { id: 3, name: 'Quantum Edge Systems Inc', dateCreated: new Date('2024-11-09'), createdBy: 'Walter Stan', accountManager: 'Walter Stan', noOfUsers: 6, status: 'Active', creditLimit: 100000 },
+    { id: 4, name: 'Maple Leaf Consulting', dateCreated: new Date('2024-11-09'), createdBy: 'Sarah Lin', accountManager: '', noOfUsers: 8, status: 'Active', creditLimit: 25000 },
+    { id: 5, name: 'Blue Horizon Ventures LLC', dateCreated: new Date('2024-11-09'), createdBy: 'Alice Brown', accountManager: 'Alice Brown', noOfUsers: 7, status: 'Inactive', creditLimit: 150000 },
+    { id: 6, name: 'Golden Path Marketing', dateCreated: new Date('2024-11-09'), createdBy: 'Michael Chen', accountManager: '', noOfUsers: 9, status: 'Active', creditLimit: 80000 }
   ];
 
   displayedColumns: string[] = [
     'id', 'name', 'dateCreated', 'createdBy',
-    'registeredBuyer', 'status', 'approvalStatus', 'actions'
+    'accountManager', 'noOfUsers', 'creditLimit', 'status', 'actions'
   ];
 
   statusOptions = [
@@ -124,24 +92,25 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
     { value: 'inactive', label: 'Inactive' }
   ];
 
-  approvalStatusOptions = [
-    { value: '', label: 'Any' },
-    { value: 'approved', label: 'Approved' },
-    { value: 'rejected', label: 'Rejected' },
-    { value: 'pending approval', label: 'Pending Approval' }
-  ];
-
   constructor(private fb: FormBuilder) {
     this.filterForm = this.fb.group({
       fromDate: [''],
       toDate: [''],
       status: [''],
-      approvalStatus: [''],
       searchType: ['name'],
       searchTerm: ['']
     });
 
-    this.dataSource = new MatTableDataSource(this.merchants);
+    this.dataSource = new MatTableDataSource(this.buyers);
+
+    this.dataSource.sortingDataAccessor = (item, property) => {
+      switch (property) {
+        case 'dateCreated': return new Date(item.dateCreated).getTime();
+        case 'noOfUsers': return item.noOfUsers;
+        case 'creditLimit': return item.creditLimit;
+        default: return (item as any)[property];
+      }
+    };
   }
 
   ngOnInit() {
@@ -158,8 +127,10 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
 
   onTabChange(event: any) {
     this.activeTabIndex = event.index;
-    this.showMerchantsContent = this.activeTabIndex === 0;
-    this.showApproveMerchantsContent = this.activeTabIndex === 1;
+    this.showBuyersContent = this.activeTabIndex === 0;
+    this.showApproveBuyersContent = this.activeTabIndex === 1;
+    this.showManageBuyersContent = this.activeTabIndex === 2;
+    this.showApproveRequestContent = this.activeTabIndex === 3;
   }
 
   checkFiltersApplied() {
@@ -168,7 +139,6 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
       formValues.fromDate ||
       formValues.toDate ||
       formValues.status ||
-      formValues.approvalStatus ||
       formValues.searchTerm
     );
   }
@@ -178,12 +148,11 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
       fromDate: '',
       toDate: '',
       status: '',
-      approvalStatus: '',
       searchType: 'name',
       searchTerm: ''
     });
 
-    this.dataSource.data = this.merchants;
+    this.dataSource.data = this.buyers;
 
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
@@ -193,41 +162,40 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
   }
 
   applyFilters() {
-    let filtered = [...this.merchants];
+    let filtered = [...this.buyers];
     const filters = this.filterForm.value;
 
     if (filters.fromDate) {
-      filtered = filtered.filter(merchant =>
-        merchant.dateCreated >= new Date(filters.fromDate)
+      filtered = filtered.filter(buyer =>
+        buyer.dateCreated >= new Date(filters.fromDate)
       );
     }
 
     if (filters.toDate) {
-      filtered = filtered.filter(merchant =>
-        merchant.dateCreated <= new Date(filters.toDate)
+      filtered = filtered.filter(buyer =>
+        buyer.dateCreated <= new Date(filters.toDate)
       );
     }
 
     if (filters.status) {
-      filtered = filtered.filter(merchant =>
-        merchant.status.toLowerCase() === filters.status.toLowerCase()
-      );
-    }
-
-    if (filters.approvalStatus) {
-      filtered = filtered.filter(merchant =>
-        merchant.approvalStatus.toLowerCase() === filters.approvalStatus.toLowerCase()
+      filtered = filtered.filter(buyer =>
+        buyer.status.toLowerCase() === filters.status.toLowerCase()
       );
     }
 
     if (filters.searchTerm) {
-      filtered = filtered.filter(merchant =>
-        merchant.name.toLowerCase().includes(filters.searchTerm.toLowerCase())
-      );
+      filtered = filtered.filter(buyer => {
+        if (filters.searchType === 'name') {
+          return buyer.name.toLowerCase().includes(filters.searchTerm.toLowerCase());
+        } else {
+          return buyer.noOfUsers.toString().includes(filters.searchTerm);
+        }
+      });
     }
 
     this.dataSource.data = filtered;
 
+    // Reset to first page when filters are applied
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
@@ -236,40 +204,19 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
   getStatusClass(status: string): string {
     switch (status.toLowerCase()) {
       case 'active':
-        return 'text-green-500';
+        return 'approved';
       case 'inactive':
-        return 'text-red-500';
+        return 'rejected';
       default:
         return '';
     }
   }
 
-  getApprovalStatusClass(approvalStatus: string): string {
-    switch (approvalStatus.toLowerCase()) {
-      case 'approved':
-        return 'text-green-500';
-      case 'rejected':
-        return 'text-red-500';
-      case 'pending approval':
-        return 'text-orange-500';
-      default:
-        return '';
-    }
+  getAccountManagerActionLabel(accountManager: string): string {
+    return accountManager ? 'Change Account Manager' : 'Assign Account Manager';
   }
 
-  onAccept(merchant: Merchant) {
-    console.log('Accepted:', merchant);
-    // Implement your accept logic here
+  getAccountManagerActionIcon(accountManager: string): string {
+    return accountManager ? 'edit' : 'person_add';
   }
-
-  onReject(merchant: Merchant) {
-    console.log('Rejected:', merchant);
-    // Implement your reject logic here
-  }
-
-  onInfo(merchant: Merchant) {
-    console.log('Info:', merchant);
-    // Implement your info logic here
-  }
-
 }

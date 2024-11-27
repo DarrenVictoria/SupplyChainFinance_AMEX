@@ -6,7 +6,8 @@ interface Tab {
   iconType: string;
   text: string;
   route: string;
-  subTabs?: { text: string; route: string }[];
+  subTabs?: Tab[];
+  isExpanded?: boolean;
 }
 
 @Component({
@@ -18,34 +19,56 @@ interface Tab {
 })
 export class SidebarComponent implements OnInit {
   @Input() isOpen: boolean = true;
-  activeTab: Tab | null = null;
+  activeMainTab: Tab | null = null;
+  activeSubTab: Tab | null = null;
+
   profileImageUrl: string = '';
 
   tabs: Tab[] = [
-    { 
-      iconType: 'people', 
-      text: 'Customers', 
-      route: '/customers', 
+    {
+      iconType: 'dashboard',
+      text: 'Dashboard',
+      route: '/dashboard'
+    },
+    {
+      iconType: 'people',
+      text: 'Customers',
+      route: '/customers',
       subTabs: [
-        { text: 'Buyers', route: '/buyers' },
-        { text: 'Merchants', route: '/merchants' }
+        {
+          iconType: 'person',
+          text: 'Buyers',
+          route: '/buyers',
+          subTabs: [
+            {
+              iconType: 'list',
+              text: 'All Buyers',
+              route: '/all-buyers'
+            },
+            {
+              iconType: 'person_search',
+              text: 'My Buyers',
+              route: '/my-buyers'
+            },
+            {
+              iconType: 'check_box',
+              text: 'Approvals',
+              route: '/approvals'
+            }
+          ]
+        },
+        {
+          iconType: 'store',
+          text: 'Merchants',
+          route: '/merchants'
+        }
       ]
     },
-    { iconType: 'credit_card', text: 'Payments', route: '/payments' },
-  ];
-
-  settingsTabs: Tab[] = [
-    { iconType: 'person', text: 'Users', route: '/users' },
-    { 
-      iconType: 'edit', 
-      text: 'Supplier Registration', 
-      route: '/supplier-registration', 
-      subTabs: [
-        { text: 'Company Types', route: '/supplier-registration/company-types' },
-        { text: 'Registration Documents', route: '/supplier-registration/registration-documents' }
-      ]
-    },
-    { iconType: 'model_training', text: 'Types of Models', route: '/types-of-models' }
+    {
+      iconType: 'credit_card',
+      text: 'Payments',
+      route: '/payments'
+    }
   ];
 
   constructor(private router: Router) { }
@@ -56,17 +79,35 @@ export class SidebarComponent implements OnInit {
 
   setActiveTab(tab: Tab): void {
     if (tab.subTabs) {
-      // Toggle activeTab for tabs with sub-tabs
-      this.activeTab = this.activeTab === tab ? null : tab;
+      if (this.activeMainTab === tab) {
+        tab.isExpanded = !tab.isExpanded;
+      } else {
+        if (this.activeMainTab) {
+          this.activeMainTab.isExpanded = false;
+        }
+
+        this.activeMainTab = tab;
+        tab.isExpanded = true;
+      }
+
+      this.activeSubTab = null;
     } else {
-      this.activeTab = tab;
       this.router.navigate([tab.route]);
     }
   }
-  
 
-  navigateToSubTab(subTab: { text: string; route: string }): void {
-    this.router.navigate([subTab.route]);
+  setActiveSubTab(subTab: Tab): void {
+    if (subTab.subTabs) {
+      subTab.isExpanded = !subTab.isExpanded;
+      this.activeSubTab = subTab;
+    } else {
+      this.router.navigate([subTab.route]);
+    }
+  }
+
+  navigateToSubSubTab(subSubTab: Tab): void {
+    // Directly navigate to the route of the sub-sub tab
+    this.router.navigate([subSubTab.route]);
   }
 
   logout(): void {

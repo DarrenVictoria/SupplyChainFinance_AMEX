@@ -27,9 +27,7 @@ interface Notification {
   ],
   template: `
     <mat-toolbar class="amex-navbar">
-      <button mat-icon-button (click)="toggleSidenav.emit()" class="menu-button">
-        <mat-icon>menu</mat-icon>
-      </button>
+      
       <span class="spacer"></span>
       
       <button mat-icon-button [matMenuTriggerFor]="notificationsMenu" class="notification-button">

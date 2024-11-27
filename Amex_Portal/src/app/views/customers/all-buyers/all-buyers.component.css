@@ -1,0 +1,81 @@
+.container {
+    padding: 20px;
+  }
+  
+  .header-section h1 {
+    margin-bottom: 2rem;
+    font-size: 2rem;
+  }
+  
+  .filter-section {
+    background-color: #dedfe3;
+    padding: 20px;
+    border-radius: 0 1rem 0 1rem;
+    margin-bottom: 20px;
+  
+    .filter-controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+  
+    .filter-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 1rem;
+  
+      .reset-button {
+        background-color: rgb(74, 74, 178);
+        color: white;
+        border-radius: 0 1rem 0 1rem;
+        padding: 0.5rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+  
+        mat-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+        }
+  
+        &:hover {
+          background-color: rgb(61, 61, 148);
+        }
+      }
+    }
+  }
+  
+  .table-container {
+    background: white;
+    border-radius: 4px;
+    overflow-x: auto; /* Allow horizontal scroll */
+    -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  mat-table {
+    min-width: 900px; /* Minimum width for the table */
+  }
+  
+  mat-header-cell, mat-cell {
+    white-space: nowrap; /* Prevent text wrapping */
+    padding: 16px;
+  }
+  
+  mat-cell {
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+  
+  .account-manager-popup {
+    position: absolute;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    z-index: 1000; /* Ensure it appears above other elements */
+  }
+  
+  

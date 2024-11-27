@@ -1,0 +1,109 @@
+<div class="container">
+    <div class="header-section">
+      <h1 class="text-3xl font-bold mb-8">All Buyers</h1>
+    </div>
+  
+    <!-- Filter Section -->
+    <form [formGroup]="filterForm" class="filter-section mt-6">
+      <div class="filter-controls">
+        <mat-form-field>
+          <mat-label>From Retrieved Date</mat-label>
+          <input matInput [matDatepicker]="fromPicker" formControlName="fromDate">
+          <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+          <mat-datepicker #fromPicker></mat-datepicker>
+        </mat-form-field>
+  
+        <mat-form-field>
+          <mat-label>To Retrieved Date</mat-label>
+          <input matInput [matDatepicker]="toPicker" formControlName="toDate">
+          <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+          <mat-datepicker #toPicker></mat-datepicker>
+        </mat-form-field>
+  
+        <mat-form-field class="search-input">
+          <input matInput placeholder="Search by Buyer Name or ID" formControlName="searchTerm">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+      </div>
+  
+      <!-- Reset Filters Button -->
+      <div class="filter-actions" *ngIf="isFiltersApplied">
+        <button 
+          mat-raised-button 
+          color="primary" 
+          class="reset-button" 
+          (click)="resetFilters()"
+        >
+          <mat-icon>refresh</mat-icon>
+          Reset Filters
+        </button>
+      </div>
+    </form>
+  
+    <!-- Table -->
+    <div class="table-container">
+        <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+          <!-- ID Column -->
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Buyer ID</th>
+            <td mat-cell *matCellDef="let buyer"> {{buyer.id}} </td>
+          </ng-container>
+      
+          <!-- Name Column -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Buyer Name</th>
+            <td mat-cell *matCellDef="let buyer"> {{buyer.name}} </td>
+          </ng-container>
+      
+          <!-- Retrieved Date Column -->
+          <ng-container matColumnDef="retrievedDate">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Retrieved Date</th>
+            <td mat-cell *matCellDef="let buyer"> {{buyer.retrievedDate | date}} </td>
+          </ng-container>
+      
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let buyer">
+              <div class="action-buttons">
+                <button mat-stroked-button color="primary" (click)="onViewMore(buyer)">View More</button>
+                <ng-container *ngIf="buyer.hasActiveCampaign; else noActiveCampaign">
+                  <button mat-flat-button color="primary" (click)="onTakeBuyer(buyer)">
+                    Take Buyer
+                  </button>
+                </ng-container>
+                <ng-template #noActiveCampaign>
+                    <button
+                      mat-icon-button
+                      (click)="openAccountManagerPopup($event, buyer)"
+                      matTooltip="View Account Manager"
+                    >
+                      <mat-icon>visibility</mat-icon>
+                    </button>
+                  </ng-template>
+                  
+                  <div
+                    *ngIf="selectedBuyer === buyer"
+                    class="account-manager-popup"
+                    [ngStyle]="{ top: popupPosition.top + 'px', left: popupPosition.left + 'px' }"
+                  >
+                    <p>Account Manager : <b>{{ buyer.accountManager || 'Not Assigned' }}</b></p>
+                    <button mat-stroked-button color="primary" (click)="closeAccountManagerPopup()">Close</button>
+                  </div>
+                  
+              </div>
+            </td>
+          </ng-container>
+      
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      
+        <mat-paginator
+          [pageSizeOptions]="[5, 10, 20]"
+          showFirstLastButtons
+          aria-label="Select page of buyers"
+        ></mat-paginator>
+      </div>
+</div>
+
