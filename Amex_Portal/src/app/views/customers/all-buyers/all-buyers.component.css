@@ -68,14 +68,20 @@
     overflow: hidden;
   }
   
-  .account-manager-popup {
-    position: absolute;
-    background: #f5f5f5;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 10px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-    z-index: 1000; /* Ensure it appears above other elements */
-  }
-  
-  
+.account-manager-popup {
+  position: absolute;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  z-index: 1000; /* Ensure it appears above other elements */
+}
+
+.with-visibility-icon {
+  margin-bottom: 5px;
+}
+
+.no-visibility-icon {
+  padding-bottom: 0;
+}
