@@ -1,4 +1,3 @@
-/* merchants.component.scss */
 .container {
     padding: 20px;
   }
@@ -139,7 +138,7 @@
     tr.mat-row:hover {
       background-color: #f5f5f5;
     }
-
+  
     @media (max-width: 768px) {
         .table-container {
           padding: 0 15px; /* Optional: Add some padding on small screens */
@@ -193,9 +192,57 @@
     background-color: #00BCD4 !important; /* cyan */
     color: white !important;
   }
-
+  
   .mat-cell button {
     margin-right: 8px;
+  }
+  
+  .add-inv-button{
+    margin-bottom: 2rem;
+  }
+  
+  ::ng-deep .approval-tooltip {
+    white-space: pre-line;
+    background-color: #58a2de;
+    color: #1968b7;
+    
+    font-size: 14px;
+    padding: 5px;
+    max-width: 300px;
+  
+    strong {
+      display: block;
+      margin-bottom: 10px;
+      color: #1976d2;
+      font-size: 16px;
+    }
+  }
+  
+  
+  
+  .approved {
+    color: #4CAF50 !important; /* green */
+    background-color: #ffffff !important;
+  }
+  
+  .rejected {
+    color: #D32F2F !important; /* red */
+    background-color: #ffffff !important;
+  }
+  
+  .pending-approval {
+   color: #FFC107 !important; /* yellow/amber */
+    background-color: #ffffff !important;
+  }
+  
+  .paid {
+    color: #4CAF50 !important; /* green */
+    background-color: #ffffff !important;
+  }
+  
+  .unpaid {
+   color: #D32F2F !important; /* red */
+    background-color: #ffffff !important;
   }
   
   

@@ -9,6 +9,8 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatMenuModule } from '@angular/material/menu';
@@ -18,12 +20,12 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 
 interface Merchant {
   id: number;
-  merchantName: string;
-  contactPerson: string;
-  mobileNo: string;
-  email: string;
-  address: string;
-  status: string;
+  name: string;
+  dateCreated: Date;
+  createdBy: string;
+  registeredBuyer: string;
+  status: 'Active' | 'Inactive';
+  approvalStatus: 'Approved' | 'Rejected' | 'Pending Approval';
 }
 
 @Component({
@@ -41,13 +43,15 @@ interface Merchant {
     MatIconModule,
     MatTabsModule,
     MatSelectModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     MatFormFieldModule,
     MatChipsModule,
     MatMenuModule,
     MatSortModule
   ],
   templateUrl: './merchants.component.html',
-  styleUrls: ['./merchants.component.scss']
+  styleUrls: ['./merchants.component.css']
 })
 export class MerchantsComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -62,27 +66,78 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
   showApproveMerchantsContent = false;
 
   merchants: Merchant[] = [
-    { id: 1, merchantName: 'Fu Shop', contactPerson: 'John Doe', mobileNo: '0123456789', email: 'merchant@mail.com', address: '123 ABC Road', status: 'Pending Approval' },
-    { id: 2, merchantName: 'Paradise Store', contactPerson: 'Daniel P', mobileNo: '0234567890', email: 'merchant@mail.com', address: '456 ABC Road', status: 'Approved' },
-    { id: 3, merchantName: 'Orion Mall', contactPerson: 'Sarah Lee', mobileNo: '0345678901', email: 'merchant@mail.com', address: '789 ABC Road', status: 'Approved' },
-    { id: 4, merchantName: 'Black Steel', contactPerson: 'John Mark', mobileNo: '0456789012', email: 'merchant@mail.com', address: '012 ABC Road', status: 'Pending Approval' },
-    { id: 5, merchantName: 'Paris Arts', contactPerson: 'Daniel Mark', mobileNo: '0567890123', email: 'merchant@mail.com', address: '345 ABC Road', status: 'Approved' }
+    {
+      id: 1,
+      name: 'Sunrise Innovations LLC',
+      dateCreated: new Date('2024-01-15'),
+      createdBy: 'Mark Smith',
+      registeredBuyer: 'Tyler Phillips',
+      status: 'Active',
+      approvalStatus: 'Approved'
+    },
+    {
+      id: 2,
+      name: 'Vanguard Resource Group LP',
+      dateCreated: new Date('2024-02-18'),
+      createdBy: 'John Bill',
+      registeredBuyer: 'John Bill',
+      status: 'Inactive',
+      approvalStatus: 'Rejected'
+    },
+    {
+      id: 3,
+      name: 'Quantum Edge Systems Inc',
+      dateCreated: new Date('2024-03-12'),
+      createdBy: 'Walter Stan',
+      registeredBuyer: 'Walter Stan',
+      status: 'Active',
+      approvalStatus: 'Approved'
+    },
+    {
+      id: 4,
+      name: 'Maple Leaf Consulting',
+      dateCreated: new Date('2024-04-05'),
+      createdBy: 'Will Black',
+      registeredBuyer: 'Tyler Phillips',
+      status: 'Inactive',
+      approvalStatus: 'Rejected'
+    },
+    {
+      id: 5,
+      name: 'Blue Horizon Ventures LLC',
+      dateCreated: new Date('2024-04-20'),
+      createdBy: 'Smith Stacker',
+      registeredBuyer: 'Harry J',
+      status: 'Active',
+      approvalStatus: 'Pending Approval'
+    }
   ];
 
   displayedColumns: string[] = [
-    'id', 'merchantName', 'contactPerson', 'mobileNo',
-    'email', 'address', 'status', 'actions'
+    'id', 'name', 'dateCreated', 'createdBy',
+    'registeredBuyer', 'status', 'approvalStatus', 'actions'
   ];
 
   statusOptions = [
     { value: '', label: 'Any' },
+    { value: 'active', label: 'Active' },
+    { value: 'inactive', label: 'Inactive' }
+  ];
+
+  approvalStatusOptions = [
+    { value: '', label: 'Any' },
     { value: 'approved', label: 'Approved' },
+    { value: 'rejected', label: 'Rejected' },
     { value: 'pending approval', label: 'Pending Approval' }
   ];
 
   constructor(private fb: FormBuilder) {
     this.filterForm = this.fb.group({
+      fromDate: [''],
+      toDate: [''],
       status: [''],
+      approvalStatus: [''],
+      searchType: ['name'],
       searchTerm: ['']
     });
 
@@ -109,17 +164,27 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
 
   checkFiltersApplied() {
     const formValues = this.filterForm.value;
-    this.isFiltersApplied = !!(formValues.status || formValues.searchTerm);
+    this.isFiltersApplied = !!(
+      formValues.fromDate ||
+      formValues.toDate ||
+      formValues.status ||
+      formValues.approvalStatus ||
+      formValues.searchTerm
+    );
   }
 
   resetFilters(): void {
     this.filterForm.reset({
+      fromDate: '',
+      toDate: '',
       status: '',
+      approvalStatus: '',
+      searchType: 'name',
       searchTerm: ''
     });
 
     this.dataSource.data = this.merchants;
-    
+
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
@@ -131,20 +196,38 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
     let filtered = [...this.merchants];
     const filters = this.filterForm.value;
 
+    if (filters.fromDate) {
+      filtered = filtered.filter(merchant =>
+        merchant.dateCreated >= new Date(filters.fromDate)
+      );
+    }
+
+    if (filters.toDate) {
+      filtered = filtered.filter(merchant =>
+        merchant.dateCreated <= new Date(filters.toDate)
+      );
+    }
+
     if (filters.status) {
-      filtered = filtered.filter(merchant => 
+      filtered = filtered.filter(merchant =>
         merchant.status.toLowerCase() === filters.status.toLowerCase()
+      );
+    }
+
+    if (filters.approvalStatus) {
+      filtered = filtered.filter(merchant =>
+        merchant.approvalStatus.toLowerCase() === filters.approvalStatus.toLowerCase()
       );
     }
 
     if (filters.searchTerm) {
       filtered = filtered.filter(merchant =>
-        merchant.merchantName.toLowerCase().includes(filters.searchTerm.toLowerCase())
+        merchant.name.toLowerCase().includes(filters.searchTerm.toLowerCase())
       );
     }
 
     this.dataSource.data = filtered;
-    
+
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
@@ -152,18 +235,41 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
 
   getStatusClass(status: string): string {
     switch (status.toLowerCase()) {
-      case 'approved':
-        return 'approved';
-      case 'pending approval':
-        return 'pending-approval';
+      case 'active':
+        return 'text-green-500';
+      case 'inactive':
+        return 'text-red-500';
       default:
         return '';
     }
   }
 
-  inviteMerchant() {
-    // Implement the logic for inviting a merchant, e.g., open a dialog or navigate to an invite page
-    console.log('Invite Merchant button clicked');
+  getApprovalStatusClass(approvalStatus: string): string {
+    switch (approvalStatus.toLowerCase()) {
+      case 'approved':
+        return 'text-green-500';
+      case 'rejected':
+        return 'text-red-500';
+      case 'pending approval':
+        return 'text-orange-500';
+      default:
+        return '';
+    }
   }
-  
+
+  onAccept(merchant: Merchant) {
+    console.log('Accepted:', merchant);
+    // Implement your accept logic here
+  }
+
+  onReject(merchant: Merchant) {
+    console.log('Rejected:', merchant);
+    // Implement your reject logic here
+  }
+
+  onInfo(merchant: Merchant) {
+    console.log('Info:', merchant);
+    // Implement your info logic here
+  }
+
 }

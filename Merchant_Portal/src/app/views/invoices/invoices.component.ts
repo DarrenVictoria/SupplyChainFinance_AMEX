@@ -24,7 +24,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 interface Merchant {
   requestId: string;
   dateCreated: string;
-  merchant: string;
+  buyerName: string;
+  merchantStatus: string;
   invoiceNumber: string;
   invoiceAmount: number;
   creditAmount: number;
@@ -39,7 +40,7 @@ interface Merchant {
 }
 
 @Component({
-  selector: 'app-payments',
+  selector: 'app-invoices',
   imports: [
     CommonModule,
     FormsModule,
@@ -60,11 +61,11 @@ interface Merchant {
     MatSortModule,
     MatTooltipModule
   ],
-  templateUrl: './payments.component.html',
-  styleUrls: ['./payments.component.css'],
+  templateUrl: './invoices.component.html',
+  styleUrls: ['./invoices.component.css'],
   standalone: true,
 })
-export class PaymentsComponent implements AfterViewInit, OnInit {
+export class InvoicesComponent implements AfterViewInit, OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -88,54 +89,44 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
     { value: 'RF', label: 'RF' }
   ];
 
+  merchantStatusOptions = [
+    { value: 'Approved', label: 'Approved' },
+    { value: 'Rejected', label: 'Rejected' },
+    { value: 'Pending Approval', label: 'Pending Approval' }
+  ];
+
+  // Update search type options
   searchTypeOptions = [
     { value: 'requestId', label: 'Request ID' },
-    { value: 'merchant', label: 'Merchant Name' },
+    { value: 'buyerName', label: 'Buyer Name' }, // Changed from merchant
     { value: 'invoiceNumber', label: 'Invoice Number' }
   ];
 
+  // Update displayed columns
   displayedColumns: string[] = [
-    'requestId', 'dateCreated', 'merchant', 'invoiceNumber', 'invoiceAmount',
-    'creditAmount', 'productCode', 'buyerStatus', 'paymentStatus', 'actions'
+    'requestId', 'dateCreated', 'buyerName',
+    'invoiceNumber', 'invoiceAmount', 'creditAmount',
+    'productCode', 'merchantStatus', 'buyerStatus', 'paymentStatus', 'actions'
   ];
 
+  // Update sample data
   merchants: Merchant[] = [
     {
       requestId: 'REQ-CS-576',
       dateCreated: '11/09/2024',
-      merchant: 'Compu Smart',
+      buyerName: 'John Doe',
+      merchantStatus: 'Approved', // New field with same status options as buyerStatus
       invoiceNumber: 'INV-001',
       invoiceAmount: 10000.00,
       creditAmount: 9700.00,
       productCode: 'ID',
       buyerStatus: 'Approved',
       paymentStatus: 'Paid',
-
+      approvedBy: 'John Smith',
+      approvedDate: '11/09/2024 14:30 EST',
+      approvalStatus: 'Approved'
     },
-    {
-      requestId: 'REQ-CS-577',
-      dateCreated: '11/09/2024',
-      merchant: 'Compu Smart',
-      invoiceNumber: 'INV-002',
-      invoiceAmount: 100000.00,
-      creditAmount: 95000.00,
-      productCode: 'RF',
-      buyerStatus: 'Rejected',
-      paymentStatus: 'Unpaid',
-
-    },
-    {
-      requestId: 'REQ-CS-578',
-      dateCreated: '11/10/2024',
-      merchant: 'Tech Solutions',
-      invoiceNumber: 'INV-003',
-      invoiceAmount: 25000.00,
-      creditAmount: 24250.00,
-      productCode: 'ID',
-      buyerStatus: 'Pending Approval',
-      paymentStatus: 'Unpaid',
-
-    }
+    // Update other sample entries similarly
   ];
 
   constructor(private fb: FormBuilder, private router: Router) {
@@ -145,6 +136,7 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
       status: [''],
       approvalStatus: [''],
       productCode: [''],
+      merchantStatus: [''], // Keep this filter
       searchType: [''],
       searchTerm: ['']
     });
@@ -173,6 +165,7 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
     const filters = this.filterForm.value;
     let filtered = [...this.merchants];
 
+
     // Date filter
     if (filters.fromDate && filters.toDate) {
       const fromDate = new Date(filters.fromDate);
@@ -197,6 +190,11 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
       filtered = filtered.filter(merchant => merchant.productCode === filters.productCode);
     }
 
+    // Merchant Status filter
+    if (filters.merchantStatus) {
+      filtered = filtered.filter(merchant => merchant.merchantStatus === filters.merchantStatus);
+    }
+
     // Search filter
     if (filters.searchType && filters.searchTerm) {
       const searchTerm = filters.searchTerm.toLowerCase();
@@ -204,8 +202,8 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
         switch (filters.searchType) {
           case 'requestId':
             return merchant.requestId.toLowerCase().includes(searchTerm);
-          case 'merchant':
-            return merchant.merchant.toLowerCase().includes(searchTerm);
+          case 'buyerName': // Changed from merchant
+            return merchant.buyerName.toLowerCase().includes(searchTerm);
           case 'invoiceNumber':
             return merchant.invoiceNumber.toLowerCase().includes(searchTerm);
           default:
@@ -230,6 +228,7 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
       filters.status ||
       filters.approvalStatus ||
       filters.productCode ||
+      filters.merchantStatus || // New filter
       (filters.searchType && filters.searchTerm)
     );
   }
@@ -263,14 +262,36 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
   }
 
   getActionButtons(merchant: Merchant): string {
-    if (merchant.paymentStatus === 'Paid') {
+    if (merchant.buyerStatus === 'Approved' || merchant.buyerStatus === 'Rejected') {
       return 'info';
     } else {
-      return 'info,card';
+      return 'approve,reject,info';
     }
   }
 
-
+  getApprovalDetails(merchant: Merchant): string {
+    switch (merchant.approvalStatus) {
+      case 'Approved':
+        return `
+          Approval Details
+          Approved by: ${merchant.approvedBy}
+          Date: ${merchant.approvedDate}
+        `;
+      case 'Rejected':
+        return `
+          Rejection Details
+          Rejected by: ${merchant.approvedBy}
+          Date: ${merchant.approvedDate}
+        `;
+      case 'Pending':
+        return `
+          Pending Details
+          Awaiting approval: ${merchant.pendingApprover}
+        `;
+      default:
+        return '';
+    }
+  }
 
   getBuyerStatusClass(status: string): string {
     switch (status) {
@@ -291,6 +312,19 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
         return 'paid';
       case 'Unpaid':
         return 'unpaid';
+      default:
+        return '';
+    }
+  }
+
+  getMerchantStatusClass(status: string): string {
+    switch (status) {
+      case 'Approved':
+        return 'approved';
+      case 'Rejected':
+        return 'rejected';
+      case 'Pending Approval':
+        return 'pending-approval';
       default:
         return '';
     }

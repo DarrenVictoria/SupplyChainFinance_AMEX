@@ -39,15 +39,10 @@ export class SidebarComponent implements OnInit {
       route: '/buyers'
     },
     {
-      iconType: 'request_quote',
-      text: 'Requests',
-      route: '/requests'
+      iconType: 'book',
+      text: 'Invoices',
+      route: '/invoices'
     },
-    {
-      iconType: 'local_atm',
-      text: 'Payments',
-      route: '/payments'
-    }
   ];
 
   constructor(private router: Router) {
@@ -55,7 +50,7 @@ export class SidebarComponent implements OnInit {
       id: 'MERCH123456',
       name: 'Sample Merchant'
     };
-   }
+  }
 
   ngOnInit(): void {
     this.setRandomProfileImage();

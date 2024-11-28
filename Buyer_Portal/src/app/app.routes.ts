@@ -7,6 +7,8 @@ import { PlaceholderComponent } from './placeholder/placeholder.component';
 import { MerchantsComponent } from './views/merchants/merchants.component';
 import { HomepageComponent } from './views/homepage/homepage.component';
 import { PaymentsComponent } from './views/payments/payments.component';
+import { InvoicesComponent } from './views/invoices/invoices.component';
+import { AddInvoiceComponent } from './views/add-invoice/add-invoice.component';
 
 export const routes: Routes = [
   {
@@ -14,49 +16,42 @@ export const routes: Routes = [
     component: MainLayoutComponent,
     children: [
       {
-        path: 'homepage',
-        component: HomepageComponent
-      },
-      {
         path: 'dashboard',
         component: PlaceholderComponent
       },
       {
         path: 'merchants',
-        component:  MerchantsComponent
+        component: MerchantsComponent
       },
+      // {
+      //   path: 'requests',
+      //   children: [
+      //     {
+      //       path: 'creation',
+      //       component: PlaceholderComponent
+      //     },
+      //     {
+      //       path: 'submission',
+      //       component: PlaceholderComponent
+      //     }
+      //   ]
+      // },
       {
-        path: 'requests',
-        children: [
-          {
-            path: 'creation',
-            component: PlaceholderComponent
-          },
-          {
-            path: 'submission',
-            component: PlaceholderComponent
-          }
-        ]
+        path: 'invoices',
+        component: InvoicesComponent
       },
       {
         path: 'payments',
         component: PaymentsComponent
       },
       {
-        path: 'financial',
-        component: PlaceholderComponent
+        path: 'add-invoice',
+        component: AddInvoiceComponent
       },
-      {
-        path: 'users',
-        component: PlaceholderComponent
-      },
-      {
-        path: 'business-activities',
-        component: PlaceholderComponent
-      },
+
       {
         path: '',
-        redirectTo: 'homepage',
+        redirectTo: 'merchants',
         pathMatch: 'full'
       }
     ]

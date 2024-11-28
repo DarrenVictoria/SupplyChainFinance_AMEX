@@ -39,7 +39,7 @@ interface Merchant {
 }
 
 @Component({
-  selector: 'app-payments',
+  selector: 'app-invoices',
   imports: [
     CommonModule,
     FormsModule,
@@ -60,11 +60,11 @@ interface Merchant {
     MatSortModule,
     MatTooltipModule
   ],
-  templateUrl: './payments.component.html',
-  styleUrls: ['./payments.component.css'],
+  templateUrl: './invoices.component.html',
+  styleUrls: ['./invoices.component.css'],
   standalone: true,
 })
-export class PaymentsComponent implements AfterViewInit, OnInit {
+export class InvoicesComponent implements AfterViewInit, OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -110,7 +110,9 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
       productCode: 'ID',
       buyerStatus: 'Approved',
       paymentStatus: 'Paid',
-
+      approvedBy: 'John Smith',
+      approvedDate: '11/09/2024 14:30 EST',
+      approvalStatus: 'Approved'
     },
     {
       requestId: 'REQ-CS-577',
@@ -122,7 +124,9 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
       productCode: 'RF',
       buyerStatus: 'Rejected',
       paymentStatus: 'Unpaid',
-
+      approvedBy: 'Sarah Johnson',
+      approvedDate: '11/09/2024 15:45 EST',
+      approvalStatus: 'Rejected'
     },
     {
       requestId: 'REQ-CS-578',
@@ -134,7 +138,8 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
       productCode: 'ID',
       buyerStatus: 'Pending Approval',
       paymentStatus: 'Unpaid',
-
+      pendingApprover: 'Michael Chen',
+      approvalStatus: 'Pending'
     }
   ];
 
@@ -263,14 +268,36 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
   }
 
   getActionButtons(merchant: Merchant): string {
-    if (merchant.paymentStatus === 'Paid') {
+    if (merchant.buyerStatus === 'Approved' || merchant.buyerStatus === 'Rejected') {
       return 'info';
     } else {
-      return 'info,card';
+      return 'approve,reject,info';
     }
   }
 
-
+  getApprovalDetails(merchant: Merchant): string {
+    switch (merchant.approvalStatus) {
+      case 'Approved':
+        return `
+          Approval Details
+          Approved by: ${merchant.approvedBy}
+          Date: ${merchant.approvedDate}
+        `;
+      case 'Rejected':
+        return `
+          Rejection Details
+          Rejected by: ${merchant.approvedBy}
+          Date: ${merchant.approvedDate}
+        `;
+      case 'Pending':
+        return `
+          Pending Details
+          Awaiting approval: ${merchant.pendingApprover}
+        `;
+      default:
+        return '';
+    }
+  }
 
   getBuyerStatusClass(status: string): string {
     switch (status) {

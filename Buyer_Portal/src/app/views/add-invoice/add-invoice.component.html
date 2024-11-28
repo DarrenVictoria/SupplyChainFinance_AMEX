@@ -1,0 +1,146 @@
+<!-- invoice-form.component.html -->
+<div class="invoice-form-container">
+  <h1>Add Invoice</h1>
+
+  <div class="upload-section">
+    <button mat-raised-button color="primary">Upload Invoice(s)</button>
+  </div>
+
+  <form [formGroup]="invoiceForm" (ngSubmit)="onSubmit()">
+    <div formArrayName="merchants">
+      <div *ngFor="let merchant of merchantsArray.controls; let merchantIndex = index" 
+           [formGroupName]="merchantIndex" class="merchant-block">
+        
+        <div class="merchant-header">
+          <!-- Merchant Select -->
+          <mat-form-field appearance="outline">
+            <mat-label>Select Merchant</mat-label>
+            <mat-select formControlName="merchantName">
+              <mat-option *ngFor="let option of merchantOptions" 
+                          [value]="option.value">
+                {{ option.label }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Merchant Delete Button -->
+          <button *ngIf="merchantsArray.length > 1" 
+                  mat-mini-fab color="warn" type="button"
+                  (click)="removeMerchant(merchantIndex)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+
+        <!-- Invoices Section -->
+        <div formArrayName="invoices">
+          <div *ngFor="let invoice of getMerchantsInvoicesArray(merchantIndex).controls; let invoiceIndex = index"
+               [formGroupName]="invoiceIndex" class="invoice-block">
+
+               
+            
+            <div class="invoice-header">
+
+             
+
+              
+              <!-- Invoice Number -->
+              <mat-form-field appearance="outline">
+                <mat-label>Invoice Number</mat-label>
+                <input matInput formControlName="invoiceNumber" required>
+              </mat-form-field>
+
+              <!-- Invoice Date -->
+              <mat-form-field appearance="outline">
+                <mat-label>Invoice Date</mat-label>
+                <input matInput [matDatepicker]="invoiceDatePicker" formControlName="invoiceDate" required>
+                <mat-datepicker-toggle matSuffix [for]="invoiceDatePicker"></mat-datepicker-toggle>
+                <mat-datepicker #invoiceDatePicker></mat-datepicker>
+              </mat-form-field>
+
+              <!-- Due Date -->
+              <mat-form-field appearance="outline">
+                <mat-label>Due Date</mat-label>
+                <input matInput [matDatepicker]="dueDatePicker" formControlName="dueDate" required>
+                <mat-datepicker-toggle matSuffix [for]="dueDatePicker"></mat-datepicker-toggle>
+                <mat-datepicker #dueDatePicker></mat-datepicker>
+              </mat-form-field>
+
+              
+            </div>
+
+            <div class="invoice-details">
+              <!-- Currency -->
+              <mat-form-field appearance="outline">
+                <mat-label>Currency</mat-label>
+                <mat-select formControlName="currency" required>
+                  <mat-option *ngFor="let currency of currencyOptions" 
+                              [value]="currency.value">
+                    {{ currency.label }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <!-- Total Invoice Amount -->
+              <mat-form-field appearance="outline">
+                <mat-label>Total Invoice Amount</mat-label>
+                <input matInput type="number" formControlName="totalAmount" required>
+              </mat-form-field>
+
+              <!-- Payment Terms -->
+              <mat-form-field appearance="outline">
+                <mat-label>Payment Terms</mat-label>
+                <mat-select formControlName="paymentTerms" required>
+                  <mat-option *ngFor="let terms of paymentTermsOptions" 
+                              [value]="terms.value">
+                    {{ terms.label }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <!-- File Upload -->
+              <div class="file-upload">
+                <input type="file" 
+                       (change)="onFileSelected($event, merchantIndex, invoiceIndex)"
+                       style="display: none" 
+                       #fileInput>
+                <button mat-raised-button type="button" 
+                        (click)="fileInput.click()">
+                  Add Attachment
+                </button>
+              </div>
+               <!-- Invoice Delete Button -->
+               <button *ngIf="getMerchantsInvoicesArray(merchantIndex).length > 1"
+                mat-mini-fab color="warn" type="button"
+                (click)="removeInvoice(merchantIndex, invoiceIndex)">
+          <mat-icon>delete</mat-icon>
+        </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Merchant Action Buttons -->
+        <div class="merchant-actions">
+          <button mat-raised-button color="primary" type="button" 
+                  (click)="addInvoice(merchantIndex)">
+            Add Another Invoice
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Global Add Merchant Button -->
+    <div class="global-actions">
+      <button mat-raised-button color="primary" type="button" 
+              (click)="addMerchant()">
+        Add Another Merchant
+      </button>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="submit-section">
+      <button mat-raised-button color="primary" type="submit">
+        Submit Invoices
+      </button>
+    </div>
+  </form>
+</div>

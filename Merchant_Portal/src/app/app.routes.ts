@@ -6,10 +6,12 @@ import { LoginComponent } from './auth/login.component';
 import { PlaceholderComponent } from './placeholder/placeholder.component';
 
 import { PaymentsComponent } from './views/payments/payments.component';
-import { RegisterComponent} from './auth/register.component'
+import { RegisterComponent } from './auth/register.component'
 import { CompanyRegistrationComponent } from './auth/company-registration/company-registration.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { BuyerGridComponent } from './views/buyer-grid/buyer-grid.component';
+import { InvoicesComponent } from './views/invoices/invoices.component';
+import { AddInvoiceComponent } from './views/add-invoice/add-invoice.component';
 
 export const routes: Routes = [
   {
@@ -23,8 +25,8 @@ export const routes: Routes = [
       },
 
       {
-        path: 'payments',
-        component: PaymentsComponent
+        path: 'invoices',
+        component: InvoicesComponent
       },
       {
         path: 'buyers',
@@ -34,7 +36,11 @@ export const routes: Routes = [
         path: '',
         redirectTo: 'homepage',
         pathMatch: 'full'
-      }
+      },
+      {
+        path: 'add-invoice',
+        component: AddInvoiceComponent
+      },
     ]
   },
   {
