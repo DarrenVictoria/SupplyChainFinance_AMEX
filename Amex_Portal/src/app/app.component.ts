@@ -1,11 +1,15 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { LoadingComponent } from './loading.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
-  templateUrl: './app.component.html',
+  imports: [RouterOutlet, LoadingComponent],
+  template: `
+    <app-loading></app-loading>
+    <router-outlet></router-outlet>
+  `,
   styleUrl: './app.component.css'
 })
 export class AppComponent {
