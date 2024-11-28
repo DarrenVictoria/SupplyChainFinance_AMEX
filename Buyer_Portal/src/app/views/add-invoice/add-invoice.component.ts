@@ -14,11 +14,26 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import * as Papa from 'papaparse';
+import { Router } from '@angular/router';
+import { InvoiceDataService } from '../../services/invoice-data.service';
 
 interface Merchant {
   name: string;
   invoices: Invoice[];
 }
+
+interface CsvInvoiceRow {
+  merchantName: string;
+  invoiceNumber: string;
+  invoiceDate: string;
+  dueDate: string;
+  currency: string;
+  totalAmount: string;
+  paymentTerms: string;
+}
+
 
 interface Invoice {
   invoiceNumber: string;
@@ -49,6 +64,13 @@ interface Invoice {
 export class AddInvoiceComponent implements OnInit {
   invoiceForm!: FormGroup;
 
+  constructor(
+    private fb: NonNullableFormBuilder,
+    private snackBar: MatSnackBar,
+    private invoiceDataService: InvoiceDataService, // Inject the service
+    private router: Router // Inject Router
+  ) { }
+
   merchantOptions = [
     { value: 'sbc', label: 'SBC Holdings Pvt Ltd' },
     { value: 'jana', label: 'Janashakthi Pvt Ltd' },
@@ -68,7 +90,7 @@ export class AddInvoiceComponent implements OnInit {
     { value: 'progressbilling', label: 'Progress Billing - Payments due at specific milestones or project phases' }
   ];
 
-  constructor(private fb: NonNullableFormBuilder) { }
+
 
   ngOnInit() {
     this.initForm();
@@ -108,6 +130,118 @@ export class AddInvoiceComponent implements OnInit {
     return merchantGroup.get('invoices') as FormArray;
   }
 
+  // CSV Upload Method
+  onCsvUpload(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+
+      // Validate file type
+      if (!file.name.endsWith('.csv')) {
+        this.snackBar.open('Please upload a CSV file', 'Close', { duration: 3000 });
+        return;
+      }
+
+      Papa.parse(file, {
+        header: true,
+        complete: (results) => {
+          if (results.errors.length > 0) {
+            this.snackBar.open('Error parsing CSV', 'Close', { duration: 3000 });
+            console.error(results.errors);
+            return;
+          }
+
+          this.populateFormFromCsv(results.data as CsvInvoiceRow[]);
+        }
+      });
+    }
+  }
+
+  populateFormFromCsv(data: CsvInvoiceRow[]) {
+    // Clear existing form
+    while (this.merchantsArray.length !== 0) {
+      this.merchantsArray.removeAt(0);
+    }
+
+    // Group invoices by merchant
+    const merchantGroups = this.groupInvoicesByMerchant(data);
+
+    // Populate form
+    merchantGroups.forEach(merchantInvoices => {
+      const merchantGroup = this.createMerchantGroup();
+
+      // Set merchant name
+      merchantGroup.get('merchantName')?.setValue(
+        this.validateMerchantName(merchantInvoices[0].merchantName)
+      );
+
+      // Create invoice groups
+      const invoicesArray = merchantGroup.get('invoices') as FormArray;
+      invoicesArray.clear(); // Remove default invoice
+
+      merchantInvoices.forEach(invoice => {
+        const invoiceGroup = this.createInvoiceGroup();
+
+        invoiceGroup.patchValue({
+          invoiceNumber: invoice.invoiceNumber,
+          invoiceDate: new Date(invoice.invoiceDate),
+          dueDate: new Date(invoice.dueDate),
+          currency: this.validateCurrency(invoice.currency),
+          totalAmount: parseFloat(invoice.totalAmount),
+          paymentTerms: this.validatePaymentTerms(invoice.paymentTerms)
+        });
+
+        invoicesArray.push(invoiceGroup);
+      });
+
+      this.merchantsArray.push(merchantGroup);
+    });
+  }
+
+  // Validation helpers
+  validateMerchantName(name: string): string {
+    const match = this.merchantOptions.find(option =>
+      option.label.toLowerCase().includes(name.toLowerCase())
+    );
+    return match ? match.value : '';
+  }
+
+  validateCurrency(currency: string): string {
+    const match = this.currencyOptions.find(option =>
+      option.value.toLowerCase() === currency.toLowerCase() ||
+      option.label.toLowerCase() === currency.toLowerCase()
+    );
+    return match ? match.value : 'USD'; // Default to USD
+  }
+
+  validatePaymentTerms(terms: string): string {
+    const match = this.paymentTermsOptions.find(option =>
+      option.label.toLowerCase().includes(terms.toLowerCase())
+    );
+    return match ? match.value : 'net30'; // Default to Net 30
+  }
+
+  // Group invoices by merchant name to support multiple invoices per merchant
+  groupInvoicesByMerchant(data: CsvInvoiceRow[]): CsvInvoiceRow[][] {
+    const merchantMap = new Map<string, CsvInvoiceRow[]>();
+
+    data.forEach(invoice => {
+      const merchantKey = invoice.merchantName;
+      if (!merchantMap.has(merchantKey)) {
+        merchantMap.set(merchantKey, []);
+      }
+      merchantMap.get(merchantKey)?.push(invoice);
+    });
+
+    return Array.from(merchantMap.values());
+  }
+
+
+
+
+
+
+
   addMerchant() {
     this.merchantsArray.push(this.createMerchantGroup());
   }
@@ -140,16 +274,6 @@ export class AddInvoiceComponent implements OnInit {
     }
   }
 
-  onSubmit() {
-    if (this.invoiceForm.valid) {
-      console.log(this.invoiceForm.value);
-      // Add your submission logic here
-    } else {
-      // Mark all fields as touched to show validation errors
-      this.markFormGroupTouched(this.invoiceForm);
-    }
-  }
-
   // Helper method to mark all controls as touched
   private markFormGroupTouched(formGroup: FormGroup | FormArray) {
     Object.values(formGroup.controls).forEach(control => {
@@ -159,5 +283,23 @@ export class AddInvoiceComponent implements OnInit {
         control.markAsTouched();
       }
     });
+  }
+
+  onSubmit() {
+    if (this.invoiceForm.valid) {
+      const formValue = this.invoiceForm.value;
+
+      // Send data to the service
+      this.invoiceDataService.updateInvoiceData(formValue.merchants);
+
+      // Show success message
+      this.snackBar.open('Invoices added successfully', 'Close', { duration: 3000 });
+
+      // Navigate to invoices page
+      this.router.navigate(['/invoices']);
+    } else {
+      // Mark all fields as touched to show validation errors
+      this.markFormGroupTouched(this.invoiceForm);
+    }
   }
 }

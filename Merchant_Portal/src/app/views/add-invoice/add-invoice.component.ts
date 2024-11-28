@@ -14,6 +14,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import * as Papa from 'papaparse';
+import { Router } from '@angular/router';
+import { InvoiceDataService } from '../../services/invoice-data.service';
 
 interface Buyer {
   name: string;
@@ -43,7 +47,8 @@ interface Invoice {
     MatButtonModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatIconModule
+    MatIconModule,
+
   ]
 })
 export class AddInvoiceComponent implements OnInit {
@@ -68,12 +73,122 @@ export class AddInvoiceComponent implements OnInit {
     { value: 'progressbilling', label: 'Progress Billing - Payments due at specific milestones or project phases' }
   ];
 
-  constructor(private fb: NonNullableFormBuilder) { }
+  constructor(
+    private fb: NonNullableFormBuilder,
+    private snackBar: MatSnackBar,
+    private invoiceDataService: InvoiceDataService,
+    private router: Router
+  ) { }
 
   ngOnInit() {
     this.initForm();
   }
 
+  // CSV Upload Method
+  onCsvUpload(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+
+      if (!file.name.endsWith('.csv')) {
+        this.snackBar.open('Please upload a CSV file', 'Close', { duration: 3000 });
+        return;
+      }
+
+      Papa.parse(file, {
+        header: true,
+        complete: (results) => {
+          if (results.errors.length > 0) {
+            this.snackBar.open('Error parsing CSV', 'Close', { duration: 3000 });
+            console.error(results.errors);
+            return;
+          }
+
+          this.populateFormFromCsv(results.data);
+        }
+      });
+    }
+  }
+
+  populateFormFromCsv(data: any[]) {
+    // Clear existing form
+    while (this.buyersArray.length !== 0) {
+      this.buyersArray.removeAt(0);
+    }
+
+    // Group invoices by buyer
+    const buyerGroups = this.groupInvoicesByBuyer(data);
+
+    // Populate form
+    buyerGroups.forEach(buyerInvoices => {
+      const buyerGroup = this.createBuyerGroup();
+
+      // Try to match the buyer name with predefined options
+      const buyerName = buyerInvoices[0].buyerName || '';
+      const matchedBuyer = this.buyerOptions.find(option =>
+        option.label.toLowerCase().includes(buyerName.toLowerCase())
+      );
+
+      // Set buyer name with matched value or default
+      buyerGroup.get('buyerName')?.setValue(
+        matchedBuyer ? matchedBuyer.value : ''
+      );
+
+      // Create invoice groups
+      const invoicesArray = buyerGroup.get('invoices') as FormArray;
+      invoicesArray.clear(); // Remove default invoice
+
+      buyerInvoices.forEach((invoice: any) => {
+        const invoiceGroup = this.createInvoiceGroup();
+
+        invoiceGroup.patchValue({
+          invoiceNumber: invoice.invoiceNumber || '',
+          invoiceDate: new Date(invoice.invoiceDate || Date.now()),
+          dueDate: new Date(invoice.dueDate || Date.now()),
+          currency: this.validateCurrency(invoice.currency),
+          totalAmount: parseFloat(invoice.totalAmount || 0),
+          paymentTerms: this.validatePaymentTerms(invoice.paymentTerms)
+        });
+
+        invoicesArray.push(invoiceGroup);
+      });
+
+      this.buyersArray.push(buyerGroup);
+    });
+  }
+
+  // Helper method to group invoices by buyer
+  groupInvoicesByBuyer(data: any[]): any[][] {
+    const buyerMap = new Map<string, any[]>();
+
+    data.forEach(invoice => {
+      const buyerKey = invoice.buyerName;
+      if (!buyerMap.has(buyerKey)) {
+        buyerMap.set(buyerKey, []);
+      }
+      buyerMap.get(buyerKey)?.push(invoice);
+    });
+
+    return Array.from(buyerMap.values());
+  }
+
+  // Validation helpers
+  validateCurrency(currency: string): string {
+    const match = this.currencyOptions.find(option =>
+      option.value.toLowerCase() === currency.toLowerCase() ||
+      option.label.toLowerCase() === currency.toLowerCase()
+    );
+    return match ? match.value : 'USD'; // Default to USD
+  }
+
+  validatePaymentTerms(terms: string): string {
+    const match = this.paymentTermsOptions.find(option =>
+      option.label.toLowerCase().includes(terms.toLowerCase())
+    );
+    return match ? match.value : 'net30'; // Default to Net 30
+  }
+
+  // Existing form methods (createBuyerGroup, createInvoiceGroup, etc.)
   initForm() {
     this.invoiceForm = this.fb.group({
       buyers: this.fb.array([this.createBuyerGroup()])
@@ -102,6 +217,8 @@ export class AddInvoiceComponent implements OnInit {
   get buyersArray(): FormArray {
     return this.invoiceForm.get('buyers') as FormArray;
   }
+
+
 
   getBuyersInvoicesArray(buyerIndex: number): FormArray {
     const buyerGroup = this.buyersArray.at(buyerIndex);
@@ -142,13 +259,22 @@ export class AddInvoiceComponent implements OnInit {
 
   onSubmit() {
     if (this.invoiceForm.valid) {
-      console.log(this.invoiceForm.value);
-      // Add your submission logic here
+      const formValue = this.invoiceForm.value;
+
+      // Send data to the service
+      this.invoiceDataService.updateInvoiceData(formValue.buyers);
+
+      // Show success message
+      this.snackBar.open('Invoices added successfully', 'Close', { duration: 3000 });
+
+      // Navigate to invoices page
+      this.router.navigate(['/invoices']);
     } else {
       // Mark all fields as touched to show validation errors
       this.markFormGroupTouched(this.invoiceForm);
     }
   }
+
 
   // Helper method to mark all controls as touched
   private markFormGroupTouched(formGroup: FormGroup | FormArray) {

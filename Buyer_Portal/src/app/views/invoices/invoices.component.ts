@@ -20,6 +20,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatMenuModule } from '@angular/material/menu';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { InvoiceDataService, InvoiceData } from '../../services/invoice-data.service';
 
 interface Merchant {
   requestId: string;
@@ -31,7 +32,6 @@ interface Merchant {
   productCode: string;
   buyerStatus: string;
   paymentStatus: string;
-
   approvedBy?: string;
   approvedDate?: string;
   approvalStatus?: 'Approved' | 'Rejected' | 'Pending';
@@ -71,7 +71,7 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
   filterForm: FormGroup;
   dataSource: MatTableDataSource<Merchant>;
 
-  // Define options for dropdowns
+  // Define options for dropdowns (rest of the code remains the same)
   statusOptions = [
     { value: 'Approved', label: 'Approved' },
     { value: 'Rejected', label: 'Rejected' },
@@ -143,7 +143,41 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
     }
   ];
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(private fb: FormBuilder, private router: Router,
+    private invoiceDataService: InvoiceDataService) {
+    // Initialize dataSource with initial merchants
+    this.dataSource = new MatTableDataSource(this.merchants);
+
+    // Subscribe to invoice data service
+    this.invoiceDataService.currentInvoiceData.subscribe(invoices => {
+      const newMerchants: Merchant[] = invoices.map(invoice => ({
+        requestId: invoice.requestId,
+        dateCreated: invoice.dateCreated,
+        merchant: invoice.merchant,
+        invoiceNumber: invoice.invoiceNumber,
+        invoiceAmount: invoice.invoiceAmount,
+        creditAmount: invoice.creditAmount,
+        productCode: invoice.productCode,
+        buyerStatus: invoice.buyerStatus,
+        paymentStatus: invoice.paymentStatus,
+        approvalStatus: invoice.buyerStatus === 'Approved' ? 'Approved' :
+          invoice.buyerStatus === 'Rejected' ? 'Rejected' : 'Pending',
+        approvedBy: invoice.buyerStatus !== 'Pending Approval' ? 'System' : undefined,
+        approvedDate: invoice.buyerStatus !== 'Pending Approval' ?
+          new Date().toLocaleString() : undefined,
+        pendingApprover: invoice.buyerStatus === 'Pending Approval' ? 'Pending Review' : undefined
+      }));
+
+      // Merge existing merchants with new merchants
+      this.merchants = [...this.merchants, ...newMerchants];
+      this.dataSource.data = this.merchants;
+
+      // Reapply pagination and sorting
+      if (this.paginator) this.dataSource.paginator = this.paginator;
+      if (this.sort) this.dataSource.sort = this.sort;
+    });
+
+    // Initialize filterForm
     this.filterForm = this.fb.group({
       fromDate: [null],
       toDate: [null],
@@ -153,8 +187,6 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
       searchType: [''],
       searchTerm: ['']
     });
-
-    this.dataSource = new MatTableDataSource(this.merchants);
   }
 
   ngOnInit() {

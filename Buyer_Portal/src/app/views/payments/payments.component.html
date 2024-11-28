@@ -75,8 +75,27 @@
     </div>
 
     <!-- Reset Filters -->
-    <div class="filter-actions mt-4 flex justify-end">
-      <button mat-raised-button color="warn" class="reset-button" (click)="resetFilters()" *ngIf="isFiltersApplied">
+    <p>Select date range to generate Client Statement</p>
+    <div class="filter-actions mt-4 flex justify-between items-center">
+     
+      <button 
+  mat-raised-button 
+  color="primary" 
+  class="generate-statement-button" 
+  (click)="generateClientStatement()"
+  [disabled]="!filterForm.get('fromDate')?.value || !filterForm.get('toDate')?.value"
+>
+  <mat-icon>description</mat-icon>
+  Generate Client Statement
+</button>
+
+      <button 
+        mat-raised-button 
+        color="warn" 
+        class="reset-button" 
+        (click)="resetFilters()" 
+        *ngIf="isFiltersApplied"
+      >
         <mat-icon>refresh</mat-icon>
         Reset Filters
       </button>

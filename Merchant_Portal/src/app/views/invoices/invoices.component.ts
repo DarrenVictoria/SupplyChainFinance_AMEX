@@ -20,6 +20,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatMenuModule } from '@angular/material/menu';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { InvoiceDataService, InvoiceData } from '../../services/invoice-data.service';
 
 interface Merchant {
   requestId: string;
@@ -115,7 +116,7 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
       requestId: 'REQ-CS-576',
       dateCreated: '11/09/2024',
       buyerName: 'John Doe',
-      merchantStatus: 'Approved', // New field with same status options as buyerStatus
+      merchantStatus: 'Approved',
       invoiceNumber: 'INV-001',
       invoiceAmount: 10000.00,
       creditAmount: 9700.00,
@@ -126,17 +127,78 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
       approvedDate: '11/09/2024 14:30 EST',
       approvalStatus: 'Approved'
     },
-    // Update other sample entries similarly
+    {
+      requestId: 'REQ-SBC-782',
+      dateCreated: '12/15/2024',
+      buyerName: 'Sarah Johnson',
+      merchantStatus: 'Pending Approval',
+      invoiceNumber: 'INV-002',
+      invoiceAmount: 15500.50,
+      creditAmount: 15035.00,
+      productCode: 'RF',
+      buyerStatus: 'Pending Approval',
+      paymentStatus: 'Unpaid',
+      pendingApprover: 'Michael Chen',
+      approvalStatus: 'Pending'
+    },
+    {
+      requestId: 'REQ-EMAAR-345',
+      dateCreated: '01/22/2024',
+      buyerName: 'Michael Rodriguez',
+      merchantStatus: 'Rejected',
+      invoiceNumber: 'INV-003',
+      invoiceAmount: 7800.25,
+      creditAmount: 7566.00,
+      productCode: 'ID',
+      buyerStatus: 'Rejected',
+      paymentStatus: 'Unpaid',
+      approvedBy: 'Emily Davis',
+      approvedDate: '01/23/2024 09:15 EST',
+      approvalStatus: 'Rejected'
+    },
+    {
+      requestId: 'REQ-JANA-619',
+      dateCreated: '02/05/2024',
+      buyerName: 'Emma Thompson',
+      merchantStatus: 'Approved',
+      invoiceNumber: 'INV-004',
+      invoiceAmount: 22000.75,
+      creditAmount: 21340.00,
+      productCode: 'RF',
+      buyerStatus: 'Approved',
+      paymentStatus: 'Paid',
+      approvedBy: 'David Wilson',
+      approvedDate: '02/06/2024 11:45 EST',
+      approvalStatus: 'Approved'
+    },
+    {
+      requestId: 'REQ-SBC-890',
+      dateCreated: '03/18/2024',
+      buyerName: 'Alex Turner',
+      merchantStatus: 'Pending Approval',
+      invoiceNumber: 'INV-005',
+      invoiceAmount: 5600.00,
+      creditAmount: 5432.00,
+      productCode: 'ID',
+      buyerStatus: 'Pending Approval',
+      paymentStatus: 'Unpaid',
+      pendingApprover: 'Lisa Martinez',
+      approvalStatus: 'Pending'
+    }
   ];
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private invoiceDataService: InvoiceDataService,
+    private router: Router
+  ) {
     this.filterForm = this.fb.group({
       fromDate: [null],
       toDate: [null],
       status: [''],
       approvalStatus: [''],
       productCode: [''],
-      merchantStatus: [''], // Keep this filter
+      merchantStatus: [''],
       searchType: [''],
       searchTerm: ['']
     });
@@ -145,16 +207,37 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
   }
 
   ngOnInit() {
-    // Subscribe to form value changes to trigger filtering
+    // Subscribe to invoice data service
+    this.invoiceDataService.currentInvoiceData.subscribe(
+      invoices => {
+        // Merge existing merchants with new invoices
+        const updatedMerchants = [
+          ...this.merchants,
+          ...invoices.map(invoice => ({
+            ...invoice,
+            merchantStatus: invoice.merchantStatus || 'Pending Approval'
+          }))
+        ];
+
+        // Update merchants array
+        this.merchants = updatedMerchants;
+
+        // Update data source
+        this.dataSource.data = updatedMerchants;
+      }
+    );
+
+    // Existing filter subscription
     this.filterForm.valueChanges
       .pipe(
-        debounceTime(300), // Wait 300ms after last event before emitting
-        distinctUntilChanged() // Only emit when the current value is different than the last
+        debounceTime(300),
+        distinctUntilChanged()
       )
       .subscribe(() => {
         this.applyFilters();
       });
   }
+
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
@@ -175,6 +258,7 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
         return merchantDate >= fromDate && merchantDate <= toDate;
       });
     }
+
 
     // Status filters
     if (filters.status) {

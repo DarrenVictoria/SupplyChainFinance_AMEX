@@ -20,6 +20,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatMenuModule } from '@angular/material/menu';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog } from '@angular/material/dialog';
 
 interface Merchant {
   requestId: string;
@@ -138,7 +139,8 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
     }
   ];
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(private fb: FormBuilder, private router: Router,
+    private dialog: MatDialog) {
     this.filterForm = this.fb.group({
       fromDate: [null],
       toDate: [null],
@@ -294,5 +296,69 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
       default:
         return '';
     }
+  }
+
+  generateClientStatement() {
+    const filters = this.filterForm.value;
+
+    // Validate date range is selected
+    if (!filters.fromDate || !filters.toDate) {
+      // You might want to use a snackbar or dialog to show this message
+      alert('Please select a date range for the client statement');
+      return;
+    }
+
+    // Filter merchants based on the date range
+    const statementsInRange = this.merchants.filter(merchant => {
+      const merchantDate = new Date(merchant.dateCreated);
+      const fromDate = new Date(filters.fromDate);
+      const toDate = new Date(filters.toDate);
+      return merchantDate >= fromDate && merchantDate <= toDate;
+    });
+
+    // Generate a simple CSV for demonstration
+    this.downloadClientStatement(statementsInRange);
+  }
+
+  downloadClientStatement(statements: Merchant[]) {
+    // Convert merchant data to CSV
+    const headers = [
+      'Request ID',
+      'Date Created',
+      'Merchant',
+      'Invoice Number',
+      'Invoice Amount',
+      'Credit Amount',
+      'Product Code',
+      'Buyer Status',
+      'Payment Status'
+    ];
+
+    const csvContent = [
+      headers.join(','),
+      ...statements.map(merchant => [
+        merchant.requestId,
+        merchant.dateCreated,
+        merchant.merchant,
+        merchant.invoiceNumber,
+        merchant.invoiceAmount,
+        merchant.creditAmount,
+        merchant.productCode,
+        merchant.buyerStatus,
+        merchant.paymentStatus
+      ].map(value => `"${value}"`).join(','))
+    ].join('\n');
+
+    // Create and download CSV
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', `client_statement_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 }

@@ -3,7 +3,20 @@
   <h1>Add Invoice</h1>
 
   <div class="upload-section">
-    <button mat-raised-button color="primary">Upload Invoice(s)</button>
+    <input 
+      type="file" 
+      #csvFileInput 
+      (change)="onCsvUpload($event)" 
+      accept=".csv" 
+      style="display: none"
+    >
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="csvFileInput.click()"
+    >
+      Upload CSV
+    </button>
   </div>
 
   <form [formGroup]="invoiceForm" (ngSubmit)="onSubmit()">
