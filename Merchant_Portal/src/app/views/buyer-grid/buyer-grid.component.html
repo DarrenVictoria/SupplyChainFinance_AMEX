@@ -1,17 +1,27 @@
 <div class="buyers-container">
-    <h1>Buyers</h1>
-    <div class="buyer-grid">
-      <mat-card *ngFor="let buyer of buyers" class="buyer-card">
-        <mat-card-content>
-          <div class="logo-container">
-            <img [src]="buyer.logo" [alt]="buyer.name">
-          </div>
-          <button mat-raised-button color="primary" 
-                  class="register-button"
-                  (click)="navigateToBuyer(buyer.redirectLink)">
-            Register
-          </button>
-        </mat-card-content>
-      </mat-card>
-    </div>
+  <h1>Buyers</h1>
+  
+  <div class="buyer-grid">
+    <mat-card class="buyer-card" *ngFor="let buyer of buyers">
+      <div class="logo-container">
+        <img [src]="buyer.logo" [alt]="buyer.name + ' logo'">
+      </div>
+      
+      <mat-card-content>
+        <h2>{{ buyer.name }}</h2>
+      </mat-card-content>
+      
+      <mat-card-actions>
+        <button 
+          mat-raised-button 
+          color="primary" 
+          class="register-button"
+          [disabled]="buyer.isRegistered"
+          (click)="navigateToBuyer(buyer.redirectLink)"
+        >
+          {{ buyer.isRegistered ? 'Registered' : 'Register' }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
   </div>
+</div>

@@ -8,6 +8,7 @@ interface Buyer {
   name: string;
   logo: string;
   redirectLink: string;
+  isRegistered: boolean; // New property to track registration status
 }
 
 @Component({
@@ -15,35 +16,39 @@ interface Buyer {
   templateUrl: './buyer-grid.component.html',
   styleUrls: ['./buyer-grid.component.scss'],
   standalone: true,
-  imports: [CommonModule,MatCardModule, MatButtonModule]
+  imports: [CommonModule, MatCardModule, MatButtonModule]
 })
 export class BuyerGridComponent implements OnInit {
   buyers: Buyer[] = [
     {
       name: 'Howings Engineering',
       logo: '/howings-logo.png',
-      redirectLink: '/howings'
+      redirectLink: '/howings',
+      isRegistered: false
     },
     {
       name: 'Exceer',
       logo: '/exceer-logo.png',
-      redirectLink: '/exceer'
+      redirectLink: '/exceer',
+      isRegistered: true
     },
     {
       name: 'MFC',
       logo: '/mfc-logo.png',
-      redirectLink: '/mfc'
+      redirectLink: '/mfc',
+      isRegistered: false
     },
     {
       name: 'JKI Corporation',
       logo: '/jki-logo.png',
-      redirectLink: '/jki'
+      redirectLink: '/jki',
+      isRegistered: true
     }
   ];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   navigateToBuyer(redirectLink: string): void {
     this.router.navigate([redirectLink]);
