@@ -103,13 +103,13 @@
             </ng-container>
   
             <!-- Created By Column -->
-            <ng-container matColumnDef="createdBy">
+            <!-- <ng-container matColumnDef="createdBy">
               <th mat-header-cell *matHeaderCellDef mat-sort-header> Created By </th>
               <td mat-cell *matCellDef="let buyer"> {{buyer.createdBy}} </td>
-            </ng-container>
+            </ng-container> -->
   
             <!-- Account Manager Column -->
-            <ng-container matColumnDef="accountManager">
+            <!-- <ng-container matColumnDef="accountManager">
               <th mat-header-cell *matHeaderCellDef mat-sort-header> Account Manager </th>
               <td mat-cell *matCellDef="let buyer">
                 <span *ngIf="buyer.accountManager; else noAccountManager">
@@ -119,7 +119,7 @@
                   <span class="text-gray-500">Not Assigned</span>
                 </ng-template>
               </td>
-            </ng-container>
+            </ng-container> -->
   
             <!-- Number of Users Column -->
             <ng-container matColumnDef="noOfUsers">
@@ -135,45 +135,44 @@
   
             <!-- Status Column -->
             <!-- Status Column -->
-<ng-container matColumnDef="status">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
-    <td mat-cell *matCellDef="let buyer">
-      <span [ngClass]="{
-        'text-green-500': buyer.status === 'Active',
-        'text-red-500': buyer.status === 'Inactive',
-           }">
-        {{ buyer.status }}
-      </span>
-    </td>
-  </ng-container>
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+              <td mat-cell *matCellDef="let buyer">
+                <span [ngClass]="getStatusClass(buyer.status)">
+                  {{ buyer.status }}
+                </span>
+              </td>
+            </ng-container>
   
             <!-- Actions Column -->
-  <ng-container matColumnDef="actions">
-    <th mat-header-cell *matHeaderCellDef> Actions </th>
-    <td mat-cell *matCellDef="let buyer">
-      <button mat-icon-button [matMenuTriggerFor]="menu">
-        <mat-icon>more_vert</mat-icon>
-      </button>
-      <mat-menu #menu="matMenu">
-        <button mat-menu-item>
-          <mat-icon>visibility</mat-icon>
-          <span>View</span>
-        </button>
-        <button mat-menu-item>
-          <mat-icon>money</mat-icon>
-          <span>Edit Credit Limit</span>
-        </button>
-        <button mat-menu-item>
-          <mat-icon>people</mat-icon>
-          <span>User Management</span>
-        </button>
-        <button mat-menu-item>
-          <mat-icon>settings</mat-icon>
-          <span>Configuration</span>
-        </button>
-      </mat-menu>
-    </td>
-  </ng-container>
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef> Actions </th>
+              <td mat-cell *matCellDef="let buyer">
+                <button mat-icon-button [matMenuTriggerFor]="menu">
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #menu="matMenu">
+                  <button mat-menu-item>
+                    <mat-icon>visibility</mat-icon>
+                    <span>View</span>
+                  </button>
+                  <button mat-menu-item (click)="openEditCreditLimitPopup(buyer)">
+                    <mat-icon>money</mat-icon>
+                    <span>Edit Credit Limit</span>
+                  </button>
+                  <button mat-menu-item>
+                    <mat-icon>people</mat-icon>
+                    <span>User Management</span>
+                  </button>
+                  <button mat-menu-item>
+                    <mat-icon>settings</mat-icon>
+                    <span>Configuration</span>
+                  </button>
+                </mat-menu>
+              </td>
+            </ng-container>
+            
+           
 
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
   <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>

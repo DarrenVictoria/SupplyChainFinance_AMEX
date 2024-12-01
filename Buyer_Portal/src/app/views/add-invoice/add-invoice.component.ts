@@ -71,6 +71,10 @@ export class AddInvoiceComponent implements OnInit {
     private router: Router // Inject Router
   ) { }
 
+  cardNumber = '37XX XXXXXX XXXXX';
+  creditLimit = 600000;
+  availableCredit = 200000;
+
   merchantOptions = [
     { value: 'sbc', label: 'SBC Holdings Pvt Ltd' },
     { value: 'jana', label: 'Janashakthi Pvt Ltd' },

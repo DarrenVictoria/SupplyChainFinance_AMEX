@@ -197,6 +197,26 @@
   .mat-cell button {
     margin-right: 8px;
   }
+
+  .status-active {
+    color: #4CAF50; 
+  }
+  
+  .status-inactive {
+    color: #D32F2F;
+  }
+  
+  .status-approved {
+    color: #4CAF50; 
+  }
+  
+  .status-rejected {
+    color: #D32F2F; 
+  }
+  
+  .status-pending-approval {
+    color: #F57C00; 
+  }
   
   
   

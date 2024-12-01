@@ -19,13 +19,14 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { EditCreditLimitPopupComponent } from './edit-credit-limit-popup/edit-credit-limit-popup.component';
+
 
 interface Buyer {
   id: number;
   name: string;
   dateCreated: Date;
-  createdBy: string;
-  accountManager: string;
   noOfUsers: number;
   status: string;
   creditLimit: number;
@@ -53,7 +54,9 @@ interface Buyer {
     MatFormFieldModule,
     MatChipsModule,
     MatMenuModule,
-    MatSortModule
+    MatSortModule,
+    MatDialogModule,
+    EditCreditLimitPopupComponent,
   ],
   templateUrl: './my-buyers.component.html',
   styleUrls: ['./my-buyers.component.css']
@@ -61,6 +64,8 @@ interface Buyer {
 export class MyBuyersComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(EditCreditLimitPopupComponent) editCreditLimitPopup!: EditCreditLimitPopupComponent;
+
 
   filterForm: FormGroup;
   activeTabIndex = 0;
@@ -73,17 +78,16 @@ export class MyBuyersComponent implements OnInit, AfterViewInit {
   showApproveRequestContent = false;
 
   buyers: Buyer[] = [
-    { id: 1, name: 'Silverline Innovations LLC', dateCreated: new Date('2024-11-09'), createdBy: 'Mark Smith', accountManager: 'Mark Smith', noOfUsers: 5, status: 'Active', creditLimit: 50000 },
-    { id: 2, name: 'Vanguard Resource Group LP', dateCreated: new Date('2024-11-09'), createdBy: 'John Bill', accountManager: '', noOfUsers: 4, status: 'Inactive', creditLimit: 75000 },
-    { id: 3, name: 'Quantum Edge Systems Inc', dateCreated: new Date('2024-11-09'), createdBy: 'Walter Stan', accountManager: 'Walter Stan', noOfUsers: 6, status: 'Active', creditLimit: 100000 },
-    { id: 4, name: 'Maple Leaf Consulting', dateCreated: new Date('2024-11-09'), createdBy: 'Sarah Lin', accountManager: '', noOfUsers: 8, status: 'Active', creditLimit: 25000 },
-    { id: 5, name: 'Blue Horizon Ventures LLC', dateCreated: new Date('2024-11-09'), createdBy: 'Alice Brown', accountManager: 'Alice Brown', noOfUsers: 7, status: 'Inactive', creditLimit: 150000 },
-    { id: 6, name: 'Golden Path Marketing', dateCreated: new Date('2024-11-09'), createdBy: 'Michael Chen', accountManager: '', noOfUsers: 9, status: 'Active', creditLimit: 80000 }
+    { id: 1, name: 'Silverline Innovations LLC', dateCreated: new Date('2024-11-09'), noOfUsers: 5, status: 'Active', creditLimit: 50000 },
+    { id: 2, name: 'Vanguard Resource Group LP', dateCreated: new Date('2024-11-09'), noOfUsers: 4, status: 'Inactive', creditLimit: 75000 },
+    { id: 3, name: 'Quantum Edge Systems Inc', dateCreated: new Date('2024-11-09'), noOfUsers: 6, status: 'Active', creditLimit: 100000 },
+    { id: 4, name: 'Maple Leaf Consulting', dateCreated: new Date('2024-11-09'), noOfUsers: 8, status: 'Active', creditLimit: 25000 },
+    { id: 5, name: 'Blue Horizon Ventures LLC', dateCreated: new Date('2024-11-09'), noOfUsers: 7, status: 'Inactive', creditLimit: 150000 },
+    { id: 6, name: 'Golden Path Marketing', dateCreated: new Date('2024-11-09'), noOfUsers: 9, status: 'Active', creditLimit: 80000 }
   ];
 
   displayedColumns: string[] = [
-    'id', 'name', 'dateCreated', 'createdBy',
-    'accountManager', 'noOfUsers', 'creditLimit', 'status', 'actions'
+    'id', 'name', 'dateCreated', 'noOfUsers', 'creditLimit', 'status', 'actions'
   ];
 
   statusOptions = [
@@ -92,7 +96,7 @@ export class MyBuyersComponent implements OnInit, AfterViewInit {
     { value: 'inactive', label: 'Inactive' }
   ];
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private dialog: MatDialog) {
     this.filterForm = this.fb.group({
       fromDate: [''],
       toDate: [''],
@@ -102,15 +106,8 @@ export class MyBuyersComponent implements OnInit, AfterViewInit {
     });
 
     this.dataSource = new MatTableDataSource(this.buyers);
+    this.dataSource.sortingDataAccessor = this.sortingDataAccessor;
 
-    this.dataSource.sortingDataAccessor = (item, property) => {
-      switch (property) {
-        case 'dateCreated': return new Date(item.dateCreated).getTime();
-        case 'noOfUsers': return item.noOfUsers;
-        case 'creditLimit': return item.creditLimit;
-        default: return (item as any)[property];
-      }
-    };
   }
 
   ngOnInit() {
@@ -124,6 +121,15 @@ export class MyBuyersComponent implements OnInit, AfterViewInit {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
+
+  sortingDataAccessor = (item: Buyer, property: string) => {
+    switch (property) {
+      case 'dateCreated': return new Date(item.dateCreated).getTime();
+      case 'noOfUsers': return item.noOfUsers;
+      case 'creditLimit': return item.creditLimit;
+      default: return (item as any)[property];
+    }
+  };
 
   onTabChange(event: any) {
     this.activeTabIndex = event.index;
@@ -212,11 +218,20 @@ export class MyBuyersComponent implements OnInit, AfterViewInit {
     }
   }
 
-  getAccountManagerActionLabel(accountManager: string): string {
-    return accountManager ? 'Change Account Manager' : 'Assign Account Manager';
+  openEditCreditLimitPopup(buyer: Buyer) {
+    const dialogRef = this.dialog.open(EditCreditLimitPopupComponent, {
+      width: '400px',
+      data: { currentCreditLimit: buyer.creditLimit }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result !== undefined) {
+        buyer.creditLimit = result;
+        this.dataSource.data = [...this.dataSource.data];
+      }
+    });
   }
 
-  getAccountManagerActionIcon(accountManager: string): string {
-    return accountManager ? 'edit' : 'person_add';
-  }
+
+
 }

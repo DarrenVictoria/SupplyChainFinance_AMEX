@@ -1,0 +1,27 @@
+:host {
+    display: block;
+    padding: 24px;
+  }
+  
+  .mat-dialog-title {
+    margin-bottom: 24px;
+  }
+  
+  .mat-dialog-content {
+    margin-bottom: 24px;
+  }
+  
+  .mat-dialog-actions {
+    justify-content: flex-end;
+  }
+
+  .input-field {
+    padding: 15px;
+  }
+
+  .current-limit{
+    font-size: 25px;
+    font-weight: 500;
+    color: #000;
+    margin-bottom: 10px;
+  }

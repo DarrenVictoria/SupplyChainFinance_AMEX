@@ -194,4 +194,14 @@
     color: white !important;
   }
   
+
+  ::ng-deep .approved {
+    color: #4CAF50 !important; /* green text */
+    background-color: transparent !important;
+  }
+  
+  ::ng-deep .rejected {
+    color: #D32F2F !important; /* red text */
+    background-color: transparent !important;
+  }
   

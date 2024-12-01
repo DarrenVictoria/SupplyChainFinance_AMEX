@@ -2,6 +2,20 @@
 <div class="invoice-form-container">
   <h1>Add Invoice</h1>
 
+<!-- american-express.component.html -->
+<div class="credit-remainder">Your Credit Overview</div>
+<div class="american-express-card">
+  <img class="card-img" src="./american-express-card.png" alt="American Express Card">
+  <div class="card-text">
+    <div class="card-number">{{ cardNumber }}</div>
+    <div class="credit-limit">
+      <span class="value">Credit Limit:</span> ${{ creditLimit }}
+    </div>
+    <div class="available-credit">
+      <span class="value">Available Credit:</span> ${{ availableCredit }}
+    </div>
+  </div>
+</div>
   <div class="upload-section">
     <input 
       type="file" 

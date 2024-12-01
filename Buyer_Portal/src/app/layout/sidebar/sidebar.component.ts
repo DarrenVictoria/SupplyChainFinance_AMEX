@@ -22,7 +22,6 @@ export class SidebarComponent implements OnInit {
   profileImageUrl: string = '';
 
   tabs: Tab[] = [
-
     {
       iconType: 'bar_chart',
       text: 'Dashboard',
@@ -33,15 +32,6 @@ export class SidebarComponent implements OnInit {
       text: 'Merchants',
       route: '/merchants'
     },
-    // {
-    //   iconType: 'assignment_add',
-    //   text: 'Requests',
-    //   subTabs: [
-    //     { text: 'Creation', route: '/requests/creation' },
-    //     { text: 'Submission', route: '/requests/submission' }
-    //   ],
-    //   route: ''
-    // },
     {
       iconType: 'book',
       text: 'Invoices',
@@ -54,23 +44,13 @@ export class SidebarComponent implements OnInit {
     }
   ];
 
-  // settingsTabs: Tab[] = [
-  //   {
-  //     iconType: 'payments',
-  //     text: 'Financial',
-  //     route: '/financial'
-  //   },
-  //   {
-  //     iconType: 'group',
-  //     text: 'Users',
-  //     route: '/users'
-  //   },
-  //   {
-  //     iconType: 'analytics',
-  //     text: 'Business Activities',
-  //     route: '/business-activities'
-  //   }
-  // ];
+  settingsTabs: Tab[] = [
+    {
+      iconType: 'manage_accounts',
+      text: 'User Management',
+      route: '/user-management'
+    }
+  ];
 
   constructor(private router: Router) { }
 
@@ -87,7 +67,6 @@ export class SidebarComponent implements OnInit {
       this.router.navigate([tab.route]);
     }
   }
-
 
   navigateToSubTab(subTab: { text: string; route: string }): void {
     this.router.navigate([subTab.route]);

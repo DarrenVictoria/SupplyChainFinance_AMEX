@@ -1,0 +1,131 @@
+<div class="user-management-container">
+    <mat-card>
+      <mat-card-content>
+        <mat-tab-group>
+          <mat-tab label="Users">
+            <mat-table [dataSource]="users" class="expanded-table">
+              <!-- Username Column -->
+              <ng-container matColumnDef="userName">
+                <mat-header-cell *matHeaderCellDef>User Name</mat-header-cell>
+                <mat-cell *matCellDef="let user">{{user.userName}}</mat-cell>
+              </ng-container>
+  
+              <!-- First Name Column -->
+              <ng-container matColumnDef="firstName">
+                <mat-header-cell *matHeaderCellDef>First Name</mat-header-cell>
+                <mat-cell *matCellDef="let user">{{user.firstName}}</mat-cell>
+              </ng-container>
+  
+              <!-- Last Name Column -->
+              <ng-container matColumnDef="lastName">
+                <mat-header-cell *matHeaderCellDef>Last Name</mat-header-cell>
+                <mat-cell *matCellDef="let user">{{user.lastName}}</mat-cell>
+              </ng-container>
+  
+              <!-- Email Column -->
+              <ng-container matColumnDef="email">
+                <mat-header-cell *matHeaderCellDef>Email</mat-header-cell>
+                <mat-cell *matCellDef="let user">{{user.email}}</mat-cell>
+              </ng-container>
+  
+              <!-- Actions Column -->
+              <ng-container matColumnDef="actions">
+                <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
+                <mat-cell *matCellDef="let user">
+                  <div class="actions-container">
+                    <button 
+                      mat-raised-button 
+                      color="primary" 
+                      class="user-action-button"
+                      (click)="openUserDetailsDialog(user)">
+                      View Details
+                    </button>
+                    <button 
+                      mat-raised-button 
+                      color="accent" 
+                      class="user-action-button"
+                      (click)="generatePassword(user)">
+                      Reset Password
+                    </button>
+                  </div>
+                </mat-cell>
+              </ng-container>
+  
+              <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+              <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+            </mat-table>
+          </mat-tab>
+  
+          <mat-tab label="Add New User">
+            <form #userForm="ngForm" (ngSubmit)="addUser(userForm)" class="user-form">
+              <mat-form-field>
+                <mat-label>User Name</mat-label>
+                <input 
+                  matInput 
+                  [(ngModel)]="newUser.userName" 
+                  name="userName" 
+                  required 
+                  #userNameInput="ngModel"
+                >
+                <mat-error *ngIf="userNameInput.invalid && (userNameInput.dirty || userNameInput.touched)">
+                  User Name is required
+                </mat-error>
+              </mat-form-field>
+  
+              <mat-form-field>
+                <mat-label>First Name</mat-label>
+                <input 
+                  matInput 
+                  [(ngModel)]="newUser.firstName" 
+                  name="firstName" 
+                  required
+                  #firstNameInput="ngModel"
+                >
+                <mat-error *ngIf="firstNameInput.invalid && (firstNameInput.dirty || firstNameInput.touched)">
+                  First Name is required
+                </mat-error>
+              </mat-form-field>
+  
+              <mat-form-field>
+                <mat-label>Last Name</mat-label>
+                <input 
+                  matInput 
+                  [(ngModel)]="newUser.lastName" 
+                  name="lastName" 
+                  required
+                  #lastNameInput="ngModel"
+                >
+                <mat-error *ngIf="lastNameInput.invalid && (lastNameInput.dirty || lastNameInput.touched)">
+                  Last Name is required
+                </mat-error>
+              </mat-form-field>
+  
+              <mat-form-field>
+                <mat-label>Email</mat-label>
+                <input 
+                  matInput 
+                  type="email" 
+                  [(ngModel)]="newUser.email" 
+                  name="email" 
+                  required 
+                  email
+                  #emailInput="ngModel"
+                >
+                <mat-error *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched)">
+                  Please enter a valid email
+                </mat-error>
+              </mat-form-field>
+  
+              <button 
+                mat-raised-button 
+                color="primary" 
+                type="submit"
+                [disabled]="!userForm.valid">
+                Add User
+              </button>
+            </form>
+          </mat-tab>
+        </mat-tab-group>
+      </mat-card-content>
+    </mat-card>
+  </div>

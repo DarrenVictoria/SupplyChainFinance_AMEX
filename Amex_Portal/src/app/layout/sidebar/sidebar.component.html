@@ -1,31 +1,37 @@
+<!-- Material Icons Font -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"/>
 
+<!-- Sidebar Navigation -->
 <nav class="sidebar">
-  <!-- Logo -->
+  <!-- Logo Section -->
   <div class="logo">
     <img src="../../../../amex-logo.png" alt="American Express" class="logo-image">
     <h3 style="margin-right: 2.5rem; margin-top: -1.5rem;">Finance Portal</h3>
   </div>
 
-  <!-- Main Navigation -->
+  <!-- Main Navigation List -->
   <ul class="nav-list">
+    <!-- Iterate through main tabs -->
     <li class="nav-item" *ngFor="let tab of tabs">
+      <!-- Main Tab Link -->
       <a (click)="setActiveTab(tab)" class="nav-link" [ngClass]="{ 'active': tab.isExpanded }">
         <span class="material-icons icon">{{ tab.iconType }}</span>
         <span>{{ tab.text }}</span>
       </a>
       
-      <!-- First level sub-navigation -->
+      <!-- First Level Sub-Navigation -->
       <ul class="sub-nav" *ngIf="tab.subTabs && tab.isExpanded">
         <li *ngFor="let subTab of tab.subTabs">
+          <!-- Sub-Tab Link -->
           <a (click)="setActiveSubTab(subTab)" class="sub-nav-link">
             <span class="material-icons icon">{{ subTab.iconType }}</span>
             <span>{{ subTab.text }}</span>
           </a>
           
-          <!-- Second level sub-navigation -->
+          <!-- Second Level Sub-Navigation -->
           <ul class="sub-nav" *ngIf="subTab.subTabs && subTab.isExpanded">
             <li *ngFor="let subSubTab of subTab.subTabs">
+              <!-- Sub-Sub-Tab Link -->
               <a (click)="navigateToSubSubTab(subSubTab)" class="sub-nav-link">
                 <span class="material-icons icon">{{ subSubTab.iconType }}</span>
                 <span>{{ subSubTab.text }}</span>
@@ -37,7 +43,7 @@
     </li>
   </ul>
 
-  <!-- User Profile -->
+  <!-- User Profile Section -->
   <div class="user-profile">
     <div class="profile-info">
       <img [src]="profileImageUrl" alt="Profile" class="profile-image">

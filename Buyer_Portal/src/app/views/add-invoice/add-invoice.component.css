@@ -99,3 +99,43 @@
   border-style: none !important;
   border-width: 0 !important;
 }
+
+.american-express-card {
+  position: relative;
+  display: inline-block;
+}
+
+.card-text {
+  position: absolute;
+  top: 60%;
+  left: 45%;
+  transform: translate(-50%, -50%);
+  text-align: left;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-family: 'Roboto', sans-serif;
+}
+
+.card-number {
+  font-size: 1.2rem;
+  margin-bottom: 1.4rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-img {
+  width: 20rem;
+  max-width: 100%;
+}
+
+.value {
+  color: rgb(136, 136, 64);
+}
+
+.credit-remainder {
+  color: rgb(43, 29, 135);
+  font-weight: bold;
+  margin-left: 2rem;
+}

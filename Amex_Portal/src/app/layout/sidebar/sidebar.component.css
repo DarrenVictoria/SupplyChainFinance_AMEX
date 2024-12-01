@@ -133,4 +133,29 @@
   text-transform: uppercase;
 }
 
+.settings-section {
+  margin-top: 20px;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 10px;
+}
+
+.settings-title {
+  color: #666;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: 10px 15px;
+  font-size: 0.8em;
+}
+
+.settings-nav {
+  list-style-type: none;
+  padding: 0;
+}
+
+.settings-nav .nav-link {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  cursor: pointer;
+}
 

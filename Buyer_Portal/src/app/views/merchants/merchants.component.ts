@@ -236,9 +236,9 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
   getStatusClass(status: string): string {
     switch (status.toLowerCase()) {
       case 'active':
-        return 'text-green-500';
+        return 'status-active';
       case 'inactive':
-        return 'text-red-500';
+        return 'status-inactive';
       default:
         return '';
     }
@@ -247,11 +247,11 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
   getApprovalStatusClass(approvalStatus: string): string {
     switch (approvalStatus.toLowerCase()) {
       case 'approved':
-        return 'text-green-500';
+        return 'status-approved';
       case 'rejected':
-        return 'text-red-500';
+        return 'status-rejected';
       case 'pending approval':
-        return 'text-orange-500';
+        return 'status-pending-approval';
       default:
         return '';
     }

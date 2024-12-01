@@ -2,12 +2,14 @@ import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
+// Define an interface to represent the structure of sidebar tabs
+// This allows for nested, hierarchical navigation with support for multiple levels
 interface Tab {
-  iconType: string;
-  text: string;
-  route: string;
-  subTabs?: Tab[];
-  isExpanded?: boolean;
+  iconType: string;  // Material Icons identifier
+  text: string;      // Display text for the tab
+  route: string;     // Navigation route
+  subTabs?: Tab[];   // Optional nested tabs
+  isExpanded?: boolean;  // Track expanded/collapsed state
 }
 
 @Component({
@@ -18,12 +20,17 @@ interface Tab {
   styleUrls: ['./sidebar.component.css']
 })
 export class SidebarComponent implements OnInit {
+  // Input to control sidebar open/closed state
   @Input() isOpen: boolean = true;
+
+  // Track currently active main and sub tabs
   activeMainTab: Tab | null = null;
   activeSubTab: Tab | null = null;
 
+  // Profile image URL
   profileImageUrl: string = '';
 
+  // Define the sidebar navigation structure
   tabs: Tab[] = [
     {
       iconType: 'dashboard',
@@ -53,7 +60,7 @@ export class SidebarComponent implements OnInit {
             {
               iconType: 'check_box',
               text: 'Approvals',
-              route: '/approvals'
+              route: '/buyers/approvals'
             }
           ]
         },
@@ -67,7 +74,30 @@ export class SidebarComponent implements OnInit {
     {
       iconType: 'credit_card',
       text: 'Payments',
-      route: '/payments'
+      route: '/payments',
+    },
+    {
+      // New Settings section with nested administrative options
+      iconType: 'settings',
+      text: 'Settings',
+      route: '', // No direct route for the Settings section
+      subTabs: [
+        {
+          iconType: 'manage_accounts',
+          text: 'User Management',
+          route: '/user-management'
+        },
+        {
+          iconType: 'event',
+          text: 'Holiday Setup',
+          route: '/holidaysetup'
+        },
+        {
+          iconType: 'inventory_2',
+          text: 'Types of Products',
+          route: '/typeproducts'
+        }
+      ]
     }
   ];
 
@@ -77,11 +107,14 @@ export class SidebarComponent implements OnInit {
     this.setRandomProfileImage();
   }
 
+  // Handle main tab selection
   setActiveTab(tab: Tab): void {
     if (tab.subTabs) {
+      // If the tab has sub-tabs, toggle its expanded state
       if (this.activeMainTab === tab) {
         tab.isExpanded = !tab.isExpanded;
       } else {
+        // Close previously expanded main tab
         if (this.activeMainTab) {
           this.activeMainTab.isExpanded = false;
         }
@@ -92,29 +125,35 @@ export class SidebarComponent implements OnInit {
 
       this.activeSubTab = null;
     } else {
+      // If no sub-tabs, navigate directly
       this.router.navigate([tab.route]);
     }
   }
 
+  // Handle sub-tab selection
   setActiveSubTab(subTab: Tab): void {
     if (subTab.subTabs) {
+      // Toggle sub-tab expansion if it has further sub-tabs
       subTab.isExpanded = !subTab.isExpanded;
       this.activeSubTab = subTab;
     } else {
+      // Navigate directly if no further sub-tabs
       this.router.navigate([subTab.route]);
     }
   }
 
+  // Navigate to deepest level sub-tabs
   navigateToSubSubTab(subSubTab: Tab): void {
-    // Directly navigate to the route of the sub-sub tab
     this.router.navigate([subSubTab.route]);
   }
 
+  // Logout functionality
   logout(): void {
     console.log('Logout clicked');
     this.router.navigate(['/login']);
   }
 
+  // Set a default profile image
   setRandomProfileImage(): void {
     this.profileImageUrl = `https://www.pngplay.com/wp-content/uploads/12/User-Avatar-Profile-PNG-Free-File-Download.png`;
   }

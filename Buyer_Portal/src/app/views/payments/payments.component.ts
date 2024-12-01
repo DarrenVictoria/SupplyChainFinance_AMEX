@@ -309,13 +309,47 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
       return;
     }
 
-    // Filter merchants based on the date range
+    // Filter merchants based on all active filter criteria
     const statementsInRange = this.merchants.filter(merchant => {
       const merchantDate = new Date(merchant.dateCreated);
       const fromDate = new Date(filters.fromDate);
       const toDate = new Date(filters.toDate);
-      return merchantDate >= fromDate && merchantDate <= toDate;
+
+      // Date range filter
+      const dateMatch = merchantDate >= fromDate && merchantDate <= toDate;
+
+      // Status filters
+      const statusMatch = !filters.status || merchant.buyerStatus === filters.status;
+      const approvalStatusMatch = !filters.approvalStatus || merchant.paymentStatus === filters.approvalStatus;
+      const productCodeMatch = !filters.productCode || merchant.productCode === filters.productCode;
+
+      // Search filter
+      let searchMatch = true;
+      if (filters.searchType && filters.searchTerm) {
+        const searchTerm = filters.searchTerm.toLowerCase();
+        switch (filters.searchType) {
+          case 'requestId':
+            searchMatch = merchant.requestId.toLowerCase().includes(searchTerm);
+            break;
+          case 'merchant':
+            searchMatch = merchant.merchant.toLowerCase().includes(searchTerm);
+            break;
+          case 'invoiceNumber':
+            searchMatch = merchant.invoiceNumber.toLowerCase().includes(searchTerm);
+            break;
+        }
+      }
+
+      // Combine all filter conditions
+      return dateMatch && statusMatch && approvalStatusMatch &&
+        productCodeMatch && searchMatch;
     });
+
+    // If no merchants match the filters, show an alert
+    if (statementsInRange.length === 0) {
+      alert('No merchants found matching the selected filters');
+      return;
+    }
 
     this.downloadClientStatementPDF(statementsInRange, filters.fromDate, filters.toDate);
   }

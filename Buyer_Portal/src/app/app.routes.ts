@@ -9,6 +9,7 @@ import { HomepageComponent } from './views/homepage/homepage.component';
 import { PaymentsComponent } from './views/payments/payments.component';
 import { InvoicesComponent } from './views/invoices/invoices.component';
 import { AddInvoiceComponent } from './views/add-invoice/add-invoice.component';
+import { UserManagementComponent } from './views/settings/user-management/user-management.component';
 
 export const routes: Routes = [
   {
@@ -47,6 +48,10 @@ export const routes: Routes = [
       {
         path: 'add-invoice',
         component: AddInvoiceComponent
+      },
+      {
+        path: 'user-management',
+        component: UserManagementComponent
       },
 
       {

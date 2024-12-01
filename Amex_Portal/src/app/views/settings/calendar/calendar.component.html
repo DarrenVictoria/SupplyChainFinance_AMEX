@@ -1,0 +1,103 @@
+<div class="holiday-calendar-container">
+    <div class="calendar-and-form-container">
+      <!-- Calendar Section -->
+      <div class="calendar-section">
+        <div class="calendar-navigation">
+          <button (click)="previousMonth()">&lt;</button>
+          <h2>{{ currentDate | date:'MMMM yyyy' }}</h2>
+          <button (click)="nextMonth()">&gt;</button>
+        </div>
+  
+        <div class="calendar-grid">
+          <!-- Weekday Headers -->
+          <div class="weekday-header">Sun</div>
+          <div class="weekday-header">Mon</div>
+          <div class="weekday-header">Tue</div>
+          <div class="weekday-header">Wed</div>
+          <div class="weekday-header">Thu</div>
+          <div class="weekday-header">Fri</div>
+          <div class="weekday-header">Sat</div>
+  
+          <!-- Calendar Days -->
+          <div *ngFor="let day of generateCalendarDays()" 
+               class="calendar-day"
+               [class.holiday]="isHoliday(day)">
+            {{ day | date:'d' }}
+            <span *ngIf="isHoliday(day)" class="holiday-marker">
+              {{ isHoliday(day)?.name }}
+            </span>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Holiday Form Section -->
+      <div class="holiday-form-section">
+        <h3>Add New Holiday</h3>
+        <form (ngSubmit)="addHoliday()" class="holiday-form">
+          <div class="form-group">
+            <label>Holiday Name</label>
+            <input type="text" 
+                   [(ngModel)]="newHoliday.name" 
+                   name="name" 
+                   required>
+          </div>
+  
+          <div class="form-group">
+            <label>Start Date</label>
+            <input type="date" 
+                   [(ngModel)]="newHoliday.startDate" 
+                   name="startDate" 
+                   required>
+          </div>
+  
+          <div class="form-group">
+            <label>End Date</label>
+            <input type="date" 
+                   [(ngModel)]="newHoliday.endDate" 
+                   name="endDate" 
+                   required>
+          </div>
+  
+          <div class="form-group">
+            <label>Holiday Type</label>
+            <select [(ngModel)]="newHoliday.type" 
+                    name="type" 
+                    required>
+              <option *ngFor="let type of holidayTypes" [value]="type">
+                {{ type }}
+              </option>
+            </select>
+          </div>
+  
+          <button type="submit" class="add-holiday-btn">Add Holiday</button>
+        </form>
+      </div>
+    </div>
+  
+    <!-- Holidays Table -->
+    <div class="holidays-table-section">
+      <h3>Holidays List</h3>
+      <table class="holidays-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Type</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let holiday of holidays">
+            <td>{{ holiday.name }}</td>
+            <td>{{ holiday.startDate | date:'shortDate' }}</td>
+            <td>{{ holiday.endDate | date:'shortDate' }}</td>
+            <td>{{ holiday.type }}</td>
+            <td>
+              <button (click)="removeHoliday(holiday.id)">Remove</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
