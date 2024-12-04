@@ -218,19 +218,20 @@
       
           <!-- Actions Column -->
           <!-- Actions Column -->
-<ng-container matColumnDef="actions">
-  <th mat-header-cell *matHeaderCellDef>Actions</th>
-  <td mat-cell *matCellDef="let merchant">
-    <button
-      *ngIf="merchant.buyerStatus === 'Approved'"
-      style="padding: 10px;"
-      mat-raised-button
-      color="primary"
-    >
-      Request Payment
-    </button>
-  </td>
-</ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let merchant">
+              <button
+                *ngIf="merchant.buyerStatus === 'Approved'"
+                style="padding: 10px;"
+                mat-raised-button
+                color="primary"
+                [routerLink]="'/requestpayment'"
+              >
+                Request Payment
+              </button>
+            </td>
+          </ng-container>
 
       
           <!-- Table Row Definitions -->

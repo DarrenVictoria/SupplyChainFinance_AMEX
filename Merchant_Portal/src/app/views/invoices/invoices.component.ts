@@ -2,7 +2,7 @@ import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { Router } from '@angular/router';
+import { Router, RouterLink, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -60,7 +60,9 @@ interface Merchant {
     MatChipsModule,
     MatMenuModule,
     MatSortModule,
-    MatTooltipModule
+    MatTooltipModule,
+    RouterModule,
+    RouterLink
   ],
   templateUrl: './invoices.component.html',
   styleUrls: ['./invoices.component.css'],
