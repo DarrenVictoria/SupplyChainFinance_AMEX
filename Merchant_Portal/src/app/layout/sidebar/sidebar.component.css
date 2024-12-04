@@ -13,11 +13,14 @@
   text-align: center;
   padding-right: 1rem;
   padding-left: 1.5rem;
+ 
 }
 
 .logo-image {
   height: 80px;
+  margin-bottom: 0.5rem;
 }
+
 
 .nav-list {
   list-style: none;
@@ -43,7 +46,7 @@
 .nav-link.active,
 .nav-link:hover {
   background-color: #59ABCF;
-  color: #fff;
+  color: #000000;
   border-radius: 8px;
 }
 
@@ -133,12 +136,43 @@
   text-transform: uppercase;
 }
 
-.portal-title{
-  margin-right: 1.75rem;
-  margin-top: 1rem;
+.settings-section {
+  margin-top: 20px;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 10px;
 }
 
-.merchant-id{
-  margin-right: 1rem;
+.settings-title {
+  color: #000000;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: 10px 15px;
+  font-size: 0.8em;
+}
+
+.settings-nav {
+  list-style-type: none;
+  padding: 0;
+}
+
+.settings-nav .nav-link {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  cursor: pointer;
+}
+
+.nav-link.current-route, 
+.sub-nav-link.current-route {
+  background-color: #93b8ee;  /* Light gray background for current route */
+  font-weight: bold;
+  color: #000000;  /* Highlight color */
+  border-radius: 10px;
+}
+
+.nav-link.active, 
+.sub-nav-link.active {
+  background-color: #93b8ee;  /* Light blue for expanded/active sections */
+  border-radius: 10px;
 }
 

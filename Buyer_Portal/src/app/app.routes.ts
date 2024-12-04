@@ -21,7 +21,7 @@ export const routes: Routes = [
         component: PlaceholderComponent
       },
       {
-        path: 'merchants',
+        path: 'suppliers',
         component: MerchantsComponent
       },
       // {

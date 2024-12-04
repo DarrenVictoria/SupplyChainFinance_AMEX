@@ -1,0 +1,198 @@
+<div class="user-management-container">
+  <mat-card>
+    <mat-card-content>
+      <mat-tab-group>
+        <mat-tab label="Users">
+          <div class="table-header">
+            <button 
+              mat-raised-button 
+              color="primary" 
+              class="add-user-button" 
+              (click)="openNewUserDialog()">
+              <mat-icon>add</mat-icon> Add New User
+            </button>
+          </div>
+          <mat-table [dataSource]="users" class="expanded-table">
+            <!-- Username Column -->
+            <ng-container matColumnDef="userName">
+              <mat-header-cell *matHeaderCellDef>User Name</mat-header-cell>
+              <mat-cell *matCellDef="let user">{{user.userName}}</mat-cell>
+            </ng-container>
+  
+            <!-- First Name Column -->
+            <ng-container matColumnDef="firstName">
+              <mat-header-cell *matHeaderCellDef>First Name</mat-header-cell>
+              <mat-cell *matCellDef="let user">{{user.firstName}}</mat-cell>
+            </ng-container>
+  
+            <!-- Last Name Column -->
+            <ng-container matColumnDef="lastName">
+              <mat-header-cell *matHeaderCellDef>Last Name</mat-header-cell>
+              <mat-cell *matCellDef="let user">{{user.lastName}}</mat-cell>
+            </ng-container>
+  
+            <!-- Email Column -->
+            <ng-container matColumnDef="email">
+              <mat-header-cell *matHeaderCellDef>Email</mat-header-cell>
+              <mat-cell *matCellDef="let user" style="min-width: 150px;">{{user.email}}</mat-cell>
+            </ng-container>
+
+            <!-- Role Column -->
+            <ng-container matColumnDef="role">
+              <mat-header-cell *matHeaderCellDef>Role</mat-header-cell>
+              <mat-cell *matCellDef="let user">{{user.role}}</mat-cell>
+            </ng-container>
+  
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+              <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
+              <mat-cell *matCellDef="let user">
+                <div class="actions-container">
+                  <button 
+                    mat-raised-button 
+                    color="primary" 
+                    class="user-action-button"
+                    (click)="openUserDetailsDialog(user)">
+                    Edit Details
+                  </button>
+                  <button 
+                  class="button-style"
+                    mat-raised-button 
+                    color="accent" 
+                    class="user-action-button"
+                    (click)="generatePassword(user)">
+                    Issue Credentials
+                  </button>
+                  <button 
+                    class="button-style"
+                    mat-icon-button 
+                    color="warn"
+                    (click)="deleteUser(user)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </mat-cell>
+            </ng-container>
+  
+            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+          </mat-table>
+        </mat-tab>
+  
+        <mat-tab label="Programs">
+          <div class="programs-container" *ngIf="programs.length > 0">
+            <div class="program-list">
+              <mat-card 
+                *ngFor="let program of programs" 
+                class="program-card"
+                (click)="selectProgram(program)"
+                [class.selected]="program.isActive">
+                <mat-card-header>
+                  <mat-card-title style="min-width: 200px !important;">{{ program.programName }}</mat-card-title>
+                  <mat-card-subtitle>
+                    {{ program.productTypes.join(', ') }}
+                  </mat-card-subtitle>
+                  <mat-card-title-group>
+                    <mat-icon *ngIf="program.isActive" color="primary">check_circle</mat-icon>
+                  </mat-card-title-group>
+                </mat-card-header>
+              </mat-card>
+            </div>
+            
+            <div class="program-details" *ngIf="selectedProgram">
+              <mat-card>
+                <mat-card-header>
+                  <mat-card-title>Program Details</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                  <table mat-table [dataSource]="getProgramDetails()" class="program-details-table">
+                    <ng-container matColumnDef="name">
+                      <th mat-header-cell *matHeaderCellDef>Attribute</th>
+                      <td mat-cell *matCellDef="let element" 
+                          [ngClass]="{
+                            'daily-rate-factoring-group': element.name === 'Daily Rate (Factoring)' || element.name === 'Supplier Exceptions',
+                            'daily-rate-direct-group': element.name === 'Daily Rate (Direct)' || element.name === 'Grace Period'
+                          }">
+                        {{ element.name }}
+                        <ng-container *ngIf="element.name === 'Daily Rate (Factoring)'">
+                          <div class="section-title" style="margin-top: 10px;">Invoice Factoring Settings</div>
+                        </ng-container>
+                        <ng-container *ngIf="element.name === 'Daily Rate (Direct)'">
+                          <div class="section-title" style="margin-top: 10px;">Direct Payment Settings</div>
+                        </ng-container>
+                      </td>
+                    </ng-container>
+            
+                    <ng-container matColumnDef="value">
+                      <th mat-header-cell *matHeaderCellDef>Value</th>
+                      <td mat-cell *matCellDef="let element" 
+                          [ngClass]="{
+                            'daily-rate-factoring-group': element.name === 'Daily Rate (Factoring)' || element.name === 'Supplier Exceptions',
+                            'daily-rate-direct-group': element.name === 'Daily Rate (Direct)' || element.name === 'Grace Period'
+                          }">
+                        <ng-container *ngIf="element.name === 'Supplier Exceptions'">
+                          <div class="supplier-exceptions-value">
+                            <div *ngFor="let exception of getSupplierExceptions()">
+                              {{ exception }}
+                            </div>
+                          </div>
+                        </ng-container>
+                        <span *ngIf="element.name !== 'Supplier Exceptions'">
+                          {{ element.value }}
+                        </span>
+                      </td>
+                    </ng-container>
+            
+                    <tr mat-header-row *matHeaderRowDef="['name', 'value']"></tr>
+                    <tr mat-row *matRowDef="let row; columns: ['name', 'value']"></tr>
+                  </table>
+                </mat-card-content>
+              </mat-card>
+            </div>
+          </div>
+
+          <div *ngIf="programs.length === 0" class="no-programs">
+            <p>No programs configured yet.</p>
+            <button mat-raised-button color="primary">Add New Program</button>
+          </div>
+        </mat-tab>
+
+        <mat-tab label="General">
+          <div class="general-settings">
+            <mat-card>
+              <mat-card-header>
+                <mat-card-title style="margin-bottom: 20px;">System Settings</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="toggle-section">
+                  <mat-slide-toggle 
+                  color="primary" 
+                    [(ngModel)]="mainActiveToggle"
+                    (change)="onMainActiveToggleChange($event.checked)">
+                    Main System Active
+                  </mat-slide-toggle>
+
+                  <div *ngIf="mainActiveToggle" class="nested-toggles">
+                    <mat-slide-toggle 
+                    color="primary" 
+                      [(ngModel)]="enableNotifications"
+                      (change)="onNotificationsToggleChange($event.checked)">
+                      Enable Notifications
+                    </mat-slide-toggle>
+
+                    <mat-slide-toggle 
+                    color="primary" 
+                      [(ngModel)]="enableMakerCheckerInvoice"
+                      (change)="onMakerCheckerInvoiceToggleChange($event.checked)">
+                      Enable Maker/Checker Invoice Upload
+                    </mat-slide-toggle>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+  </mat-card>
+</div>

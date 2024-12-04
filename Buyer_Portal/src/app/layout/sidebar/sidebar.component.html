@@ -10,7 +10,12 @@
   <!-- Main Navigation -->
   <ul class="nav-list">
     <li class="nav-item" *ngFor="let tab of tabs">
-      <a (click)="setActiveTab(tab)" class="nav-link" [ngClass]="{ 'active': activeTab === tab }">
+      <a (click)="setActiveTab(tab)" 
+         class="nav-link" 
+         [ngClass]="{ 
+           'current-route': tab.isActive, 
+           'active': activeTab === tab 
+         }">
         <span class="material-icons icon">{{ tab.iconType }}</span>
         <span>{{ tab.text }}</span>
       </a>
@@ -29,7 +34,12 @@
 
     <!-- Settings Tabs -->
     <li class="nav-item" *ngFor="let settingTab of settingsTabs">
-      <a (click)="setActiveTab(settingTab)" class="nav-link" [ngClass]="{ 'active': activeTab === settingTab }">
+      <a (click)="setActiveTab(settingTab)" 
+         class="nav-link" 
+         [ngClass]="{ 
+           'current-route': settingTab.isActive, 
+           'active': activeTab === settingTab 
+         }">
         <span class="material-icons icon">{{ settingTab.iconType }}</span>
         <span>{{ settingTab.text }}</span>
       </a>

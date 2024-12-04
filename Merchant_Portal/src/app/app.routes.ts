@@ -12,6 +12,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { BuyerGridComponent } from './views/buyer-grid/buyer-grid.component';
 import { InvoicesComponent } from './views/invoices/invoices.component';
 import { AddInvoiceComponent } from './views/add-invoice/add-invoice.component';
+import { RequestPaymentComponent } from './views/invoices/request-payment/request-payment.component';
 
 export const routes: Routes = [
   {
@@ -31,6 +32,10 @@ export const routes: Routes = [
       {
         path: 'buyers',
         component: BuyerGridComponent
+      },
+      {
+        path: 'requestpayment',
+        component: RequestPaymentComponent
       },
       {
         path: '',
@@ -55,6 +60,8 @@ export const routes: Routes = [
     path: 'company-registration',
     component: CompanyRegistrationComponent
   },
+
+
   {
     path: '**',
     redirectTo: ''

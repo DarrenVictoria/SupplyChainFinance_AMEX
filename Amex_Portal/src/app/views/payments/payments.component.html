@@ -38,21 +38,32 @@
               <mat-label>Buyer</mat-label>
               <input matInput formControlName="buyer">
             </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>Payment Terms</mat-label>
+              <mat-select formControlName="paymentTerms" placeholder="Select payment terms">
+                <mat-option value="30">30 Days</mat-option>
+                <mat-option value="60">60 Days</mat-option>
+                <mat-option value="90">90 Days</mat-option>
+              </mat-select>
+            </mat-form-field>
   
             <mat-form-field>
-              <mat-label>Merchant</mat-label>
+              <mat-label>Supplier</mat-label>
               <input matInput formControlName="merchant">
             </mat-form-field>
   
             <mat-form-field>
-              <mat-label>Product Code</mat-label>
-              <mat-select formControlName="productCode">
-                <mat-option *ngFor="let option of productCodeOptions" [value]="option.value">
+              <mat-label>Program</mat-label>
+              <mat-select formControlName="program">
+                <mat-option *ngFor="let option of programOptions" [value]="option.value">
                   {{option.label}}
                 </mat-option>
               </mat-select>
             </mat-form-field>
           </div>
+
+
   
           <!-- Reset Button Section -->
           <div class="filter-actions">
@@ -82,7 +93,7 @@
             </ng-container>
   
             <ng-container matColumnDef="merchant">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Merchant</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Supplier</th>
               <td mat-cell *matCellDef="let payment">{{ payment.merchant }}</td>
             </ng-container>
   
@@ -91,6 +102,26 @@
               <td mat-cell *matCellDef="let payment">{{ payment.invoiceNumber }}</td>
             </ng-container>
   
+            <!-- New Invoice Date Column -->
+            <ng-container matColumnDef="invoiceDate">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Invoice Date</th>
+              <td mat-cell *matCellDef="let payment">{{ payment.invoiceDate | date }}</td>
+            </ng-container>
+  
+            <!-- New Due Date Column -->
+            <ng-container matColumnDef="dueDate">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Due Date</th>
+              <td mat-cell *matCellDef="let payment">{{ payment.dueDate | date }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="paymentTerms">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Payment Terms</th>
+              <td mat-cell *matCellDef="let payment">{{payment.paymentTerms}}</td>
+            </ng-container>
+
+           
+  
+            <!-- Rest of the existing columns remain the same -->
             <ng-container matColumnDef="invoiceAmount">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>Invoice Amount</th>
               <td mat-cell *matCellDef="let payment">{{ payment.invoiceAmount | currency }}</td>
@@ -106,9 +137,9 @@
               <td mat-cell *matCellDef="let payment">{{ payment.financierReceivables | currency }}</td>
             </ng-container>
   
-            <ng-container matColumnDef="productCode">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Product Code</th>
-              <td mat-cell *matCellDef="let payment">{{ payment.productCode.toUpperCase() }}</td>
+            <ng-container matColumnDef="program">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Program</th>
+              <td mat-cell *matCellDef="let payment">{{ payment.program }}</td>
             </ng-container>
   
             <ng-container matColumnDef="actions">

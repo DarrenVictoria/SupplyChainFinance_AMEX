@@ -10,11 +10,17 @@
   </div>
 
   <!-- Main Navigation List -->
-  <ul class="nav-list">
+   <!-- Main Navigation List -->
+   <ul class="nav-list">
     <!-- Iterate through main tabs -->
     <li class="nav-item" *ngFor="let tab of tabs">
       <!-- Main Tab Link -->
-      <a (click)="setActiveTab(tab)" class="nav-link" [ngClass]="{ 'active': tab.isExpanded }">
+      <a (click)="setActiveTab(tab)" 
+         class="nav-link" 
+         [ngClass]="{ 
+           'active': tab.isExpanded || tab.isActive, 
+           'current-route': tab.isActive 
+         }">
         <span class="material-icons icon">{{ tab.iconType }}</span>
         <span>{{ tab.text }}</span>
       </a>
@@ -23,7 +29,12 @@
       <ul class="sub-nav" *ngIf="tab.subTabs && tab.isExpanded">
         <li *ngFor="let subTab of tab.subTabs">
           <!-- Sub-Tab Link -->
-          <a (click)="setActiveSubTab(subTab)" class="sub-nav-link">
+          <a (click)="setActiveSubTab(subTab)" 
+             class="sub-nav-link"
+             [ngClass]="{ 
+               'active': subTab.isExpanded, 
+               'current-route': subTab.isActive 
+             }">
             <span class="material-icons icon">{{ subTab.iconType }}</span>
             <span>{{ subTab.text }}</span>
           </a>
@@ -32,7 +43,9 @@
           <ul class="sub-nav" *ngIf="subTab.subTabs && subTab.isExpanded">
             <li *ngFor="let subSubTab of subTab.subTabs">
               <!-- Sub-Sub-Tab Link -->
-              <a (click)="navigateToSubSubTab(subSubTab)" class="sub-nav-link">
+              <a (click)="navigateToSubSubTab(subSubTab)" 
+                 class="sub-nav-link"
+                 [ngClass]="{ 'current-route': subSubTab.isActive }">
                 <span class="material-icons icon">{{ subSubTab.iconType }}</span>
                 <span>{{ subSubTab.text }}</span>
               </a>

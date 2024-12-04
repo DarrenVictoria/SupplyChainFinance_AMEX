@@ -93,7 +93,7 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
 
   searchTypeOptions = [
     { value: 'requestId', label: 'Request ID' },
-    { value: 'merchant', label: 'Merchant Name' },
+    { value: 'merchant', label: 'Supplier Name' },
     { value: 'invoiceNumber', label: 'Invoice Number' }
   ];
 

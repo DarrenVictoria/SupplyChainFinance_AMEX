@@ -33,7 +33,7 @@ interface Merchant {
   productCode: string;
   buyerStatus: string;
   paymentStatus: string;
-
+  paymentTerms: '30 days' | '60 days' | '90 days';
   approvedBy?: string;
   approvedDate?: string;
   approvalStatus?: 'Approved' | 'Rejected' | 'Pending';
@@ -106,8 +106,14 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
   // Update displayed columns
   displayedColumns: string[] = [
     'requestId', 'dateCreated', 'buyerName',
-    'invoiceNumber', 'invoiceAmount', 'creditAmount',
-    'productCode', 'merchantStatus', 'buyerStatus', 'paymentStatus', 'actions'
+    'invoiceNumber', 'paymentTerms', 'invoiceAmount', 'creditAmount',
+    'merchantStatus', 'buyerStatus', 'paymentStatus', 'actions'
+  ];
+
+  paymentTermsOptions = [
+    { value: '30 days', label: '30 Days' },
+    { value: '60 days', label: '60 Days' },
+    { value: '90 days', label: '90 Days' }
   ];
 
   // Update sample data
@@ -115,7 +121,7 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
     {
       requestId: 'REQ-CS-576',
       dateCreated: '11/09/2024',
-      buyerName: 'John Doe',
+      buyerName: 'Skyline Innovations',
       merchantStatus: 'Approved',
       invoiceNumber: 'INV-001',
       invoiceAmount: 10000.00,
@@ -125,12 +131,13 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
       paymentStatus: 'Paid',
       approvedBy: 'John Smith',
       approvedDate: '11/09/2024 14:30 EST',
-      approvalStatus: 'Approved'
+      approvalStatus: 'Approved',
+      paymentTerms: '30 days',
     },
     {
       requestId: 'REQ-SBC-782',
       dateCreated: '12/15/2024',
-      buyerName: 'Sarah Johnson',
+      buyerName: 'Vanguard Resources',
       merchantStatus: 'Pending Approval',
       invoiceNumber: 'INV-002',
       invoiceAmount: 15500.50,
@@ -139,12 +146,13 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
       buyerStatus: 'Pending Approval',
       paymentStatus: 'Unpaid',
       pendingApprover: 'Michael Chen',
-      approvalStatus: 'Pending'
+      approvalStatus: 'Pending',
+      paymentTerms: '30 days',
     },
     {
       requestId: 'REQ-EMAAR-345',
       dateCreated: '01/22/2024',
-      buyerName: 'Michael Rodriguez',
+      buyerName: 'Streamline Ventures',
       merchantStatus: 'Rejected',
       invoiceNumber: 'INV-003',
       invoiceAmount: 7800.25,
@@ -154,12 +162,13 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
       paymentStatus: 'Unpaid',
       approvedBy: 'Emily Davis',
       approvedDate: '01/23/2024 09:15 EST',
-      approvalStatus: 'Rejected'
+      approvalStatus: 'Rejected',
+      paymentTerms: '30 days',
     },
     {
       requestId: 'REQ-JANA-619',
       dateCreated: '02/05/2024',
-      buyerName: 'Emma Thompson',
+      buyerName: 'Pinnacle Data ',
       merchantStatus: 'Approved',
       invoiceNumber: 'INV-004',
       invoiceAmount: 22000.75,
@@ -169,12 +178,13 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
       paymentStatus: 'Paid',
       approvedBy: 'David Wilson',
       approvedDate: '02/06/2024 11:45 EST',
-      approvalStatus: 'Approved'
+      approvalStatus: 'Approved',
+      paymentTerms: '30 days',
     },
     {
       requestId: 'REQ-SBC-890',
       dateCreated: '03/18/2024',
-      buyerName: 'Alex Turner',
+      buyerName: 'Quantum Edge',
       merchantStatus: 'Pending Approval',
       invoiceNumber: 'INV-005',
       invoiceAmount: 5600.00,
@@ -183,7 +193,8 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
       buyerStatus: 'Pending Approval',
       paymentStatus: 'Unpaid',
       pendingApprover: 'Lisa Martinez',
-      approvalStatus: 'Pending'
+      approvalStatus: 'Pending',
+      paymentTerms: '30 days',
     }
   ];
 
@@ -198,6 +209,7 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
       status: [''],
       approvalStatus: [''],
       productCode: [''],
+      paymentTerms: [''],
       merchantStatus: [''],
       searchType: [''],
       searchTerm: ['']
@@ -215,7 +227,8 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
           ...this.merchants,
           ...invoices.map(invoice => ({
             ...invoice,
-            merchantStatus: invoice.merchantStatus || 'Pending Approval'
+            merchantStatus: invoice.merchantStatus || 'Pending Approval',
+            paymentTerms: invoice.paymentTerms as '30 days' | '60 days' | '90 days'
           }))
         ];
 
@@ -273,6 +286,8 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
     if (filters.productCode) {
       filtered = filtered.filter(merchant => merchant.productCode === filters.productCode);
     }
+
+
 
     // Merchant Status filter
     if (filters.merchantStatus) {

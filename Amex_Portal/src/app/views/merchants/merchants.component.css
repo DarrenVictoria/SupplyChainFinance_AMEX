@@ -197,6 +197,26 @@
   .mat-cell button {
     margin-right: 8px;
   }
+
+  .deactivate-button{
+    margin-bottom: 10px;
+  }
+
+  .mdc-text-field--filled:not(.mdc-text-field--disabled){
+    min-width: 900px !important;
+  }
+
+  .text-green{
+    color: #4CAF50;
+  }
+
+  .text-red{
+    color: #D32F2F;
+  }
+
+  .text-orange{
+    color: #F57C00;
+  }
   
   
   

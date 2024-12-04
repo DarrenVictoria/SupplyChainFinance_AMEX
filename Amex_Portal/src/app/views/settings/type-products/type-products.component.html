@@ -1,26 +1,32 @@
 <div class="container">
-    <h1>Types of Products</h1>
+  <h1>Types of Products</h1>
   
-    <table class="product-table">
-      <thead>
-        <tr>
-          <th class="px-4 py-3">Active</th>
-          <th class="px-4 py-3">Type of Product</th>
-          <th class="px-4 py-3">Description</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let product of productTypes" class="border-b">
-          <td class="text-center px-4 py-3">
-            <mat-checkbox
-              [checked]="activeProducts.includes(product.id)"
-              (change)="toggleProductActive(product.id)"
-              color="primary"
-            ></mat-checkbox>
-          </td>
-          <td class="px-4 py-3">{{ product.name }}</td>
-          <td class="px-4 py-3">{{ product.description }}</td>
-        </tr>
-      </tbody>
-    </table>
+  <div style="text-align: right; margin-bottom: 15px;" >
+    <button mat-raised-button color="primary" (click)="openAddProductDialog()">
+      Add Product
+    </button>
   </div>
+
+  <table class="product-table w-full">
+    <thead>
+      <tr>
+        <th class="px-4 py-3">Active</th>
+        <th class="px-4 py-3">Type of Product</th>
+        <th class="px-4 py-3">Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let product of productTypes" class="border-b">
+        <td class="text-center px-4 py-3">
+          <mat-checkbox
+            [checked]="activeProducts.includes(product.id)"
+            (change)="toggleProductActive(product.id)"
+            color="primary"
+          ></mat-checkbox>
+        </td>
+        <td class="px-4 py-3">{{ product.name }}</td>
+        <td class="px-4 py-3">{{ product.description }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

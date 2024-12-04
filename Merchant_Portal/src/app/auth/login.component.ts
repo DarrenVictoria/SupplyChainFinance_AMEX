@@ -186,7 +186,7 @@ import { CommonModule } from '@angular/common';
     <div class="container">
       <div class="header">
         <h2>Supply Chain Finance</h2>
-        <p>Merchant Login</p>
+        <p>Supplier Login</p>
       </div>
 
       <div class="main-content">

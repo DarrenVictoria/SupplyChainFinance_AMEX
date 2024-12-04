@@ -82,7 +82,7 @@
                     color="primary"
                     (click)="onTakeBuyer(buyer)"
                   >
-                    Take Buyer
+                    Assign Buyer
                   </button>
                 </ng-container>
                 <ng-template #noActiveCampaign>
@@ -101,7 +101,9 @@
                   [ngStyle]="{ top: popupPosition.top + 'px', left: popupPosition.left + 'px' }"
                 >
                   <p>Account Manager: <b>{{ buyer.accountManager || 'Not Assigned' }}</b></p>
+                  <button mat-flat-button color="primary" style="margin-right:7px; background-color: #437de2;" >Re-Assign</button> 
                   <button mat-stroked-button color="primary" (click)="closeAccountManagerPopup()">Close</button>
+                  
                 </div>
               </div>
             </td>

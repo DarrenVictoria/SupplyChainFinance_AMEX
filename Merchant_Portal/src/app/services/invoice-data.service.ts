@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 export interface InvoiceData {
+
     requestId: string;
     dateCreated: string;
     buyerName: string;
@@ -15,6 +16,7 @@ export interface InvoiceData {
     approvedBy?: string;
     approvedDate?: string;
     approvalStatus?: 'Approved' | 'Rejected' | 'Pending';
+    paymentTerms: '30 days' | '60 days' | '90 days';
 }
 
 @Injectable({

@@ -1,8 +1,9 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
+import { MatDialogModule, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -12,11 +13,10 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatMenuModule } from '@angular/material/menu';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 interface Merchant {
   id: number;
@@ -25,7 +25,11 @@ interface Merchant {
   createdBy: string;
   registeredBuyer: string;
   status: 'Active' | 'Inactive';
-  approvalStatus: 'Approved' | 'Rejected' | 'Pending Approval';
+  approvalStatus: 'Pass' | 'Fail';
+  manager: string;
+  email: string;
+  phone: string;
+  blacklisted: boolean;
 }
 
 @Component({
@@ -37,6 +41,7 @@ interface Merchant {
     ReactiveFormsModule,
     MatButtonModule,
     MatInputModule,
+    MatDialogModule,
     MatCardModule,
     MatTableModule,
     MatPaginatorModule,
@@ -46,8 +51,6 @@ interface Merchant {
     MatDatepickerModule,
     MatNativeDateModule,
     MatFormFieldModule,
-    MatChipsModule,
-    MatMenuModule,
     MatSortModule
   ],
   templateUrl: './merchants.component.html',
@@ -58,7 +61,6 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort) sort!: MatSort;
 
   filterForm: FormGroup;
-  activeTabIndex = 0;
   dataSource: MatTableDataSource<Merchant>;
   isFiltersApplied = false;
 
@@ -73,7 +75,11 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
       createdBy: 'Mark Smith',
       registeredBuyer: 'Tyler Phillips',
       status: 'Active',
-      approvalStatus: 'Approved'
+      approvalStatus: 'Pass',
+      manager: 'Sarah',
+      email: 'sarah@abc.com',
+      phone: '(555) 123-4567',
+      blacklisted: false
     },
     {
       id: 2,
@@ -82,7 +88,11 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
       createdBy: 'John Bill',
       registeredBuyer: 'John Bill',
       status: 'Inactive',
-      approvalStatus: 'Rejected'
+      approvalStatus: 'Fail',
+      manager: 'Mark',
+      email: 'sarah@abc.com',
+      phone: '(555) 123-4567',
+      blacklisted: true
     },
     {
       id: 3,
@@ -91,7 +101,11 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
       createdBy: 'Walter Stan',
       registeredBuyer: 'Walter Stan',
       status: 'Active',
-      approvalStatus: 'Approved'
+      approvalStatus: 'Pass',
+      manager: 'John',
+      email: 'sarah@abc.com',
+      phone: '(555) 123-4567',
+      blacklisted: false
     },
     {
       id: 4,
@@ -100,7 +114,11 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
       createdBy: 'Will Black',
       registeredBuyer: 'Tyler Phillips',
       status: 'Inactive',
-      approvalStatus: 'Rejected'
+      approvalStatus: 'Fail',
+      manager: 'Luke',
+      email: 'sarah@abc.com',
+      phone: '(555) 123-4567',
+      blacklisted: false
     },
     {
       id: 5,
@@ -109,34 +127,29 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
       createdBy: 'Smith Stacker',
       registeredBuyer: 'Harry J',
       status: 'Active',
-      approvalStatus: 'Pending Approval'
+      approvalStatus: 'Pass',
+      manager: 'Sam',
+      email: 'sarah@abc.com',
+      phone: '(555) 123-4567',
+      blacklisted: false
     }
   ];
 
   displayedColumns: string[] = [
-    'id', 'name', 'dateCreated', 'createdBy',
-    'registeredBuyer', 'status', 'approvalStatus', 'actions'
+    'id', 'name', 'dateCreated', 'manager', 'email', 'phone',
+    'approvalStatus', 'status', 'blacklisted', 'actions'
   ];
 
-  statusOptions = [
-    { value: '', label: 'Any' },
-    { value: 'active', label: 'Active' },
-    { value: 'inactive', label: 'Inactive' }
-  ];
-
-  approvalStatusOptions = [
-    { value: '', label: 'Any' },
-    { value: 'approved', label: 'Approved' },
-    { value: 'rejected', label: 'Rejected' },
-    { value: 'pending approval', label: 'Pending Approval' }
-  ];
-
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    public dialog: MatDialog
+  ) {
     this.filterForm = this.fb.group({
       fromDate: [''],
       toDate: [''],
       status: [''],
       approvalStatus: [''],
+      blacklisted: [''],
       searchType: ['name'],
       searchTerm: ['']
     });
@@ -156,11 +169,28 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
     this.dataSource.sort = this.sort;
   }
 
-  onTabChange(event: any) {
-    this.activeTabIndex = event.index;
-    this.showMerchantsContent = this.activeTabIndex === 0;
-    this.showApproveMerchantsContent = this.activeTabIndex === 1;
+  openDeactivationDialog(merchant: Merchant): void {
+    const dialogRef = this.dialog.open(DeactivationDialogComponent, {
+      width: '400px',
+      data: merchant
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.deactivateMerchant(merchant, result);
+      }
+    });
   }
+
+  deactivateMerchant(merchant: Merchant, reason: string): void {
+    const index = this.merchants.findIndex(m => m.id === merchant.id);
+    if (index !== -1) {
+      this.merchants[index].status = 'Inactive';
+      this.dataSource.data = [...this.merchants];
+      console.log('Deactivated:', merchant, 'Reason:', reason);
+    }
+  }
+
 
   checkFiltersApplied() {
     const formValues = this.filterForm.value;
@@ -169,6 +199,7 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
       formValues.toDate ||
       formValues.status ||
       formValues.approvalStatus ||
+      formValues.blacklisted ||
       formValues.searchTerm
     );
   }
@@ -179,6 +210,7 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
       toDate: '',
       status: '',
       approvalStatus: '',
+      blacklisted: '',
       searchType: 'name',
       searchTerm: ''
     });
@@ -217,6 +249,13 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
     if (filters.approvalStatus) {
       filtered = filtered.filter(merchant =>
         merchant.approvalStatus.toLowerCase() === filters.approvalStatus.toLowerCase()
+      );
+    }
+
+    // Add blacklist filter
+    if (filters.blacklisted !== '') {
+      filtered = filtered.filter(merchant =>
+        merchant.blacklisted === (filters.blacklisted === 'true')
       );
     }
 
@@ -268,8 +307,262 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
   }
 
   onInfo(merchant: Merchant) {
-    console.log('Info:', merchant);
-    // Implement your info logic here
+    this.dialog.open(SupplierDetailsDialogComponent, {
+      width: '600px',
+      data: merchant
+    });
+  }
+}
+
+@Component({
+  selector: 'app-supplier-details-dialog',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatDialogModule,
+    MatInputModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatIconModule
+  ],
+  template: `
+    <div class="p-6">
+      <h2 mat-dialog-title class="text-2xl font-bold mb-4">Supplier Details</h2>
+      <mat-dialog-content>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Basic Information Section -->
+          <div class="bg-gray-50 border rounded-lg p-4">
+            <h3 class="text-lg font-semibold mb-4 border-b pb-2" style="margin-top:1rem; font-weight:bold;">Basic Information</h3>
+            <div class="space-y-2">
+              <div class="flex justify-between border-b pb-1">
+                <span class="font-medium">Supplier Name:</span>
+                <span>{{ data.name }}</span>
+              </div>
+              <div class="flex justify-between border-b pb-1">
+                <span class="font-medium">CR Number:</span>
+                <span>{{ supplierDetails.crNumber }}</span>
+              </div>
+              <div class="flex justify-between border-b pb-1">
+                <span class="font-medium">Business Type:</span>
+                <span>{{ supplierDetails.businessType }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="font-medium">Date Created:</span>
+                <span>{{ data.dateCreated | date:'mediumDate' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Verification Status Section -->
+          <div class="bg-gray-50 border rounded-lg p-4">
+            <h3 class="text-lg font-semibold mb-4 border-b pb-2" style="margin-top:1rem; font-weight:bold;">Verification Status</h3>
+            <div class="space-y-2">
+              <div class="flex justify-between border-b pb-1">
+                <span class="font-medium">Verification Status:</span>
+                <span 
+                  class="font-semibold"
+                  style="color: {{ data.approvalStatus === 'Pass' ? '#10B981' : '#EF4444' }}"
+                >
+                  {{ data.approvalStatus }}
+                </span>
+              </div>
+              <div class="flex justify-between border-b pb-1">
+                <span class="font-medium">Supplier Status:</span>
+                <span 
+                  class="font-semibold"
+                  style="color: {{ data.status === 'Active' ? '#10B981' : '#EF4444' }}"
+                >
+                  {{ data.status }}
+                </span>
+              </div>
+              <div class="flex justify-between">
+                <span class="font-medium">Last Updated:</span>
+                <span>{{ supplierDetails.lastUpdated | date:'mediumDate' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact Information Section -->
+          <div class="bg-gray-50 border rounded-lg p-4">
+            <h3 class="text-lg font-semibold mb-4 border-b pb-2" style="margin-top:1rem; font-weight:bold;">Contact Information</h3>
+            <div class="space-y-2">
+              <div class="flex justify-between border-b pb-1">
+                <span class="font-medium">Email:</span>
+                <span>{{ supplierDetails.email }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="font-medium">Phone:</span>
+                <span>{{ supplierDetails.phone }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Address Section -->
+          <div class="bg-gray-50 border rounded-lg p-4">
+            <h3 class="text-lg font-semibold mb-4 border-b pb-2" style="margin-top:1rem; font-weight:bold;">Address</h3>
+            <div class="space-y-2">
+              <div class="flex justify-between border-b pb-1">
+                <span class="font-medium">Street:</span>
+                <span>{{ supplierDetails.street }}</span>
+              </div>
+              <div class="flex justify-between border-b pb-1">
+                <span class="font-medium">City:</span>
+                <span>{{ supplierDetails.city }}</span>
+              </div>
+              <div class="flex justify-between border-b pb-1">
+                <span class="font-medium">State:</span>
+                <span>{{ supplierDetails.state }}</span>
+              </div>
+              <div class="flex justify-between border-b pb-1">
+                <span class="font-medium">Postal Code:</span>
+                <span>{{ supplierDetails.postalCode }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="font-medium">Country:</span>
+                <span>{{ supplierDetails.country }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional Information Section -->
+          <div class="bg-gray-50 border rounded-lg p-4 md:col-span-2">
+            <h3 class="text-lg font-semibold mb-4 border-b pb-2" style="margin-top:1rem; font-weight:bold;">Additional Information</h3>
+            <div class="space-y-2">
+              <div class="flex justify-between border-b pb-1">
+                <span class="font-medium">Products/Services Offered:</span>
+                <span>{{ supplierDetails.productsServices }}</span>
+              </div>
+              <div>
+                <span class="font-medium block mb-2">Notes:</span>
+                <p class="text-gray-600 bg-white p-3 rounded-lg">{{ supplierDetails.notes }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-dialog-content>
+      
+      <mat-dialog-actions class="flex justify-between items-center mt-4">
+        <button mat-button (click)="dialogRef.close()">Close</button>
+        <button 
+          mat-raised-button 
+          [style.backgroundColor]="data.status === 'Active' ? '#EF4444' : '#10B981'"
+          [style.color]="'white'"
+          (click)="toggleSupplierStatus()"
+        >
+          {{ data.status === 'Active' ? 'Deactivate Supplier' : 'Activate Supplier' }}
+        </button>
+      </mat-dialog-actions>
+    </div>
+  `
+})
+export class SupplierDetailsDialogComponent {
+  supplierDetails = {
+    crNumber: 'CR-SIL00100',
+    email: 'contact@sunriseinnovations.com',
+    phone: '(123) 456-7890',
+    street: '123 Innovation Way',
+    city: 'Tech City',
+    state: 'CA',
+    postalCode: '90210',
+    country: 'USA',
+    businessType: 'LLC',
+    productsServices: 'Technology Solutions, Cloud Computing, IT Consulting',
+    lastUpdated: new Date('2024-11-30'),
+    notes: 'Preferred supplier for tech equipment and innovative solutions. Long-standing relationship with proven track record of delivering high-quality services.'
+  };
+
+  constructor(
+    public dialogRef: MatDialogRef<SupplierDetailsDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: Merchant,
+    public dialog: MatDialog
+  ) { }
+
+  toggleSupplierStatus() {
+    if (this.data.status === 'Active') {
+      // Open deactivation dialog for active suppliers
+      const dialogRef = this.dialog.open(DeactivationDialogComponent, {
+        width: '400px',
+        data: this.data
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          // Update the merchant status to Inactive
+          this.data.status = 'Inactive';
+          this.dialogRef.close(this.data);
+        }
+      });
+    } else {
+      // Directly activate the supplier
+      this.data.status = 'Active';
+      this.dialogRef.close(this.data);
+    }
+  }
+}
+
+// The DeactivationDialogComponent remains the same as in the previous implementation
+@Component({
+  selector: 'app-deactivation-dialog',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatDialogModule,
+    MatInputModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatSlideToggleModule // Add this import for the toggle
+  ],
+  template: `
+    <h2 mat-dialog-title>Deactivate Supplier</h2>
+    <mat-dialog-content>
+      <p>Please provide a reason for deactivating this supplier:</p>
+      <mat-form-field class="w-full">
+        <textarea matInput [(ngModel)]="deactivationReason" placeholder="Reason for deactivation" rows="4"></textarea>
+      </mat-form-field>
+      
+      <!-- Add blacklist toggle -->
+      <mat-slide-toggle [(ngModel)]="shouldBlacklist" class="mt-4">
+        <b>Blacklist Supplier</b>
+      </mat-slide-toggle>
+      <p *ngIf="shouldBlacklist" class="text-sm text-gray-600 mt-2">
+        Blacklisting will prevent this supplier from future engagements.
+      </p>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-button (click)="onCancel()">Cancel</button>
+      <button 
+        mat-button 
+        color="warn" 
+        (click)="onConfirm()" 
+        [disabled]="!deactivationReason"
+      >
+        Confirm
+      </button>
+    </mat-dialog-actions>
+  `
+})
+export class DeactivationDialogComponent {
+  deactivationReason: string = '';
+  shouldBlacklist: boolean = false; // New property to track blacklist status
+
+  constructor(
+    public dialogRef: MatDialogRef<DeactivationDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: Merchant
+  ) { }
+
+  onCancel(): void {
+    this.dialogRef.close();
   }
 
+  onConfirm(): void {
+    if (this.deactivationReason.trim()) {
+      // Pass both the deactivation reason and blacklist status
+      this.dialogRef.close({
+        reason: this.deactivationReason,
+        blacklist: this.shouldBlacklist
+      });
+    }
+  }
 }

@@ -12,6 +12,10 @@ import { Payments } from './views/payments/payments.component';
 import { UserManagementComponent } from './views/settings/user-management/user-management.component';
 import { TypeProductsComponent } from './views/settings/type-products/type-products.component';
 import { CalendarComponent } from './views/settings/calendar/calendar.component';
+import { BuyerConfigComponent } from './views/buyer-config/buyer-config.component';
+import { ProgramsComponent } from './views/settings/programs/programs.component';
+import { AddProgramsComponent } from './views/settings/add-programs/add-programs.component';
+import { ManageSupplierComponent } from './views/customers/manage-suppliers/manage-suppliers.component';
 
 export const routes: Routes = [
   {
@@ -48,7 +52,7 @@ export const routes: Routes = [
         component: BuyersComponent // Use the BuyersComponent here
       },
       {
-        path: 'merchants',
+        path: 'suppliers',
         component: MerchantsComponent, // Temporary placeholder
       },
       {
@@ -63,6 +67,24 @@ export const routes: Routes = [
         path: 'holidaysetup',
         component: CalendarComponent, // Temporary placeholder
       },
+      {
+        path: 'buyerconfig',
+        component: BuyerConfigComponent, // Temporary placeholder
+      },
+      {
+        path: 'programs',
+        component: ProgramsComponent, // Temporary placeholder
+      },
+      {
+        path: 'addprograms',
+        component: AddProgramsComponent,
+      },
+      {
+        path: 'managesuppliers',
+        component: ManageSupplierComponent,
+      },
+
+
 
       {
         path: '',

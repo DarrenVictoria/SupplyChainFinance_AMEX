@@ -1,15 +1,20 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Observable, Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
+
 
 // Define an interface to represent the structure of sidebar tabs
 // This allows for nested, hierarchical navigation with support for multiple levels
 interface Tab {
-  iconType: string;  // Material Icons identifier
-  text: string;      // Display text for the tab
-  route: string;     // Navigation route
-  subTabs?: Tab[];   // Optional nested tabs
-  isExpanded?: boolean;  // Track expanded/collapsed state
+  iconType: string;
+  text: string;
+  route: string;
+  subTabs?: Tab[];
+  isExpanded?: boolean;
+  isActive?: boolean;
+  isParentActive?: boolean;
 }
 
 @Component({
@@ -29,6 +34,8 @@ export class SidebarComponent implements OnInit {
 
   // Profile image URL
   profileImageUrl: string = '';
+  private routerSubscription: Subscription | null = null;
+
 
   // Define the sidebar navigation structure
   tabs: Tab[] = [
@@ -57,17 +64,17 @@ export class SidebarComponent implements OnInit {
               text: 'My Buyers',
               route: '/my-buyers'
             },
-            {
-              iconType: 'check_box',
-              text: 'Approvals',
-              route: '/buyers/approvals'
-            }
+            // {
+            //   iconType: 'check_box',
+            //   text: 'Approvals',
+            //   route: '/buyers/approvals'
+            // }
           ]
         },
         {
           iconType: 'store',
-          text: 'Merchants',
-          route: '/merchants'
+          text: 'Suppliers',
+          route: '/suppliers'
         }
       ]
     },
@@ -96,6 +103,11 @@ export class SidebarComponent implements OnInit {
           iconType: 'inventory_2',
           text: 'Types of Products',
           route: '/typeproducts'
+        },
+        {
+          iconType: 'build_circle',
+          text: 'Programs',
+          route: '/programs'
         }
       ]
     }
@@ -105,27 +117,65 @@ export class SidebarComponent implements OnInit {
 
   ngOnInit(): void {
     this.setRandomProfileImage();
+    this.trackActiveRoute();
+  }
+
+  ngOnDestroy(): void {
+    this.routerSubscription?.unsubscribe();
+  }
+
+  trackActiveRoute(): void {
+    this.routerSubscription = this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.updateActiveStatus(this.tabs);
+    });
+  }
+
+  // Recursive method to update active status of tabs
+  updateActiveStatus(tabs: Tab[], currentRoute: string = this.router.url): void {
+    tabs.forEach(tab => {
+      // Check if current route matches this tab's route or its subtabs
+      tab.isActive = currentRoute === tab.route ||
+        (tab.subTabs && this.hasActiveSubTab(tab.subTabs, currentRoute));
+
+      // Expand parent tabs if a subtab is active
+      if (tab.subTabs) {
+        tab.isExpanded = tab.subTabs.some(subTab =>
+          currentRoute === subTab.route ||
+          (subTab.subTabs && this.hasActiveSubTab(subTab.subTabs, currentRoute))
+        );
+      }
+
+      // Recursively check subtabs
+      if (tab.subTabs) {
+        this.updateActiveStatus(tab.subTabs, currentRoute);
+      }
+    });
+  }
+
+  // Helper method to check if any subtab is active
+  hasActiveSubTab(subTabs: Tab[], currentRoute: string): boolean {
+    return subTabs.some(subTab =>
+      currentRoute === subTab.route ||
+      (subTab.subTabs && this.hasActiveSubTab(subTab.subTabs, currentRoute))
+    );
   }
 
   // Handle main tab selection
   setActiveTab(tab: Tab): void {
     if (tab.subTabs) {
-      // If the tab has sub-tabs, toggle its expanded state
       if (this.activeMainTab === tab) {
         tab.isExpanded = !tab.isExpanded;
       } else {
-        // Close previously expanded main tab
         if (this.activeMainTab) {
           this.activeMainTab.isExpanded = false;
         }
-
         this.activeMainTab = tab;
         tab.isExpanded = true;
       }
-
       this.activeSubTab = null;
     } else {
-      // If no sub-tabs, navigate directly
       this.router.navigate([tab.route]);
     }
   }

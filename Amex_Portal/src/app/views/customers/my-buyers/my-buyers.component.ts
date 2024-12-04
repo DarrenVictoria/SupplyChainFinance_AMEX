@@ -21,7 +21,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { EditCreditLimitPopupComponent } from './edit-credit-limit-popup/edit-credit-limit-popup.component';
-
+import { RouterModule } from '@angular/router';
 
 interface Buyer {
   id: number;
@@ -30,6 +30,8 @@ interface Buyer {
   noOfUsers: number;
   status: string;
   creditLimit: number;
+  availableCreditLimit: number; // New field
+  program: string;
 }
 
 @Component({
@@ -57,6 +59,7 @@ interface Buyer {
     MatSortModule,
     MatDialogModule,
     EditCreditLimitPopupComponent,
+    RouterModule,
   ],
   templateUrl: './my-buyers.component.html',
   styleUrls: ['./my-buyers.component.css']
@@ -65,7 +68,6 @@ export class MyBuyersComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(EditCreditLimitPopupComponent) editCreditLimitPopup!: EditCreditLimitPopupComponent;
-
 
   filterForm: FormGroup;
   activeTabIndex = 0;
@@ -78,16 +80,70 @@ export class MyBuyersComponent implements OnInit, AfterViewInit {
   showApproveRequestContent = false;
 
   buyers: Buyer[] = [
-    { id: 1, name: 'Silverline Innovations LLC', dateCreated: new Date('2024-11-09'), noOfUsers: 5, status: 'Active', creditLimit: 50000 },
-    { id: 2, name: 'Vanguard Resource Group LP', dateCreated: new Date('2024-11-09'), noOfUsers: 4, status: 'Inactive', creditLimit: 75000 },
-    { id: 3, name: 'Quantum Edge Systems Inc', dateCreated: new Date('2024-11-09'), noOfUsers: 6, status: 'Active', creditLimit: 100000 },
-    { id: 4, name: 'Maple Leaf Consulting', dateCreated: new Date('2024-11-09'), noOfUsers: 8, status: 'Active', creditLimit: 25000 },
-    { id: 5, name: 'Blue Horizon Ventures LLC', dateCreated: new Date('2024-11-09'), noOfUsers: 7, status: 'Inactive', creditLimit: 150000 },
-    { id: 6, name: 'Golden Path Marketing', dateCreated: new Date('2024-11-09'), noOfUsers: 9, status: 'Active', creditLimit: 80000 }
+    {
+      id: 1,
+      name: 'Silverline Innovations LLC',
+      dateCreated: new Date('2024-11-09'),
+      noOfUsers: 5,
+      status: 'Active',
+      creditLimit: 50000,
+      availableCreditLimit: 35000, // Less than credit limit
+      program: 'Program A'
+    },
+    {
+      id: 2,
+      name: 'Vanguard Resource Group LP',
+      dateCreated: new Date('2024-11-09'),
+      noOfUsers: 4,
+      status: 'Inactive',
+      creditLimit: 75000,
+      availableCreditLimit: 50000,
+      program: 'Program B'
+    },
+    {
+      id: 3,
+      name: 'Quantum Edge Systems Inc',
+      dateCreated: new Date('2024-11-09'),
+      noOfUsers: 6,
+      status: 'Active',
+      creditLimit: 100000,
+      availableCreditLimit: 75000,
+      program: 'Program C'
+    },
+    {
+      id: 4,
+      name: 'Maple Leaf Consulting',
+      dateCreated: new Date('2024-11-09'),
+      noOfUsers: 8,
+      status: 'Active',
+      creditLimit: 25000,
+      availableCreditLimit: 15000,
+      program: 'Program A'
+    },
+    {
+      id: 5,
+      name: 'Blue Horizon Ventures LLC',
+      dateCreated: new Date('2024-11-09'),
+      noOfUsers: 7,
+      status: 'Inactive',
+      creditLimit: 150000,
+      availableCreditLimit: 100000,
+      program: 'Program B'
+    },
+    {
+      id: 6,
+      name: 'Golden Path Marketing',
+      dateCreated: new Date('2024-11-09'),
+      noOfUsers: 9,
+      status: 'Active',
+      creditLimit: 80000,
+      availableCreditLimit: 60000,
+      program: 'Program C'
+    }
   ];
 
   displayedColumns: string[] = [
-    'id', 'name', 'dateCreated', 'noOfUsers', 'creditLimit', 'status', 'actions'
+    'id', 'name', 'dateCreated', 'creditLimit', 'availableCreditLimit', 'program', 'status', 'actions'
   ];
 
   statusOptions = [
@@ -96,18 +152,25 @@ export class MyBuyersComponent implements OnInit, AfterViewInit {
     { value: 'inactive', label: 'Inactive' }
   ];
 
+  programOptions = [
+    { value: '', label: 'Any' },
+    { value: 'Program A', label: 'Program A' },
+    { value: 'Program B', label: 'Program B' },
+    { value: 'Program C', label: 'Program C' }
+  ];
+
   constructor(private fb: FormBuilder, private dialog: MatDialog) {
     this.filterForm = this.fb.group({
       fromDate: [''],
       toDate: [''],
       status: [''],
+      program: [''], // Add program to form
       searchType: ['name'],
       searchTerm: ['']
     });
 
     this.dataSource = new MatTableDataSource(this.buyers);
     this.dataSource.sortingDataAccessor = this.sortingDataAccessor;
-
   }
 
   ngOnInit() {
@@ -139,33 +202,7 @@ export class MyBuyersComponent implements OnInit, AfterViewInit {
     this.showApproveRequestContent = this.activeTabIndex === 3;
   }
 
-  checkFiltersApplied() {
-    const formValues = this.filterForm.value;
-    this.isFiltersApplied = !!(
-      formValues.fromDate ||
-      formValues.toDate ||
-      formValues.status ||
-      formValues.searchTerm
-    );
-  }
 
-  resetFilters(): void {
-    this.filterForm.reset({
-      fromDate: '',
-      toDate: '',
-      status: '',
-      searchType: 'name',
-      searchTerm: ''
-    });
-
-    this.dataSource.data = this.buyers;
-
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
-
-    this.isFiltersApplied = false;
-  }
 
   applyFilters() {
     let filtered = [...this.buyers];
@@ -189,6 +226,13 @@ export class MyBuyersComponent implements OnInit, AfterViewInit {
       );
     }
 
+    // New filter for program
+    if (filters.program) {
+      filtered = filtered.filter(buyer =>
+        buyer.program === filters.program
+      );
+    }
+
     if (filters.searchTerm) {
       filtered = filtered.filter(buyer => {
         if (filters.searchType === 'name') {
@@ -207,6 +251,37 @@ export class MyBuyersComponent implements OnInit, AfterViewInit {
     }
   }
 
+  // Update checkFiltersApplied method
+  checkFiltersApplied() {
+    const formValues = this.filterForm.value;
+    this.isFiltersApplied = !!(
+      formValues.fromDate ||
+      formValues.toDate ||
+      formValues.status ||
+      formValues.program || // Add program to filter check
+      formValues.searchTerm
+    );
+  }
+
+  // Update resetFilters method
+  resetFilters(): void {
+    this.filterForm.reset({
+      fromDate: '',
+      toDate: '',
+      status: '',
+      program: '', // Reset program
+      searchType: 'name',
+      searchTerm: ''
+    });
+
+    this.dataSource.data = this.buyers;
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
+
+    this.isFiltersApplied = false;
+  }
   getStatusClass(status: string): string {
     switch (status.toLowerCase()) {
       case 'active':
@@ -230,6 +305,19 @@ export class MyBuyersComponent implements OnInit, AfterViewInit {
         this.dataSource.data = [...this.dataSource.data];
       }
     });
+  }
+
+  // Add this method to the MyBuyersComponent class
+  getAvailableCreditClass(availableCreditLimit: number, totalCreditLimit: number): string {
+    const utilizationPercentage = (totalCreditLimit - availableCreditLimit) / totalCreditLimit * 100;
+
+    if (utilizationPercentage > 80) {
+      return 'text-red-600'; // High utilization (>80%)
+    } else if (utilizationPercentage > 50) {
+      return 'text-orange-600'; // Medium utilization (50-80%)
+    } else {
+      return 'text-green-600'; // Low utilization (<50%)
+    }
   }
 
 

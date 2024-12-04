@@ -1,12 +1,15 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 interface Tab {
   iconType: string;
   text: string;
   route: string;
   subTabs?: { text: string; route: string }[];
+  isActive?: boolean;
 }
 
 @Component({
@@ -20,6 +23,7 @@ export class SidebarComponent implements OnInit {
   @Input() isOpen: boolean = true;
   activeTab: Tab | null = null;
   profileImageUrl: string = '';
+  private routerSubscription: Subscription | null = null;
 
   tabs: Tab[] = [
     {
@@ -29,8 +33,8 @@ export class SidebarComponent implements OnInit {
     },
     {
       iconType: 'account_balance',
-      text: 'Merchants',
-      route: '/merchants'
+      text: 'Suppliers',
+      route: '/suppliers'
     },
     {
       iconType: 'book',
@@ -56,6 +60,26 @@ export class SidebarComponent implements OnInit {
 
   ngOnInit(): void {
     this.setRandomProfileImage();
+    this.trackActiveRoute();
+  }
+
+  ngOnDestroy(): void {
+    this.routerSubscription?.unsubscribe();
+  }
+
+  trackActiveRoute(): void {
+    this.routerSubscription = this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.updateActiveStatus(this.tabs);
+      this.updateActiveStatus(this.settingsTabs);
+    });
+  }
+
+  updateActiveStatus(tabs: Tab[], currentRoute: string = this.router.url): void {
+    tabs.forEach(tab => {
+      tab.isActive = currentRoute === tab.route;
+    });
   }
 
   setActiveTab(tab: Tab): void {

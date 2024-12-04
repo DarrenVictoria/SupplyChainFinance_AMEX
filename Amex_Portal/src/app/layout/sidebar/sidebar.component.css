@@ -17,6 +17,7 @@
 
 .logo-image {
   height: 100px;
+  padding-right: 4rem;
 }
 
 .nav-list {
@@ -43,7 +44,7 @@
 .nav-link.active,
 .nav-link:hover {
   background-color: #59ABCF;
-  color: #fff;
+  color: #000000;
   border-radius: 8px;
 }
 
@@ -140,7 +141,7 @@
 }
 
 .settings-title {
-  color: #666;
+  color: #000000;
   font-weight: bold;
   text-transform: uppercase;
   padding: 10px 15px;
@@ -157,5 +158,19 @@
   align-items: center;
   padding: 10px 15px;
   cursor: pointer;
+}
+
+.nav-link.current-route, 
+.sub-nav-link.current-route {
+  background-color: #93b8ee;  /* Light gray background for current route */
+  font-weight: bold;
+  color: #000000;  /* Highlight color */
+  border-radius: 10px;
+}
+
+.nav-link.active, 
+.sub-nav-link.active {
+  background-color: #93b8ee;  /* Light blue for expanded/active sections */
+  border-radius: 10px;
 }
 

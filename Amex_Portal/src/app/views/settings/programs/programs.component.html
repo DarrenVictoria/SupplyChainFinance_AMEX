@@ -1,0 +1,36 @@
+<div class="container">
+  <h1>Types of Programs</h1>
+  
+  <div style="text-align: right; margin-bottom: 15px;">
+    <button mat-raised-button color="primary" [routerLink]="'/addprograms'">
+      Add Program
+    </button>
+  </div>
+
+  <table class="product-table w-full">
+    <thead>
+      <tr>
+        <th class="px-4 py-3">Active</th>
+        <th class="px-4 py-3">Program Name</th>
+        <th class="px-4 py-3">Created By</th>
+        <th class="px-4 py-3">Date Created</th>
+        <th class="px-4 py-3">No. of Buyers Assigned</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let product of productTypes" class="border-b">
+        <td class="text-center px-4 py-3">
+          <mat-checkbox
+            [checked]="activeProducts.includes(product.id)"
+            (change)="toggleProductActive(product.id)"
+            color="primary"
+          ></mat-checkbox>
+        </td>
+        <td class="px-4 py-3">{{ product.programName }}</td>
+        <td class="px-4 py-3">{{ product.createdBy }}</td>
+        <td class="px-4 py-3">{{ product.dateCreated | date:'mediumDate' }}</td>
+        <td class="px-4 py-3">{{ product.numberOfBuyersAssigned }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

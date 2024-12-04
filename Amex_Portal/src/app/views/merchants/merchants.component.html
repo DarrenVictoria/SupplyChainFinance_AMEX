@@ -1,22 +1,13 @@
 <div class="container">
-  <!-- Header with Title and Tabs -->
   <div class="header-section">
-    <h1 class="text-3xl font-bold mb-8">Merchants</h1>
-
-    <!-- <mat-tab-group class="merchants-tabs" [(selectedIndex)]="activeTabIndex" (selectedTabChange)="onTabChange($event)">
-      <mat-tab label="MERCHANTS"></mat-tab>
-      <mat-tab label="APPROVE MERCHANTS"></mat-tab>
-    </mat-tab-group> -->
+    <h1 class="text-3xl font-bold mb-8">Suppliers</h1>
   </div>
 
-  <!-- Tab Content -->
   <div class="tab-content">
-    <!-- Merchants Tab Content -->
     <div *ngIf="showMerchantsContent">
-      <!-- Filter Section -->
       <form [formGroup]="filterForm" class="filter-section mt-6">
         <div class="filter-header">
-          <h2 class="text-xl">Filter Merchant</h2>
+          <h2 class="text-xl">Filter Suppliers</h2>
         </div>
 
         <div class="filter-controls">
@@ -35,20 +26,29 @@
           </mat-form-field>
 
           <mat-form-field>
+            <mat-label>Verification</mat-label>
+            <mat-select formControlName="approvalStatus">
+              <mat-option value="">All</mat-option>
+              <mat-option value="Pass">Pass</mat-option>
+              <mat-option value="Fail">Fail</mat-option>
+            </mat-select>
+          </mat-form-field>
+        
+          <mat-form-field>
             <mat-label>Status</mat-label>
             <mat-select formControlName="status">
-              <mat-option *ngFor="let option of statusOptions" [value]="option.value">
-                {{option.label}}
-              </mat-option>
+              <mat-option value="">All</mat-option>
+              <mat-option value="Active">Active</mat-option>
+              <mat-option value="Inactive">Inactive</mat-option>
             </mat-select>
           </mat-form-field>
 
           <mat-form-field>
-            <mat-label>Approval Status</mat-label>
-            <mat-select formControlName="approvalStatus">
-              <mat-option *ngFor="let option of approvalStatusOptions" [value]="option.value">
-                {{option.label}}
-              </mat-option>
+            <mat-label>Blacklisted</mat-label>
+            <mat-select formControlName="blacklisted">
+              <mat-option value="">All</mat-option>
+              <mat-option value="true">Yes</mat-option>
+              <mat-option value="false">No</mat-option>
             </mat-select>
           </mat-form-field>
 
@@ -56,7 +56,7 @@
             <mat-form-field>
               <mat-label>Search by</mat-label>
               <mat-select formControlName="searchType">
-                <mat-option value="name">Merchant Name</mat-option>
+                <mat-option value="name">Supplier Name</mat-option>
               </mat-select>
             </mat-form-field>
 
@@ -75,16 +75,16 @@
         </div>
       </form>
 
-      <!-- Table -->
+
       <div class="table-container">
         <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
           <ng-container matColumnDef="id">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Merchant ID</th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>CR Number</th>
             <td mat-cell *matCellDef="let merchant">{{ merchant.id }}</td>
           </ng-container>
 
           <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Merchant Name</th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Supplier Name</th>
             <td mat-cell *matCellDef="let merchant">{{ merchant.name }}</td>
           </ng-container>
 
@@ -93,51 +93,74 @@
             <td mat-cell *matCellDef="let merchant">{{ merchant.dateCreated | date }}</td>
           </ng-container>
 
-          <ng-container matColumnDef="createdBy">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Created By</th>
-            <td mat-cell *matCellDef="let merchant">{{ merchant.createdBy }}</td>
+          <ng-container matColumnDef="manager">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Manager</th>
+            <td mat-cell *matCellDef="let merchant">{{ merchant.manager }}</td>
           </ng-container>
-
-          <ng-container matColumnDef="registeredBuyer">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Buyer</th>
-            <td mat-cell *matCellDef="let merchant">{{ merchant.registeredBuyer }}</td>
+          
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Email</th>
+            <td mat-cell *matCellDef="let merchant">{{ merchant.email }}</td>
           </ng-container>
-
-          <ng-container matColumnDef="status">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
-            <td mat-cell *matCellDef="let merchant">
-              <span [ngClass]="getStatusClass(merchant.status)">
-                {{ merchant.status }}
-              </span>
-            </td>
+          
+          <ng-container matColumnDef="phone">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Phone</th>
+            <td mat-cell *matCellDef="let merchant">{{ merchant.phone }}</td>
           </ng-container>
 
           <ng-container matColumnDef="approvalStatus">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Approval Status</th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Verification</th>
             <td mat-cell *matCellDef="let merchant">
-              <span [ngClass]="getApprovalStatusClass(merchant.approvalStatus)">
+              <span [ngClass]="{
+                'text-green': merchant.approvalStatus === 'Pass', 
+                'text-red': merchant.approvalStatus === 'Fail',
+              }">
                 {{ merchant.approvalStatus }}
               </span>
             </td>
           </ng-container>
 
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+            <td mat-cell *matCellDef="let merchant">
+              <span [ngClass]="{
+                'text-green': merchant.status === 'Active', 
+                'text-red': merchant.status === 'Inactive'
+              }">
+                {{ merchant.status }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="blacklisted">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Blacklisted</th>
+            <td mat-cell *matCellDef="let merchant">
+              <span [ngClass]="{
+                'text-green': !merchant.blacklisted, 
+                'text-red': merchant.blacklisted
+              }">
+                {{ merchant.blacklisted ? 'Yes' : 'No' }}
+              </span>
+            </td>
+          </ng-container>
+
+          
+
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef>Actions</th>
             <td mat-cell *matCellDef="let merchant">
-              <ng-container *ngIf="merchant.approvalStatus === 'Pending Approval'">
-                <button mat-icon-button color="primary" (click)="onAccept(merchant)">
-                  <mat-icon>check</mat-icon>
-                </button>
-                <button mat-icon-button color="warn" (click)="onReject(merchant)">
-                  <mat-icon>close</mat-icon>
-                </button>
-              </ng-container>
               <button mat-icon-button (click)="onInfo(merchant)">
                 <mat-icon>info</mat-icon>
               </button>
+              <!-- <button *ngIf="merchant.status === 'Active'" 
+                      class="deactivate-button"
+                      mat-stroked-button 
+                      color="warn" 
+                      (click)="openDeactivationDialog(merchant)">
+                Deactivate
+              </button> -->
             </td>
           </ng-container>
-          
 
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
@@ -146,11 +169,6 @@
         <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons aria-label="Select page of merchants">
         </mat-paginator>
       </div>
-    </div>
-
-    <!-- Approve Merchants tab content -->
-    <div *ngIf="showApproveMerchantsContent">
-      <p class="coming-text">Approve Merchants content coming soon...</p>
     </div>
   </div>
 </div>

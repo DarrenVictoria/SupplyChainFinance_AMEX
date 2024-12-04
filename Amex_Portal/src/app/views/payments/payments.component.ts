@@ -24,10 +24,13 @@ interface Payment {
   buyer: string;
   merchant: string;
   invoiceNumber: string;
+  invoiceDate: Date;
+  dueDate: Date;
+  paymentTerms: string;
   invoiceAmount: number;
   creditAmount: number;
   financierReceivables: number;
-  productCode: string;
+  program: string;
   actions: string;
 }
 
@@ -75,10 +78,13 @@ export class Payments implements OnInit, AfterViewInit {
       buyer: 'Zulify Holdings',
       merchant: 'Compu Smart',
       invoiceNumber: 'INV-001',
+      invoiceDate: new Date('2024-11-01'),
+      dueDate: new Date('2024-12-01'),
+      paymentTerms: '30 days',
       invoiceAmount: 10000.00,
       creditAmount: 9700.00,
       financierReceivables: 300.00,
-      productCode: 'ID',
+      program: 'Program A',
       actions: ''
     },
     {
@@ -87,32 +93,41 @@ export class Payments implements OnInit, AfterViewInit {
       buyer: 'Howings',
       merchant: 'Compu Smart',
       invoiceNumber: 'INV-002',
+      invoiceDate: new Date('2024-11-05'),
+      dueDate: new Date('2024-12-05'),
+      paymentTerms: '60days',
       invoiceAmount: 100000.00,
       creditAmount: 95000.00,
       financierReceivables: 5000.00,
-      productCode: 'RF',
+      program: 'Program C',
       actions: ''
     }
   ];
 
   displayedColumns: string[] = [
-    'requestId', 'dateCreated', 'buyer', 'merchant', 'invoiceNumber', 'invoiceAmount',
-    'creditAmount', 'financierReceivables', 'productCode', 'actions'
+    'requestId', 'dateCreated', 'buyer', 'merchant', 'invoiceNumber',
+    'invoiceDate', 'dueDate', 'paymentTerms', // Added paymentTerms
+    'invoiceAmount', 'creditAmount',
+    'financierReceivables', 'program', 'actions'
   ];
 
-  productCodeOptions = [
+  programOptions = [
     { value: '', label: 'Any' },
-    { value: 'id', label: 'ID' },
-    { value: 'rf', label: 'RF' }
+    { value: 'program a', label: 'Program A' },
+    { value: 'program b', label: 'Program B' },
+    { value: 'program c', label: 'Program C' }
   ];
 
   constructor(private fb: FormBuilder) {
     this.filterForm = this.fb.group({
       fromDate: [''],
       toDate: [''],
+      invoiceFromDate: [''],
+      invoiceToDate: [''],
       buyer: [''],
       merchant: [''],
-      productCode: ['']
+      program: [''],
+      paymentTerms: [''] // Added paymentTerms filter
     });
 
     this.dataSource = new MatTableDataSource(this.payments);
@@ -130,6 +145,7 @@ export class Payments implements OnInit, AfterViewInit {
     this.dataSource.sort = this.sort;
   }
 
+
   onTabChange(event: any) {
     this.activeTabIndex = event.index;
     this.showPaymentsContent = this.activeTabIndex === 0;
@@ -143,9 +159,11 @@ export class Payments implements OnInit, AfterViewInit {
       formValues.toDate ||
       formValues.buyer ||
       formValues.merchant ||
-      formValues.productCode
+      formValues.program ||
+      formValues.paymentTerms // Added paymentTerms
     );
   }
+
 
   resetFilters(): void {
     this.filterForm.reset({
@@ -153,7 +171,8 @@ export class Payments implements OnInit, AfterViewInit {
       toDate: '',
       buyer: '',
       merchant: '',
-      productCode: ''
+      program: '',
+      paymentTerms: ''
     });
 
     this.dataSource.data = this.payments;
@@ -193,9 +212,14 @@ export class Payments implements OnInit, AfterViewInit {
       );
     }
 
-    if (filters.productCode) {
+    if (filters.program) {
       filtered = filtered.filter(payment =>
-        payment.productCode.toLowerCase() === filters.productCode.toLowerCase()
+        payment.program.toLowerCase() === filters.program.toLowerCase()
+      );
+    }
+    if (filters.paymentTerms) {
+      filtered = filtered.filter(payment =>
+        payment.paymentTerms.toLowerCase().includes(filters.paymentTerms.toLowerCase())
       );
     }
 

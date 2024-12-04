@@ -11,6 +11,7 @@ export interface InvoiceData {
     productCode: string;
     buyerStatus: string;
     paymentStatus: string;
+    paymentTerms: '30 days' | '60 days' | '90 days';
 }
 
 @Injectable({

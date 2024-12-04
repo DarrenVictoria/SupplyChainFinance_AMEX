@@ -36,11 +36,21 @@
           </mat-select>
         </mat-form-field>
 
+        <mat-form-field>
+          <mat-label>Payment Terms</mat-label>
+          <mat-select formControlName="paymentTerms">
+            <mat-option value="">All Payment Terms</mat-option>
+            <mat-option *ngFor="let option of paymentTermsOptions" [value]="option.value">
+              {{option.label}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
         <!-- In the filter section, add Merchant Status filter -->
         <mat-form-field>
-            <mat-label>Merchant Status</mat-label>
+            <mat-label>Supplier Status</mat-label>
             <mat-select formControlName="merchantStatus">
-              <mat-option value="">All Merchant Statuses</mat-option>
+              <mat-option value="">All Supplier Statuses</mat-option>
               <mat-option *ngFor="let option of merchantStatusOptions" [value]="option.value">
                 {{option.label}}
               </mat-option>
@@ -145,6 +155,11 @@
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Invoice Number</th>
             <td mat-cell *matCellDef="let merchant">{{ merchant.invoiceNumber }}</td>
           </ng-container>
+
+          <ng-container matColumnDef="paymentTerms">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Payment Terms</th>
+            <td mat-cell *matCellDef="let merchant">{{ merchant.paymentTerms }}</td>
+          </ng-container>
       
           <!-- Invoice Amount Column -->
           <ng-container matColumnDef="invoiceAmount">
@@ -165,7 +180,7 @@
           </ng-container>
 
           <ng-container matColumnDef="merchantStatus">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Merchant Status</th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Supplier Status</th>
             <td mat-cell *matCellDef="let merchant">
               <span 
                 class="status-chip {{ getMerchantStatusClass(merchant.merchantStatus) }}"
@@ -202,27 +217,21 @@
           </ng-container>
       
           <!-- Actions Column -->
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef>Actions</th>
-            <td mat-cell *matCellDef="let merchant">
-              <ng-container *ngIf="getActionButtons(merchant) === 'info'">
-                <button mat-icon-button (click)="onInfo(merchant)">
-                  <mat-icon>info</mat-icon>
-                </button>
-              </ng-container>
-              <ng-container *ngIf="getActionButtons(merchant) === 'approve,reject,info'">
-                <button mat-icon-button color="primary" (click)="onAccept(merchant)">
-                  <mat-icon>check</mat-icon>
-                </button>
-                <button mat-icon-button color="warn" (click)="onReject(merchant)">
-                  <mat-icon>close</mat-icon>
-                </button>
-                <button mat-icon-button (click)="onInfo(merchant)">
-                  <mat-icon>info</mat-icon>
-                </button>
-              </ng-container>
-            </td>
-          </ng-container>
+          <!-- Actions Column -->
+<ng-container matColumnDef="actions">
+  <th mat-header-cell *matHeaderCellDef>Actions</th>
+  <td mat-cell *matCellDef="let merchant">
+    <button
+      *ngIf="merchant.buyerStatus === 'Approved'"
+      style="padding: 10px;"
+      mat-raised-button
+      color="primary"
+    >
+      Request Payment
+    </button>
+  </td>
+</ng-container>
+
       
           <!-- Table Row Definitions -->
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

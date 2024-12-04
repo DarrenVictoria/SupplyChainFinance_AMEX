@@ -80,6 +80,25 @@ export class UserManagementComponent {
     });
   }
 
+  deleteUser(user: User) {
+    // Find the index of the user to delete
+    const index = this.users.findIndex(u => u.userName === user.userName);
+
+    if (index !== -1) {
+      // Remove the user from the array
+      this.users.splice(index, 1);
+      // Trigger change detection
+      this.users = [...this.users];
+
+      // Show a snackbar to confirm deletion
+      this.snackBar.open('User deleted successfully', 'Close', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+      });
+    }
+  }
+
   addUser(userForm: NgForm) {
     if (userForm.valid) {
       // Create a new user object to avoid direct mutation
@@ -104,6 +123,7 @@ export class UserManagementComponent {
     console.log(`Generating password for user: ${user.userName}`);
   }
 }
+
 @Component({
   selector: 'app-user-details-dialog',
   template: `
