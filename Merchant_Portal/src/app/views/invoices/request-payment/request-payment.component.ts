@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-request-payment',
@@ -13,14 +14,21 @@ export class RequestPaymentComponent {
   invoiceAmount: number = 10000;
   paymentTerms: number = 90;
   earlyPaymentDay: number = 14;
-  dailyRate: number = 5;
+  annualRate: number = 20;
+  showConfirmModal: boolean = false;
+
+  constructor(private router: Router) { }
 
   get requestedEarlyPayment(): number {
     return this.paymentTerms - this.earlyPaymentDay;
   }
 
+  get dailyRate(): number {
+    return Math.floor(((this.annualRate * 0.01) / 365) * 1000000) / 1000000;
+  }
+
   get totalEarlyPaymentDiscount(): number {
-    return this.dailyRate * this.requestedEarlyPayment;
+    return this.dailyRate * this.invoiceAmount * this.requestedEarlyPayment;
   }
 
   get calculatedAmount(): number {
@@ -29,5 +37,23 @@ export class RequestPaymentComponent {
 
   getSliderMarkers(): number[] {
     return Array.from({ length: Math.floor(this.paymentTerms / 10) + 1 }, (_, i) => i * 10);
+  }
+
+  requestPayment() {
+    this.showConfirmModal = true;
+  }
+
+  closeModal() {
+    this.showConfirmModal = false;
+  }
+
+  confirmPayment() {
+    // Here you would typically call a service to submit the payment request
+    console.log('Payment requested with details:', {
+      invoiceAmount: this.invoiceAmount,
+      earlyPaymentDay: this.earlyPaymentDay,
+      calculatedAmount: this.calculatedAmount
+    });
+    this.router.navigate(['/invoices']);
   }
 }

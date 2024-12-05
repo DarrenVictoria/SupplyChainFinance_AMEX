@@ -1,54 +1,79 @@
 <div class="request-payment-container">
-    <div class="payment-section invoice-amount-section">
-      <label class="payment-label">Invoice Amount:</label>
-      <span class="payment-value">{{ invoiceAmount | currency }}</span>
-    </div>
-    
-    <div class="payment-section payment-terms-section">
-      <label class="payment-label">Payment Terms (days):</label>
-      <span class="payment-value">{{ paymentTerms }} days</span>
-    </div>
+  <div class="payment-section invoice-amount-section">
+    <label class="payment-label">Invoice Amount:</label>
+    <span class="payment-value">{{ invoiceAmount | currency }}</span>
+  </div>
   
-    <div class="payment-section early-payment-section">
-      <label class="payment-label">Early Payment Slider</label>
-      <div class="slider-container">
-        <input 
-          type="range" 
-          [min]="0" 
-          [max]="paymentTerms" 
-          [(ngModel)]="earlyPaymentDay"
-          class="payment-slider"
+  <div class="payment-section payment-terms-section">
+    <label class="payment-label">Payment Terms (days):</label>
+    <span class="payment-value">{{ paymentTerms }} days</span>
+  </div>
+
+  <div class="payment-section early-payment-section">
+    <label class="payment-label">Early Payment</label>
+    <div class="slider-container">
+      <input 
+        type="range" 
+        [min]="0" 
+        [max]="paymentTerms" 
+        [(ngModel)]="earlyPaymentDay"
+        class="payment-slider"
+      >
+      <div class="slider-markers">
+        <span 
+          *ngFor="let marker of getSliderMarkers()" 
+          class="slider-marker"
+          [style.left.%]="(marker / paymentTerms) * 100"
         >
-        <div class="slider-markers">
-          <span 
-            *ngFor="let marker of getSliderMarkers()" 
-            class="slider-marker"
-            [style.left.%]="(marker / paymentTerms) * 100"
-          >
-            {{ marker }}
-          </span>
-        </div>
+          {{ marker }}
+        </span>
       </div>
-      <span class="payment-value">Selected Day: {{ earlyPaymentDay }}</span>
     </div>
-  
-    <div class="payment-section requested-early-payment-section">
-      <label class="payment-label">Requested Early Payment (days):</label>
-      <span class="payment-value">{{ requestedEarlyPayment }} days</span>
-    </div>
-  
-    <div class="payment-section daily-rate-section">
-      <label class="payment-label">Daily Rate:</label>
-      <span class="payment-value">{{ dailyRate }}%</span>
-    </div>
-  
-    <div class="payment-section total-discount-section">
-      <label class="payment-label">Total Early Payment Discount:</label>
-      <span class="payment-value">{{ totalEarlyPaymentDiscount | currency }}</span>
-    </div>
-  
-    <div class="payment-section calculated-amount-section">
-      <label class="payment-label">Calculated Amount:</label>
-      <span class="payment-value calculated-amount">{{ calculatedAmount | currency }}</span>
+    <span class="payment-value">Selected Day: {{ earlyPaymentDay }}</span>
+  </div>
+
+  <div class="payment-section requested-early-payment-section">
+    <label class="payment-label">Requested Early Payment (days):</label>
+    <span class="payment-value">{{ requestedEarlyPayment }} days</span>
+  </div>
+
+  <div class="payment-section daily-rate-section">
+    <label class="payment-label">Daily Rate:</label>
+    <span class="payment-value">{{ dailyRate }}</span>
+  </div>
+
+  <div class="payment-section daily-rate-section">
+    <label class="payment-label">Annual Rate:</label>
+    <span class="payment-value">{{ annualRate }}%</span>
+  </div>
+
+  <div class="payment-section total-discount-section">
+    <label class="payment-label">Total Early Payment Discount:</label>
+    <span class="payment-value">{{ totalEarlyPaymentDiscount | currency }}</span>
+  </div>
+
+  <div class="payment-section calculated-amount-section">
+    <label class="payment-label">Calculated Amount:</label>
+    <span class="payment-value calculated-amount">{{ calculatedAmount | currency }}</span>
+  </div>
+
+  <div class="payment-section">
+    <button class="request-payment-btn" (click)="requestPayment()">Request Payment</button>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div *ngIf="showConfirmModal" class="modal-overlay">
+    <div class="modal-content">
+      <h2>Confirm Payment Request</h2>
+      <div class="modal-details">
+        <p><strong>Invoice Amount:</strong> {{ invoiceAmount | currency }}</p>
+        <p><strong>Early Payment Day:</strong> {{ earlyPaymentDay }}</p>
+        <p><strong>Calculated Amount:</strong> {{ calculatedAmount | currency }}</p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-edit" (click)="closeModal()">Edit</button>
+        <button class="btn btn-confirm" (click)="confirmPayment()">Confirm</button>
+      </div>
     </div>
   </div>
+</div>
