@@ -1,9 +1,20 @@
 .buyers-container {
   padding: 2rem;
   
-  h1 {
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 2rem;
-    font-size: 2rem;
+    
+    h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+    
+    .add-buyer-button {
+      text-transform: uppercase;
+    }
   }
 }
 

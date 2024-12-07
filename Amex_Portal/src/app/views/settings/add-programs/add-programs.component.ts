@@ -8,7 +8,6 @@ import {
   Validators,
   AbstractControl,
   FormControl,
-
 } from '@angular/forms';
 
 // Angular Material Imports
@@ -19,6 +18,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { RouterModule } from '@angular/router';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-add-programs',
@@ -32,7 +33,9 @@ import { RouterModule } from '@angular/router';
     MatButtonModule,
     MatIconModule,
     MatTableModule,
-    RouterModule
+    RouterModule,
+    MatSlideToggleModule,
+    MatTooltipModule
   ],
   templateUrl: './add-programs.component.html',
   styleUrls: ['./add-programs.component.scss']
@@ -62,11 +65,15 @@ export class AddProgramsComponent implements OnInit {
 
       // Invoice Factoring Specific Fields
       dailyRateFactoring: [null, [Validators.min(0), Validators.max(100)]],
+      profitSharingWithBuyers: [null, [Validators.min(0), Validators.max(100)]],
       supplierExceptions: this.fb.array([]),
+      enableAutoFinancing: [false],
 
       // Direct Payment Specific Fields
       dailyRateDirect: [null, [Validators.min(0), Validators.max(100)]],
       gracePeriod: [null, [Validators.min(0)]],
+      enableInvoiceRedirection: [false],
+      invoiceRedirectionTimeLimit: [24, [Validators.min(1), Validators.max(168)]], // Max 1 week
 
       // Common Fields
       monthlySupplierSubscriptionFee: [null, [Validators.min(0)]],
@@ -77,9 +84,6 @@ export class AddProgramsComponent implements OnInit {
 
       financingDaysMin: [null, [Validators.min(0)]],
       financingDaysMax: [null, [Validators.min(0)]],
-
-      profitSharingAMEX: [null, [Validators.min(0), Validators.max(100)]],
-      profitSharingBuyer: [null, [Validators.min(0), Validators.max(100)]]
     });
   }
 

@@ -25,7 +25,7 @@ interface Merchant {
   createdBy: string;
   registeredBuyer: string;
   status: 'Active' | 'Inactive';
-  approvalStatus: 'Pass' | 'Fail';
+  approvalStatus: 'Pass' | 'Rejected' | 'Review';
   manager: string;
   email: string;
   phone: string;
@@ -88,7 +88,7 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
       createdBy: 'John Bill',
       registeredBuyer: 'John Bill',
       status: 'Inactive',
-      approvalStatus: 'Fail',
+      approvalStatus: 'Rejected',
       manager: 'Mark',
       email: 'sarah@abc.com',
       phone: '(555) 123-4567',
@@ -101,7 +101,7 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
       createdBy: 'Walter Stan',
       registeredBuyer: 'Walter Stan',
       status: 'Active',
-      approvalStatus: 'Pass',
+      approvalStatus: 'Review',
       manager: 'John',
       email: 'sarah@abc.com',
       phone: '(555) 123-4567',
@@ -114,7 +114,7 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
       createdBy: 'Will Black',
       registeredBuyer: 'Tyler Phillips',
       status: 'Inactive',
-      approvalStatus: 'Fail',
+      approvalStatus: 'Rejected',
       manager: 'Luke',
       email: 'sarah@abc.com',
       phone: '(555) 123-4567',
@@ -285,12 +285,12 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
 
   getApprovalStatusClass(approvalStatus: string): string {
     switch (approvalStatus.toLowerCase()) {
-      case 'approved':
-        return 'text-green-500';
+      case 'pass':
+        return 'text-green';
       case 'rejected':
-        return 'text-red-500';
-      case 'pending approval':
-        return 'text-orange-500';
+        return 'text-red';
+      case 'review':
+        return 'text-orange';
       default:
         return '';
     }
@@ -298,12 +298,14 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
 
   onAccept(merchant: Merchant) {
     console.log('Accepted:', merchant);
-    // Implement your accept logic here
+    merchant.approvalStatus = 'Pass';
+    this.dataSource.data = [...this.merchants];
   }
 
   onReject(merchant: Merchant) {
     console.log('Rejected:', merchant);
-    // Implement your reject logic here
+    merchant.approvalStatus = 'Rejected';
+    this.dataSource.data = [...this.merchants];
   }
 
   onInfo(merchant: Merchant) {
@@ -312,6 +314,7 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
       data: merchant
     });
   }
+
 }
 
 @Component({

@@ -151,6 +151,48 @@ overflow-x: auto;  /* Allow horizontal scroll */
 }
 
 
+::ng-deep .pending {
+background-color: #FFC107 !important; /* orange */
+color: white !important;
+}
+
+::ng-deep .cancelled {
+background-color: #D32F2F !important; /* red */
+color: white !important;
+}
+
+::ng-deep .requested {
+background-color: #2196F3 !important; /* blue */
+color: white !important;
+}
+
+::ng-deep .completed {
+background-color: #4CAF50 !important; /* green */
+color: white !important;
+}
+
+
+.pending {
+color: #FFC107 !important; /* orange */
+background-color: #ffffff !important;
+}
+
+.cancelled {
+color: #D32F2F !important; /* red */
+background-color: #ffffff !important;
+}
+
+.requested {
+color: #2196F3 !important; /* blue */
+background-color: #ffffff !important;
+}
+
+.completed {
+color: #4CAF50 !important; /* green */
+background-color: #ffffff !important;
+}
+
+
 ::ng-deep {
   .mat-form-field {
     width: 100%;

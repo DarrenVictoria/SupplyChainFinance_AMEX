@@ -7,7 +7,7 @@ import { Component } from '@angular/core';
     <footer class="footer">
       <div class="footer-content">
         <p>© 2024 Green Tape Supply Chain Finance. All rights reserved.</p>
-        <p>Merchant Portal powered by Affno Virtual Market PTE LTD</p>
+        <p>Supplier Portal powered by Affno Virtual Market PTE LTD</p>
       </div>
     </footer>
   `,

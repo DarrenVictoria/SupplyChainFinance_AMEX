@@ -156,6 +156,17 @@
             <td mat-cell *matCellDef="let merchant">{{ merchant.invoiceNumber }}</td>
           </ng-container>
 
+          <!-- Add these ng-container definitions in the table columns section -->
+<ng-container matColumnDef="invoiceDate">
+  <th mat-header-cell *matHeaderCellDef mat-sort-header>Invoice Date</th>
+  <td mat-cell *matCellDef="let merchant">{{ merchant.invoiceDate }}</td>
+</ng-container>
+
+<ng-container matColumnDef="invoiceDueDate">
+  <th mat-header-cell *matHeaderCellDef mat-sort-header>Invoice Due Date</th>
+  <td mat-cell *matCellDef="let merchant">{{ merchant.invoiceDueDate }}</td>
+</ng-container>
+
           <ng-container matColumnDef="paymentTerms">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Payment Terms</th>
             <td mat-cell *matCellDef="let merchant">{{ merchant.paymentTerms }}</td>
@@ -179,7 +190,7 @@
             <td mat-cell *matCellDef="let merchant">{{ merchant.productCode }}</td>
           </ng-container>
 
-          <ng-container matColumnDef="merchantStatus">
+          <!-- <ng-container matColumnDef="merchantStatus">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Supplier Status</th>
             <td mat-cell *matCellDef="let merchant">
               <span 
@@ -190,7 +201,7 @@
                 {{ merchant.merchantStatus }}
               </span>
             </td>
-          </ng-container>
+          </ng-container> -->
       
           <!-- Buyer Status Column -->
           <ng-container matColumnDef="buyerStatus">
@@ -222,7 +233,8 @@
             <th mat-header-cell *matHeaderCellDef>Actions</th>
             <td mat-cell *matCellDef="let merchant">
               <button
-                *ngIf="merchant.buyerStatus === 'Approved'"
+                *ngIf="(merchant.buyerStatus === 'Approved' && merchant.paymentStatus === 'Pending') ||
+                       (merchant.buyerStatus === 'Approved' && merchant.paymentStatus === 'Requested')"
                 style="padding: 10px;"
                 mat-raised-button
                 color="primary"

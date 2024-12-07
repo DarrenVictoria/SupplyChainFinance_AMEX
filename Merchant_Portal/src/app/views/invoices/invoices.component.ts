@@ -32,12 +32,14 @@ interface Merchant {
   creditAmount: number;
   productCode: string;
   buyerStatus: string;
-  paymentStatus: string;
+  paymentStatus: 'Pending' | 'Cancelled' | 'Requested' | 'Completed';
   paymentTerms: '30 days' | '60 days' | '90 days';
   approvedBy?: string;
   approvedDate?: string;
   approvalStatus?: 'Approved' | 'Rejected' | 'Pending';
   pendingApprover?: string;
+  invoiceDate?: string;
+  invoiceDueDate?: string;
 }
 
 @Component({
@@ -83,8 +85,10 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
   ];
 
   paymentStatusOptions = [
-    { value: 'Paid', label: 'Paid' },
-    { value: 'Unpaid', label: 'Unpaid' }
+    { value: 'Pending', label: 'Pending' },
+    { value: 'Cancelled', label: 'Cancelled' },
+    { value: 'Requested', label: 'Requested' },
+    { value: 'Completed', label: 'Completed' }
   ];
 
   productCodeOptions = [
@@ -108,8 +112,9 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
   // Update displayed columns
   displayedColumns: string[] = [
     'requestId', 'dateCreated', 'buyerName',
-    'invoiceNumber', 'paymentTerms', 'invoiceAmount', 'creditAmount',
-    'merchantStatus', 'buyerStatus', 'paymentStatus', 'actions'
+    'invoiceNumber', 'invoiceDate', 'invoiceDueDate', 'paymentTerms',
+    'invoiceAmount', 'creditAmount',
+    'buyerStatus', 'paymentStatus', 'actions'
   ];
 
   paymentTermsOptions = [
@@ -122,7 +127,7 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
   merchants: Merchant[] = [
     {
       requestId: 'REQ-CS-576',
-      dateCreated: '11/09/2024',
+      dateCreated: '12/07/2024',
       buyerName: 'Skyline Innovations',
       merchantStatus: 'Approved',
       invoiceNumber: 'INV-001',
@@ -130,15 +135,17 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
       creditAmount: 9700.00,
       productCode: 'ID',
       buyerStatus: 'Approved',
-      paymentStatus: 'Paid',
+      paymentStatus: 'Pending',
       approvedBy: 'John Smith',
       approvedDate: '11/09/2024 14:30 EST',
       approvalStatus: 'Approved',
-      paymentTerms: '30 days',
+      paymentTerms: '60 days',
+      invoiceDate: '12/07/2024',
+      invoiceDueDate: '02/07/2025',
     },
     {
       requestId: 'REQ-SBC-782',
-      dateCreated: '12/15/2024',
+      dateCreated: '12/05/2024',
       buyerName: 'Vanguard Resources',
       merchantStatus: 'Pending Approval',
       invoiceNumber: 'INV-002',
@@ -146,10 +153,12 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
       creditAmount: 15035.00,
       productCode: 'RF',
       buyerStatus: 'Pending Approval',
-      paymentStatus: 'Unpaid',
+      paymentStatus: 'Requested',
       pendingApprover: 'Michael Chen',
       approvalStatus: 'Pending',
       paymentTerms: '30 days',
+      invoiceDate: '12/05/2024',
+      invoiceDueDate: '01/05/2025',
     },
     {
       requestId: 'REQ-EMAAR-345',
@@ -161,11 +170,13 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
       creditAmount: 7566.00,
       productCode: 'ID',
       buyerStatus: 'Rejected',
-      paymentStatus: 'Unpaid',
+      paymentStatus: 'Cancelled',
       approvedBy: 'Emily Davis',
       approvedDate: '01/23/2024 09:15 EST',
       approvalStatus: 'Rejected',
       paymentTerms: '30 days',
+      invoiceDate: '12/15/2024',
+      invoiceDueDate: '01/14/2025',
     },
     {
       requestId: 'REQ-JANA-619',
@@ -177,11 +188,13 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
       creditAmount: 21340.00,
       productCode: 'RF',
       buyerStatus: 'Approved',
-      paymentStatus: 'Paid',
+      paymentStatus: 'Completed',
       approvedBy: 'David Wilson',
       approvedDate: '02/06/2024 11:45 EST',
       approvalStatus: 'Approved',
       paymentTerms: '30 days',
+      invoiceDate: '11/09/2024',
+      invoiceDueDate: '12/09/2024',
     },
     {
       requestId: 'REQ-SBC-890',
@@ -193,10 +206,12 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
       creditAmount: 5432.00,
       productCode: 'ID',
       buyerStatus: 'Pending Approval',
-      paymentStatus: 'Unpaid',
+      paymentStatus: 'Pending',
       pendingApprover: 'Lisa Martinez',
       approvalStatus: 'Pending',
       paymentTerms: '30 days',
+      invoiceDate: '11/09/2024',
+      invoiceDueDate: '12/09/2024',
     }
   ];
 
@@ -230,7 +245,9 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
           ...invoices.map(invoice => ({
             ...invoice,
             merchantStatus: invoice.merchantStatus || 'Pending Approval',
-            paymentTerms: invoice.paymentTerms as '30 days' | '60 days' | '90 days'
+            paymentTerms: invoice.paymentTerms as '30 days' | '60 days' | '90 days',
+            // Explicitly cast paymentStatus to the correct type
+            paymentStatus: (invoice.paymentStatus as 'Pending' | 'Cancelled' | 'Requested' | 'Completed') || 'Pending'
           }))
         ];
 
@@ -409,10 +426,14 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
 
   getPaymentStatusClass(status: string): string {
     switch (status) {
-      case 'Paid':
-        return 'paid';
-      case 'Unpaid':
-        return 'unpaid';
+      case 'Pending':
+        return 'pending';
+      case 'Cancelled':
+        return 'cancelled';
+      case 'Requested':
+        return 'requested';
+      case 'Completed':
+        return 'completed';
       default:
         return '';
     }
@@ -429,5 +450,25 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
       default:
         return '';
     }
+  }
+
+  calculateInvoiceDueDate(invoiceDate: string, paymentTerms: '30 days' | '60 days' | '90 days'): string {
+    const date = new Date(invoiceDate);
+    const days = parseInt(paymentTerms.split(' ')[0]);
+
+    // Add the number of days to the invoice date
+    date.setDate(date.getDate() + days);
+
+    // Format the date back to the same format as other dates in the application
+    return this.formatDate(date);
+  }
+
+  // Helper method to format date
+  formatDate(date: Date): string {
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const year = date.getFullYear();
+
+    return `${month}/${day}/${year}`;
   }
 }

@@ -10,6 +10,7 @@ import { PaymentsComponent } from './views/payments/payments.component';
 import { InvoicesComponent } from './views/invoices/invoices.component';
 import { AddInvoiceComponent } from './views/add-invoice/add-invoice.component';
 import { UserManagementComponent } from './views/settings/user-management/user-management.component';
+import { ManageSupplierComponent } from './views/merchants/manage-suppliers/manage-suppliers.component';
 
 export const routes: Routes = [
   {
@@ -23,6 +24,10 @@ export const routes: Routes = [
       {
         path: 'suppliers',
         component: MerchantsComponent
+      },
+      {
+        path: 'manage-suppliers',
+        component: ManageSupplierComponent
       },
       // {
       //   path: 'requests',
@@ -42,7 +47,7 @@ export const routes: Routes = [
         component: InvoicesComponent
       },
       {
-        path: 'payments',
+        path: 'settlements',
         component: PaymentsComponent
       },
       {

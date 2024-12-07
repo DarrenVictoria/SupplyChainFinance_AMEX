@@ -1,166 +1,268 @@
 <div class="container">
-    <h1 class="title">Company Registration Data Lookup</h1>
-    
-    <div class="search-section">
-      <div class="input-group">
-        <label>Company Registration</label>
-        <input type="text" 
-               [(ngModel)]="registrationNumber" 
-               placeholder="Enter Company Registration Number"
-               name="registrationNumber">
-      </div>
-      
-      <div class="date-inputs">
-        <div class="input-group">
-          <label>Registration Issue Date</label>
-          <input type="date" 
-                 [(ngModel)]="registrationDate"
-                 name="registrationDate">
-        </div>
-        
-        <div class="input-group">
-          <label>Registration Query Date</label>
-          <input type="date" 
-                 [(ngModel)]="queryDate"
-                 name="queryDate">
-        </div>
-      </div>
-      
-      <button class="search-button" (click)="searchCompany()">Check Registry</button>
+  <h1 class="title">Supplier Onboarding</h1>
+  
+  <!-- Stage Navigation -->
+  <div class="stage-navigation">
+    <div 
+      *ngFor="let stage of stages; let i = index" 
+      class="stage-indicator"
+      [class.active]="currentStage === i + 1"
+      [class.completed]="stage.completed"
+    >
+      {{ stage.name }}
+      <span *ngIf="stage.completed" class="check-icon">✓</span>
     </div>
-  
-    <!-- Loading State -->
-    <div *ngIf="loading" class="loading-state">
-      <div class="spinner"></div>
-      <p>Searching for company...</p>
-    </div>
-  
-    <!-- Error Message -->
-    <div *ngIf="error" class="error-message">
-      {{error}}
-    </div>
-  
-    <ng-container *ngIf="showResults && company">
-      <div class="results-panel">
-        <div class="panel basic-info">
-          <h2>Basic Info</h2>
-          <div class="info-row">
-            <label>Company Name:</label>
-            <div>
-              <div>{{getCompanyName('arabic')}}</div>
-              <div>{{getCompanyName('english')}}</div>
-            </div>
-          </div>
-          
-          <div class="info-row">
-            <label>Company Type:</label>
-            <div>{{company.basicInfo.companyType || 'N/A'}}</div>
-          </div>
-  
-          <div class="info-row">
-            <label>Legal Entity Type:</label>
-            <div>{{company.basicInfo.legalEntityType || 'N/A'}}</div>
-          </div>
-  
-          <div class="info-row">
-            <label>Company Status:</label>
-            <div>{{company.basicInfo.companyStatus || 'N/A'}}</div>
-          </div>
-  
-          <div class="info-row">
-            <label>Company Address:</label>
-            <div>{{getCompanyAddress()}}</div>
-          </div>
-  
-          <div class="info-row">
-            <label>Owners and Shareholders:</label>
-            <div>
-              <div *ngFor="let owner of company.basicInfo.ownersAndShareholders">
-                {{owner.name}} - {{owner.percentage}}%
-              </div>
-            </div>
-          </div>
+  </div>
 
-          <div class="info-row">
-            <label>Business Activities:</label>
-            <div>
-              <div *ngFor="let activity of company.basicInfo.businessActivities">
-                {{activity}}
-              </div>
-            </div>
-          </div>
-          
-          <div class="info-row">
-            <label>Branches:</label>
-            <div>
-              <div *ngFor="let branch of company.basicInfo.branches">
-                {{branch}}
-              </div>
-            </div>
-          </div>
-  
-          <div class="info-row">
-            <label>VAT Registration:</label>
-            <div>{{company.basicInfo.vatRegistrationNumber || 'N/A'}}</div>
-          </div>
-        </div>
-  
-        <div class="panel license-details">
-          <h2>License Details</h2>
-          <div class="info-row">
-            <label>Environmental License:</label>
-            <div>{{company.licenseDetails.environmentalTechnologyLicense || 'N/A'}}</div>
-          </div>
-  
-          <div class="info-row">
-            <label>IT Services License:</label>
-            <div>{{company.licenseDetails.itServicesLicense || 'N/A'}}</div>
-          </div>
-  
-          <div class="info-row">
-            <label>Authorized Capital:</label>
-            <div>{{formatCurrency(company.licenseDetails.capitalInformation.authorizedCapital)}}</div>
-          </div>
-  
-          <div class="info-row">
-            <label>Paid-up Capital:</label>
-            <div>{{formatCurrency(company.licenseDetails.capitalInformation.paidUpCapital)}}</div>
-          </div>
-        </div>
-  
-        <div class="panel contact-info">
-          <h2>Company Contact Information</h2>
-          <div class="info-row">
-            <label>Phone:</label>
-            <div>{{company.contactInformation.phone || 'N/A'}}</div>
-          </div>
-  
-          <div class="info-row">
-            <label>Email:</label>
-            <div>{{company.contactInformation.email || 'N/A'}}</div>
-          </div>
-  
-          <div class="info-row">
-            <label>Establishment Date:</label>
-            <div>{{company.contactInformation.establishmentDate || 'N/A'}}</div>
-          </div>
-  
-          <div class="info-row">
-            <label>Board Members:</label>
-            <div>
-              <div *ngFor="let member of company.boardMembers">
-                {{member.name}} - {{member.position}}
-              </div>
-            </div>
-          </div>
-        </div>
-  
-        <!-- Registration Button Section -->
-        <div class="registration-section">
-          <button class="register-button" (click)="registerWithCompany()">
-            Register with Company
+  <!-- Stage 1: Company Details -->
+  <ng-container *ngIf="currentStage === 1">
+    <div class="section-title">Buyer Details</div>
+    <div class="details-grid">
+      <div class="input-group">
+        <label>Buyer Code</label>
+        <input type="text" [value]="buyerCode" readonly>
+      </div>
+      <div class="input-group">
+        <label>Buyer Company Name</label>
+        <input type="text" [value]="buyerCompanyName" readonly>
+      </div>
+    </div>
+
+    <div class="section-title">Supplier Details</div>
+
+    <!-- Wathq API Section -->
+    <div class="section-subtitle">Wathq API</div>
+    <div class="details-grid">
+      <div class="input-group">
+        <label>Company Registration Number</label>
+        <input 
+          type="text" 
+          [(ngModel)]="supplierDetails.companyRegistrationNumber"
+          placeholder="Enter Company Registration Number"
+        >
+      </div>
+      <div class="input-group">
+        <label>Company Name</label>
+        <input 
+          type="text" 
+          [(ngModel)]="supplierDetails.companyName"
+          placeholder="Enter Company Name"
+        >
+      </div>
+      <div class="input-group full-width">
+        <label>Company Address</label>
+        <input 
+          type="text" 
+          [(ngModel)]="supplierDetails.companyAddress"
+          placeholder="Enter Company Address"
+        >
+      </div>
+    </div>
+
+    <!-- Nafth API Section -->
+    <div class="section-subtitle">Nafath API</div>
+    <div class="details-grid">
+      <div class="input-group mobile-input-group">
+        <label>Mobile Number</label>
+        <div class="mobile-input-container">
+          <select 
+            class="country-code-select"
+            [(ngModel)]="supplierDetails.selectedCountryCode"
+          >
+            <option 
+              *ngFor="let country of countryCodes" 
+              [value]="country.dial_code"
+            >
+              {{ country.dial_code }} {{ country.code }}
+            </option>
+          </select>
+          <input 
+            type="tel" 
+            class="mobile-number-input"
+            [(ngModel)]="supplierDetails.mobileNumber"
+            placeholder="Enter Mobile Number"
+          >
+          <button 
+            class="verify-mobile-button" 
+            (click)="openNafthVerificationModal()"
+          >
+            Verify
           </button>
         </div>
       </div>
-    </ng-container>
+  
+      <div class="input-group">
+        <label>National ID</label>
+        <input 
+          type="text" 
+          [(ngModel)]="supplierDetails.nationalId"
+          placeholder="Enter National ID"
+        >
+      </div>
+    </div>
+
+    <!-- OTP Modal -->
+    <div *ngIf="showOtpModal" class="otp-modal">
+      <div class="otp-modal-content">
+        <h2>OTP Verification</h2>
+        <p>Please enter the OTP sent to your mobile number</p>
+        <input 
+          type="text" 
+          [(ngModel)]="otpInput" 
+          placeholder="Enter 6-digit OTP"
+          maxlength="6"
+        >
+        <div class="otp-modal-actions">
+          <button 
+            (click)="verifyNafthOtp()"
+            [disabled]="isNafthVerificationLoading"
+          >
+            <span *ngIf="!isNafthVerificationLoading">Verify OTP</span>
+            <span *ngIf="isNafthVerificationLoading" class="loader">
+              Verifying...
+            </span>
+          </button>
+          <button (click)="showOtpModal = false">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="approval-section">
+      <button 
+        class="approve-button" 
+        (click)="approveCompanyDetails()"
+        [disabled]="companyDetailsApproved || !supplierDetails.nafthVerified"
+      >
+        <span *ngIf="!isCompanyDetailsLoading">
+          {{ companyDetailsApproved ? 'Validated' : 'Validate' }}
+        </span>
+        <span *ngIf="isCompanyDetailsLoading" class="loader">
+          Validating...
+        </span>
+      </button>
+    </div>
+  </ng-container>
+
+  <!-- Stage 2: Document Verification -->
+  <ng-container *ngIf="currentStage === 2">
+    <div class="document-section">
+      <iframe 
+        src="/SupplyChainFinanceAgreement.pdf" 
+        class="pdf-viewer" 
+        width="100%" 
+        height="600px"
+      ></iframe>
+
+      <div class="approval-section">
+        <button 
+          class="approve-button" 
+          (click)="simulateDocumentApproval()"
+          [disabled]="documentApproved"
+        >
+          <span *ngIf="!isDocumentVerificationLoading">
+            {{ documentApproved ? 'Approved' : 'Submit for Approval' }}
+          </span>
+          <span *ngIf="isDocumentVerificationLoading" class="loader">
+            Approving...
+          </span>
+        </button>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Stage 3: Bank Details -->
+  <ng-container *ngIf="currentStage === 3">
+    <div class="section-title">IBAN Details</div>
+    <div class="details-grid">
+      <div class="input-group">
+        <label>Complete IBAN</label>
+        <input 
+          type="text" 
+          [(ngModel)]="ibanDetails.completeIban"
+          placeholder="Enter Complete IBAN"
+        >
+      </div>
+      <div class="input-group">
+        <label>Country</label>
+        <input 
+          type="text" 
+          [(ngModel)]="ibanDetails.country"
+          placeholder="Enter Country"
+        >
+      </div>
+      <div class="input-group">
+        <label>Bank</label>
+        <input 
+          type="text" 
+          [(ngModel)]="ibanDetails.bank"
+          placeholder="Enter Bank Name"
+        >
+      </div>
+    </div>
+
+    <div class="approval-section">
+      <button 
+        class="approve-button" 
+        (click)="approveBankDetails()"
+        [disabled]="bankDetailsApproved"
+      >
+        <span *ngIf="!isBankDetailsLoading">
+          {{ bankDetailsApproved ? 'Validated' : 'Validate' }}
+        </span>
+        <span *ngIf="isBankDetailsLoading" class="loader">
+          Verifying...
+        </span>
+      </button>
+    </div>
+  </ng-container>
+
+    <!-- Stage 4: Sanction Screening -->
+  <ng-container *ngIf="currentStage === 4">
+    <div class="sanction-screening-section">
+      <div *ngIf="isSanctionScreenLoading" class="sanction-loader">
+        <div class="loader-content">
+          <span>Obtaining Sanction Screening Status...</span>
+          <div class="spinner"></div>
+        </div>
+      </div>
+
+      <div *ngIf="!isSanctionScreenLoading" class="sanction-status-cards">
+        <div 
+          class="sanction-card verified" 
+          [class.active]="sanctionScreenStatus === 'Verified'"
+        >
+          Verified
+        </div>
+        <div 
+          class="sanction-card under-review"
+          [class.active]="sanctionScreenStatus === 'Under Review'"
+          [class.blinking]="sanctionScreenStatus === 'Under Review'"
+        >
+          Under Review
+        </div>
+        <div 
+          class="sanction-card rejected"
+          [class.active]="sanctionScreenStatus === 'Rejected'"
+        >
+          Rejected
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Navigation Buttons -->
+  <div class="navigation-section">
+    <button 
+      class="next-stage-button" 
+      (click)="goToNextStage()"
+      [disabled]="
+        (currentStage === 1 && !companyDetailsApproved) ||
+        (currentStage === 2 && !documentApproved) ||
+        (currentStage === 3 && !bankDetailsApproved) ||
+        (currentStage === 4 && sanctionScreenStatus !== 'Verified')
+      "
+    >
+      {{ currentStage === 4 ? 'Finish' : 'Next Stage' }}
+    </button>
   </div>
+</div>

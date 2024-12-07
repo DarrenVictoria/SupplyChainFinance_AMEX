@@ -1,12 +1,12 @@
 <div class="container">
   <div class="header-section">
-    <h1 class="text-3xl font-bold mb-8">Payments</h1>
+    <h1 class="text-3xl font-bold mb-8">Settlements</h1>
   </div>
 
   <!-- Filter Section -->
   <form [formGroup]="filterForm" class="filter-section mt-6">
     <div class="filter-header">
-      <h2 class="text-xl">Filter Payments</h2>
+      <h2 class="text-xl">Filter Settlements</h2>
     </div>
 
     <p>Date Created Filter</p>
@@ -15,8 +15,6 @@
 
       
       <!-- Date Range Filters -->
-       
-       
       <mat-form-field>
         <mat-label>From Created Date</mat-label>
         <input matInput [matDatepicker]="fromPicker" formControlName="fromDate">
@@ -32,7 +30,7 @@
       </mat-form-field>
 
       <!-- Status Filters -->
-      <mat-form-field>
+      <!-- <mat-form-field>
         <mat-label>Buyer Status</mat-label>
         <mat-select formControlName="status">
           <mat-option value="">All Statuses</mat-option>
@@ -40,13 +38,23 @@
             {{option.label}}
           </mat-option>
         </mat-select>
-      </mat-form-field>
+      </mat-form-field> -->
 
       <mat-form-field>
-        <mat-label>Payment Status</mat-label>
+        <mat-label>Settlment Status</mat-label>
         <mat-select formControlName="approvalStatus">
           <mat-option value="">All Payment Statuses</mat-option>
           <mat-option *ngFor="let option of paymentStatusOptions" [value]="option.value">
+            {{option.label}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Payment Terms</mat-label>
+        <mat-select formControlName="paymentTerms">
+          <mat-option value="">All Payment Terms</mat-option>
+          <mat-option *ngFor="let option of paymentTermsOptions" [value]="option.value">
             {{option.label}}
           </mat-option>
         </mat-select>
@@ -81,7 +89,7 @@
     </div>
 
     <!-- Reset Filters -->
-    <p>Select date range to generate Client Statement</p>
+    <p>Select date range to generate Settlement Report</p>
     <div class="filter-actions mt-4 flex justify-between items-center">
      
       <button 
@@ -92,7 +100,7 @@
   [disabled]="!filterForm.get('fromDate')?.value || !filterForm.get('toDate')?.value"
 >
   <mat-icon>description</mat-icon>
-  Generate Client Statement
+  Generate Settlement Report
 </button>
 
       <button 
@@ -129,35 +137,38 @@
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Invoice Number</th>
         <td mat-cell *matCellDef="let merchant">{{ merchant.invoiceNumber }}</td>
       </ng-container>
+
+      <ng-container matColumnDef="invoiceDate">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Invoice Date</th>
+        <td mat-cell *matCellDef="let merchant">{{ merchant.invoiceDate }}</td>
+      </ng-container>
+      
+      <ng-container matColumnDef="invoiceDueDate">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Invoice Due Date</th>
+        <td mat-cell *matCellDef="let merchant">{{ merchant.invoiceDueDate }}</td>
+      </ng-container>
+      
+      <ng-container matColumnDef="paymentTerms">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Payment Terms</th>
+        <td mat-cell *matCellDef="let merchant">{{ merchant.paymentTerms }}</td>
+      </ng-container>
       
       <ng-container matColumnDef="invoiceAmount">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Invoice Amount</th>
         <td mat-cell *matCellDef="let merchant">{{ merchant.invoiceAmount | currency }}</td>
       </ng-container>
       
-      <ng-container matColumnDef="creditAmount">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Credit Amount</th>
-        <td mat-cell *matCellDef="let merchant">{{ merchant.creditAmount | currency }}</td>
-      </ng-container>
+
       
       <ng-container matColumnDef="productCode">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Product Code</th>
         <td mat-cell *matCellDef="let merchant">{{ merchant.productCode }}</td>
       </ng-container>
       
-      <ng-container matColumnDef="buyerStatus">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Buyer Status</th>
-        <td mat-cell *matCellDef="let merchant">
-          <span 
-            class="status-chip {{ getBuyerStatusClass(merchant.buyerStatus) }}"
-          >
-            {{ merchant.buyerStatus }}
-          </span>
-        </td>
-      </ng-container>
+
       
       <ng-container matColumnDef="paymentStatus">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Payment Status</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Settlement Status</th>
         <td mat-cell *matCellDef="let merchant">
           <span class="status-chip {{ getPaymentStatusClass(merchant.paymentStatus) }}">
             {{ merchant.paymentStatus }}

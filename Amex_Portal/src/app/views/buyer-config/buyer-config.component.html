@@ -186,6 +186,100 @@
                       (change)="onMakerCheckerInvoiceToggleChange($event.checked)">
                       Enable Maker/Checker Invoice Upload
                     </mat-slide-toggle>
+
+                    <!-- Inside the General tab, modify the existing prior due date reminders section -->
+<mat-slide-toggle 
+color="primary" 
+[(ngModel)]="enablePriorDueDateReminders"
+(change)="onPriorDueDateReminders($event.checked)">
+Enable Prior Due Date Reminders
+</mat-slide-toggle>
+
+<div *ngIf="enablePriorDueDateReminders" class="prior-due-date-reminder-settings">
+<div class="reminder-timing-inputs">
+  <mat-form-field>
+    <mat-label>Days Before Due</mat-label>
+    <input matInput type="number" 
+           [(ngModel)]="priorDueDateReminderDay" 
+           min="0" 
+           placeholder="Days">
+  </mat-form-field>
+  
+  <mat-form-field>
+    <mat-label>Hours Before Due</mat-label>
+    <input matInput type="number" 
+           [(ngModel)]="priorDueDateReminderHour" 
+           min="0" max="23" 
+           placeholder="Hours">
+  </mat-form-field>
+  
+  <mat-form-field>
+    <mat-label>Minutes Before Due</mat-label>
+    <input matInput type="number" 
+           [(ngModel)]="priorDueDateReminderMinute" 
+           min="0" max="59" 
+           placeholder="Minutes">
+  </mat-form-field>
+</div>
+
+<mat-slide-toggle 
+  color="primary"
+  [(ngModel)]="enableRepeatReminder"
+  (change)="onRepeatReminderToggle($event.checked)">
+  Repeat Reminder
+</mat-slide-toggle>
+
+<div *ngIf="enableRepeatReminder" class="repeat-reminder-settings">
+  <mat-form-field>
+    <mat-label>Repeat Interval</mat-label>
+    <input matInput type="number" 
+           [(ngModel)]="repeatReminderInterval" 
+           min="0" 
+           placeholder="Interval">
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Interval Unit</mat-label>
+    <mat-select [(ngModel)]="repeatReminderUnit">
+      <mat-option value="days">Days</mat-option>
+      <mat-option value="hours">Hours</mat-option>
+      <mat-option value="minutes">Minutes</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+</div>
+
+<!-- <mat-slide-toggle 
+  color="primary" 
+  [(ngModel)]="enableAutoFinance"
+  (change)="onAutoFinance($event.checked)">
+  Enable Auto Finance
+</mat-slide-toggle> -->
+
+<!-- New section for Auto Finance settings -->
+<!-- <div *ngIf="enableAutoFinance" class="auto-finance-settings">
+  <div class="auto-finance-inputs">
+    <mat-form-field>
+      <mat-label>Comparison Operator</mat-label>
+      <mat-select [(ngModel)]="autoFinanceComparisonOperator">
+        <mat-option value="<">Less Than</mat-option>
+        <mat-option value=">">Greater Than</mat-option>
+        <mat-option value="<=">Less Than or Equal To</mat-option>
+        <mat-option value=">=">Greater Than or Equal To</mat-option>
+      </mat-select>
+    </mat-form-field>
+    
+    <mat-form-field>
+      <mat-label>Invoice Value</mat-label>
+      <input matInput 
+             type="number" 
+             [(ngModel)]="autoFinanceInvoiceValue" 
+             placeholder="Enter Invoice Value">
+    </mat-form-field>
+  </div>
+</div> -->
+
+                    
                   </div>
                 </div>
               </mat-card-content>

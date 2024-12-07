@@ -149,3 +149,11 @@
     
     position: relative;
   }
+
+  .mat-mdc-slide-toggle {
+    margin-bottom: 15px;
+  }
+  
+  .mat-slide-toggle-content {
+    font-size: 0.95rem;
+  }

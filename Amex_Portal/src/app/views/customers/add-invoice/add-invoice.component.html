@@ -3,6 +3,10 @@
   <div class="main-invoices-section">
    <h2>Added Invoices</h2>
    <mat-table [dataSource]="mainInvoices" class="main-invoices-table">
+    <ng-container matColumnDef="crNumber">
+      <mat-header-cell *matHeaderCellDef>CR Number</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.crNumber }}</mat-cell>
+    </ng-container>
     <!-- Buyer Code Column -->
     <ng-container matColumnDef="buyerCode">
       <mat-header-cell *matHeaderCellDef>Buyer Code</mat-header-cell>
@@ -15,7 +19,11 @@
       <mat-cell *matCellDef="let element">{{ element.buyerName }}</mat-cell>
     </ng-container>
     
-
+     <!-- Merchant Name Column -->
+     <ng-container matColumnDef="merchantName">
+      <mat-header-cell *matHeaderCellDef>Supplier</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.merchantName }}</mat-cell>
+    </ng-container>
 
      <!-- Invoice Number Column -->
      <ng-container matColumnDef="invoiceNumber">
@@ -75,22 +83,22 @@
 
  <!-- CSV Upload Section -->
  <div class="csv-upload-section">
-   <input 
-     type="file" 
-     #csvFileInput 
-     (change)="onFileSelected($event)"
-     accept=".csv"
-     style="display: none;"
-   >
-   <button 
-     mat-raised-button 
-     color="primary" 
-     (click)="triggerFileInput()"
-   >
-     <mat-icon>cloud_upload</mat-icon>
-     Upload CSV
-   </button>
- </div>
+  <input 
+    type="file" 
+    #csvFileInput 
+    (change)="onFileSelected($event)"
+    accept=".csv"
+    style="display: none;"
+  >
+  <button 
+    mat-raised-button 
+    color="primary" 
+    (click)="triggerFileInput()"
+  >
+    <mat-icon>cloud_upload</mat-icon>
+    Upload CSV
+  </button>
+</div>
 
  <!-- Verification Table for Parsed Invoices -->
  <div *ngIf="verificationInvoices.length > 0" class="verification-table-section">
@@ -116,6 +124,12 @@
        </mat-cell>
      </ng-container>
 
+     <ng-container matColumnDef="crNumber">
+      <mat-header-cell *matHeaderCellDef>CR Number</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.crNumber }}</mat-cell>
+    </ng-container>
+
+
      <!-- Buyer Code Column -->
      <ng-container matColumnDef="buyerCode">
       <mat-header-cell *matHeaderCellDef>Buyer Code</mat-header-cell>
@@ -128,6 +142,11 @@
       <mat-cell *matCellDef="let element">{{ element.buyerName }}</mat-cell>
     </ng-container>
 
+     <!-- Merchant Name Column -->
+     <ng-container matColumnDef="merchantName">
+       <mat-header-cell *matHeaderCellDef>Supplier</mat-header-cell>
+       <mat-cell *matCellDef="let element">{{ element.merchantName }}</mat-cell>
+     </ng-container>
 
      <!-- Invoice Number Column -->
      <ng-container matColumnDef="invoiceNumber">
@@ -194,6 +213,8 @@
   <!-- Invoice Form Section -->
   <form [formGroup]="invoiceForm" (ngSubmit)="onSubmit()" class="invoice-form">
    <div class="form-grid">
+    
+
     <mat-form-field>
       <mat-label>Buyer Code</mat-label>
       <mat-select formControlName="buyerCode">
@@ -214,7 +235,29 @@
              readonly>
     </mat-form-field>
 
+    <mat-form-field>
+      <mat-label>CR Number</mat-label>
+      <mat-select formControlName="crNumber">
+        <mat-option *ngFor="let crOption of crNumberOptions" [value]="crOption.crNumber">
+          {{ crOption.crNumber }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="invoiceForm.get('crNumber')?.invalid">
+        CR Number is required
+      </mat-error>
+    </mat-form-field>
 
+     <mat-form-field>
+       <mat-label>Supplier Name</mat-label>
+       <mat-select formControlName="merchantName">
+         <mat-option *ngFor="let merchant of merchantOptions" [value]="merchant.value">
+           {{ merchant.label }}
+         </mat-option>
+       </mat-select>
+       <mat-error *ngIf="invoiceForm.get('merchantName')?.invalid">
+         Merchant Name is required
+       </mat-error>
+     </mat-form-field>
 
      <mat-form-field>
        <mat-label>Invoice Number</mat-label>

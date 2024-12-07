@@ -27,20 +27,16 @@ import 'jspdf-autotable';
 interface Merchant {
   requestId: string;
   dateCreated: string;
+  invoiceDate: string;
+  invoiceDueDate: string;
+  paymentTerms: '30 days' | '60 days' | '90 days';
   merchant: string;
   invoiceNumber: string;
   invoiceAmount: number;
-  creditAmount: number;
   productCode: string;
   buyerStatus: string;
   paymentStatus: string;
-
-  approvedBy?: string;
-  approvedDate?: string;
-  approvalStatus?: 'Approved' | 'Rejected' | 'Pending';
-  pendingApprover?: string;
 }
-
 @Component({
   selector: 'app-payments',
   imports: [
@@ -82,8 +78,9 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
   ];
 
   paymentStatusOptions = [
-    { value: 'Paid', label: 'Paid' },
-    { value: 'Unpaid', label: 'Unpaid' }
+    { value: 'Completed', label: 'Completed' },
+    { value: 'Due', label: 'Due' },
+    { value: 'Overdue', label: 'Overdue' }
   ];
 
   productCodeOptions = [
@@ -97,47 +94,57 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
     { value: 'invoiceNumber', label: 'Invoice Number' }
   ];
 
+  paymentTermsOptions = [
+    { value: '30 days', label: '30 Days' },
+    { value: '60 days', label: '60 Days' },
+    { value: '90 days', label: '90 Days' }
+  ];
+
   displayedColumns: string[] = [
-    'requestId', 'dateCreated', 'merchant', 'invoiceNumber', 'invoiceAmount',
-    'creditAmount', 'productCode', 'buyerStatus', 'paymentStatus', 'actions'
+    'requestId', 'dateCreated', 'merchant', 'invoiceNumber',
+    'invoiceDate', 'invoiceDueDate', 'paymentTerms',
+    'invoiceAmount', 'productCode', 'paymentStatus', 'actions'
   ];
 
   merchants: Merchant[] = [
     {
       requestId: 'REQ-CS-576',
       dateCreated: '11/09/2024',
+      invoiceDate: '11/09/2024',
+      invoiceDueDate: '12/09/2024', // 30 days from invoice date
+      paymentTerms: '30 days',
       merchant: 'Compu Smart',
       invoiceNumber: 'INV-001',
       invoiceAmount: 10000.00,
-      creditAmount: 9700.00,
       productCode: 'ID',
       buyerStatus: 'Approved',
-      paymentStatus: 'Paid',
-
+      paymentStatus: 'Overdue',
     },
     {
       requestId: 'REQ-CS-577',
       dateCreated: '11/09/2024',
+      invoiceDate: '11/09/2024',
+      invoiceDueDate: '10/12/2024', // 90 days from invoice date
+      paymentTerms: '90 days',
       merchant: 'Compu Smart',
       invoiceNumber: 'INV-002',
       invoiceAmount: 100000.00,
-      creditAmount: 95000.00,
       productCode: 'RF',
       buyerStatus: 'Rejected',
-      paymentStatus: 'Unpaid',
-
+      paymentStatus: 'Completed',
     },
     {
       requestId: 'REQ-CS-578',
       dateCreated: '11/10/2024',
+      invoiceDate: '11/10/2024',
+      invoiceDueDate: '10/01/2025', // 60 days from invoice date
+      paymentTerms: '60 days',
       merchant: 'Tech Solutions',
       invoiceNumber: 'INV-003',
       invoiceAmount: 25000.00,
-      creditAmount: 24250.00,
       productCode: 'ID',
       buyerStatus: 'Pending Approval',
-      paymentStatus: 'Unpaid',
-
+      paymentStatus: 'Due',
     }
   ];
 
@@ -149,6 +156,7 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
       status: [''],
       approvalStatus: [''],
       productCode: [''],
+      paymentTerms: [''], // Add this
       searchType: [''],
       searchTerm: ['']
     });
@@ -201,6 +209,10 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
       filtered = filtered.filter(merchant => merchant.productCode === filters.productCode);
     }
 
+    if (filters.paymentTerms) {
+      filtered = filtered.filter(merchant => merchant.paymentTerms === filters.paymentTerms);
+    }
+
     // Search filter
     if (filters.searchType && filters.searchTerm) {
       const searchTerm = filters.searchTerm.toLowerCase();
@@ -234,6 +246,7 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
       filters.status ||
       filters.approvalStatus ||
       filters.productCode ||
+      filters.paymentTerms || // Add this
       (filters.searchType && filters.searchTerm)
     );
   }
@@ -291,10 +304,12 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
 
   getPaymentStatusClass(status: string): string {
     switch (status) {
-      case 'Paid':
+      case 'Completed':
         return 'paid';
-      case 'Unpaid':
+      case 'Overdue':
         return 'unpaid';
+      case 'Due':
+        return 'due';
       default:
         return '';
     }
@@ -369,8 +384,8 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
     // Prepare table data
     const tableColumns = [
       'Request ID', 'Date Created', 'Merchant', 'Invoice Number',
-      'Invoice Amount', 'Credit Amount', 'Product Code',
-      'Buyer Status', 'Payment Status'
+      'Invoice Date', 'Invoice Due Date', 'Payment Terms',
+      'Invoice Amount', 'Product Code', 'Payment Status'
     ];
 
     const tableData = statements.map(merchant => [
@@ -378,10 +393,11 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
       merchant.dateCreated,
       merchant.merchant,
       merchant.invoiceNumber,
+      merchant.invoiceDate,
+      merchant.invoiceDueDate,
+      merchant.paymentTerms,
       `$${merchant.invoiceAmount.toFixed(2)}`,
-      `$${merchant.creditAmount.toFixed(2)}`,
       merchant.productCode,
-      merchant.buyerStatus,
       merchant.paymentStatus
     ]);
 

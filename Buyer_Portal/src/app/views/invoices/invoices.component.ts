@@ -2,7 +2,7 @@ import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { Router } from '@angular/router';
+import { Router, RouterLink, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -25,18 +25,21 @@ import { InvoiceDataService, InvoiceData } from '../../services/invoice-data.ser
 interface Merchant {
   requestId: string;
   dateCreated: string;
-  merchant: string;
+  buyerName: string;
+  merchantStatus: string;
   invoiceNumber: string;
   invoiceAmount: number;
   creditAmount: number;
   productCode: string;
   buyerStatus: string;
-  paymentStatus: string;
-
+  paymentStatus: 'Pending' | 'Cancelled' | 'Requested' | 'Completed';
+  paymentTerms: '30 days' | '60 days' | '90 days';
   approvedBy?: string;
   approvedDate?: string;
   approvalStatus?: 'Approved' | 'Rejected' | 'Pending';
   pendingApprover?: string;
+  invoiceDate?: string;
+  invoiceDueDate?: string;
 }
 
 @Component({
@@ -59,7 +62,9 @@ interface Merchant {
     MatChipsModule,
     MatMenuModule,
     MatSortModule,
-    MatTooltipModule
+    MatTooltipModule,
+    RouterModule,
+    RouterLink
   ],
   templateUrl: './invoices.component.html',
   styleUrls: ['./invoices.component.css'],
@@ -80,8 +85,10 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
   ];
 
   paymentStatusOptions = [
-    { value: 'Paid', label: 'Paid' },
-    { value: 'Unpaid', label: 'Unpaid' }
+    { value: 'Pending', label: 'Pending' },
+    { value: 'Cancelled', label: 'Cancelled' },
+    { value: 'Requested', label: 'Requested' },
+    { value: 'Completed', label: 'Completed' }
   ];
 
   productCodeOptions = [
@@ -89,69 +96,138 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
     { value: 'RF', label: 'RF' }
   ];
 
+  merchantStatusOptions = [
+    { value: 'Approved', label: 'Approved' },
+    { value: 'Rejected', label: 'Rejected' },
+    { value: 'Pending Approval', label: 'Pending Approval' }
+  ];
+
+  // Update search type options
   searchTypeOptions = [
     { value: 'requestId', label: 'Request ID' },
-    { value: 'merchant', label: 'Merchant Name' },
+    { value: 'buyerName', label: 'Supplier Name' }, // Changed from merchant
     { value: 'invoiceNumber', label: 'Invoice Number' }
   ];
 
+  // Update displayed columns
   displayedColumns: string[] = [
-    'requestId', 'dateCreated', 'merchant', 'invoiceNumber', 'invoiceAmount',
-    'creditAmount', 'productCode', 'buyerStatus', 'paymentStatus', 'actions'
+    'requestId', 'dateCreated', 'buyerName',
+    'invoiceNumber', 'invoiceDate', 'invoiceDueDate', 'paymentTerms',
+    'invoiceAmount', 'creditAmount',
+    'buyerStatus', 'paymentStatus', 'actions'
   ];
 
+  paymentTermsOptions = [
+    { value: '30 days', label: '30 Days' },
+    { value: '60 days', label: '60 Days' },
+    { value: '90 days', label: '90 Days' }
+  ];
+
+  // Update sample data
   merchants: Merchant[] = [
     {
       requestId: 'REQ-CS-576',
-      dateCreated: '11/09/2024',
-      merchant: 'Compu Smart',
+      dateCreated: '12/07/2024',
+      buyerName: 'Sunrise Innovations LLC',
+      merchantStatus: 'Approved',
       invoiceNumber: 'INV-001',
       invoiceAmount: 10000.00,
       creditAmount: 9700.00,
       productCode: 'ID',
       buyerStatus: 'Approved',
-      paymentStatus: 'Paid',
+      paymentStatus: 'Pending',
       approvedBy: 'John Smith',
       approvedDate: '11/09/2024 14:30 EST',
-      approvalStatus: 'Approved'
+      approvalStatus: 'Approved',
+      paymentTerms: '60 days',
+      invoiceDate: '12/07/2024',
+      invoiceDueDate: '02/07/2025',
     },
     {
-      requestId: 'REQ-CS-577',
-      dateCreated: '11/09/2024',
-      merchant: 'Compu Smart',
+      requestId: 'REQ-SBC-782',
+      dateCreated: '12/05/2024',
+      buyerName: 'Vanguard Resource Group LP',
+      merchantStatus: 'Pending Approval',
       invoiceNumber: 'INV-002',
-      invoiceAmount: 100000.00,
-      creditAmount: 95000.00,
+      invoiceAmount: 15500.50,
+      creditAmount: 15035.00,
       productCode: 'RF',
-      buyerStatus: 'Rejected',
-      paymentStatus: 'Unpaid',
-      approvedBy: 'Sarah Johnson',
-      approvedDate: '11/09/2024 15:45 EST',
-      approvalStatus: 'Rejected'
+      buyerStatus: 'Pending Approval',
+      paymentStatus: 'Requested',
+      pendingApprover: 'Michael Chen',
+      approvalStatus: 'Pending',
+      paymentTerms: '30 days',
+      invoiceDate: '12/05/2024',
+      invoiceDueDate: '01/05/2025',
     },
     {
-      requestId: 'REQ-CS-578',
-      dateCreated: '11/10/2024',
-      merchant: 'Tech Solutions',
+      requestId: 'REQ-EMAAR-345',
+      dateCreated: '01/22/2024',
+      buyerName: '	Quantum Edge Systems Inc',
+      merchantStatus: 'Rejected',
       invoiceNumber: 'INV-003',
-      invoiceAmount: 25000.00,
-      creditAmount: 24250.00,
+      invoiceAmount: 7800.25,
+      creditAmount: 7566.00,
+      productCode: 'ID',
+      buyerStatus: 'Rejected',
+      paymentStatus: 'Cancelled',
+      approvedBy: 'Emily Davis',
+      approvedDate: '01/23/2024 09:15 EST',
+      approvalStatus: 'Rejected',
+      paymentTerms: '30 days',
+      invoiceDate: '12/15/2024',
+      invoiceDueDate: '01/14/2025',
+    },
+    {
+      requestId: 'REQ-JANA-619',
+      dateCreated: '02/05/2024',
+      buyerName: 'Maple Leaf Consulting',
+      merchantStatus: 'Approved',
+      invoiceNumber: 'INV-004',
+      invoiceAmount: 22000.75,
+      creditAmount: 21340.00,
+      productCode: 'RF',
+      buyerStatus: 'Approved',
+      paymentStatus: 'Completed',
+      approvedBy: 'David Wilson',
+      approvedDate: '02/06/2024 11:45 EST',
+      approvalStatus: 'Approved',
+      paymentTerms: '30 days',
+      invoiceDate: '11/09/2024',
+      invoiceDueDate: '12/09/2024',
+    },
+    {
+      requestId: 'REQ-SBC-890',
+      dateCreated: '03/18/2024',
+      buyerName: 'Blue Horizon Ventures LLC',
+      merchantStatus: 'Pending Approval',
+      invoiceNumber: 'INV-005',
+      invoiceAmount: 5600.00,
+      creditAmount: 5432.00,
       productCode: 'ID',
       buyerStatus: 'Pending Approval',
-      paymentStatus: 'Unpaid',
-      pendingApprover: 'Michael Chen',
-      approvalStatus: 'Pending'
+      paymentStatus: 'Pending',
+      pendingApprover: 'Lisa Martinez',
+      approvalStatus: 'Pending',
+      paymentTerms: '30 days',
+      invoiceDate: '11/09/2024',
+      invoiceDueDate: '12/09/2024',
     }
   ];
 
-  constructor(private fb: FormBuilder, private router: Router,
-    private invoiceDataService: InvoiceDataService) {
+  constructor(
+    private fb: FormBuilder,
+    private invoiceDataService: InvoiceDataService,
+    private router: Router
+  ) {
     this.filterForm = this.fb.group({
       fromDate: [null],
       toDate: [null],
       status: [''],
       approvalStatus: [''],
       productCode: [''],
+      paymentTerms: [''],
+      merchantStatus: [''],
       searchType: [''],
       searchTerm: ['']
     });
@@ -160,16 +236,40 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
   }
 
   ngOnInit() {
-    // Subscribe to form value changes to trigger filtering
+    // Subscribe to invoice data service
+    this.invoiceDataService.currentInvoiceData.subscribe(
+      invoices => {
+        // Merge existing merchants with new invoices
+        const updatedMerchants = [
+          ...this.merchants,
+          ...invoices.map(invoice => ({
+            ...invoice,
+            merchantStatus: invoice.merchantStatus || 'Pending Approval',
+            paymentTerms: invoice.paymentTerms as '30 days' | '60 days' | '90 days',
+            // Explicitly cast paymentStatus to the correct type
+            paymentStatus: (invoice.paymentStatus as 'Pending' | 'Cancelled' | 'Requested' | 'Completed') || 'Pending'
+          }))
+        ];
+
+        // Update merchants array
+        this.merchants = updatedMerchants;
+
+        // Update data source
+        this.dataSource.data = updatedMerchants;
+      }
+    );
+
+    // Existing filter subscription
     this.filterForm.valueChanges
       .pipe(
-        debounceTime(300), // Wait 300ms after last event before emitting
-        distinctUntilChanged() // Only emit when the current value is different than the last
+        debounceTime(300),
+        distinctUntilChanged()
       )
       .subscribe(() => {
         this.applyFilters();
       });
   }
+
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
@@ -180,6 +280,7 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
     const filters = this.filterForm.value;
     let filtered = [...this.merchants];
 
+
     // Date filter
     if (filters.fromDate && filters.toDate) {
       const fromDate = new Date(filters.fromDate);
@@ -189,6 +290,7 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
         return merchantDate >= fromDate && merchantDate <= toDate;
       });
     }
+
 
     // Status filters
     if (filters.status) {
@@ -204,6 +306,13 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
       filtered = filtered.filter(merchant => merchant.productCode === filters.productCode);
     }
 
+
+
+    // Merchant Status filter
+    if (filters.merchantStatus) {
+      filtered = filtered.filter(merchant => merchant.merchantStatus === filters.merchantStatus);
+    }
+
     // Search filter
     if (filters.searchType && filters.searchTerm) {
       const searchTerm = filters.searchTerm.toLowerCase();
@@ -211,8 +320,8 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
         switch (filters.searchType) {
           case 'requestId':
             return merchant.requestId.toLowerCase().includes(searchTerm);
-          case 'merchant':
-            return merchant.merchant.toLowerCase().includes(searchTerm);
+          case 'buyerName': // Changed from merchant
+            return merchant.buyerName.toLowerCase().includes(searchTerm);
           case 'invoiceNumber':
             return merchant.invoiceNumber.toLowerCase().includes(searchTerm);
           default:
@@ -237,6 +346,7 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
       filters.status ||
       filters.approvalStatus ||
       filters.productCode ||
+      filters.merchantStatus || // New filter
       (filters.searchType && filters.searchTerm)
     );
   }
@@ -316,12 +426,49 @@ export class InvoicesComponent implements AfterViewInit, OnInit {
 
   getPaymentStatusClass(status: string): string {
     switch (status) {
-      case 'Paid':
-        return 'paid';
-      case 'Unpaid':
-        return 'unpaid';
+      case 'Pending':
+        return 'pending';
+      case 'Cancelled':
+        return 'cancelled';
+      case 'Requested':
+        return 'requested';
+      case 'Completed':
+        return 'completed';
       default:
         return '';
     }
+  }
+
+  getMerchantStatusClass(status: string): string {
+    switch (status) {
+      case 'Approved':
+        return 'approved';
+      case 'Rejected':
+        return 'rejected';
+      case 'Pending Approval':
+        return 'pending-approval';
+      default:
+        return '';
+    }
+  }
+
+  calculateInvoiceDueDate(invoiceDate: string, paymentTerms: '30 days' | '60 days' | '90 days'): string {
+    const date = new Date(invoiceDate);
+    const days = parseInt(paymentTerms.split(' ')[0]);
+
+    // Add the number of days to the invoice date
+    date.setDate(date.getDate() + days);
+
+    // Format the date back to the same format as other dates in the application
+    return this.formatDate(date);
+  }
+
+  // Helper method to format date
+  formatDate(date: Date): string {
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const year = date.getFullYear();
+
+    return `${month}/${day}/${year}`;
   }
 }

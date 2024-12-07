@@ -16,6 +16,8 @@ import { MatNativeDateModule } from '@angular/material/core';
 
 interface Invoice {
   id?: string;
+  crNumber: string;
+  merchantName: string;
   invoiceNumber: string;
   invoiceDate: Date;
   dueDate: Date;
@@ -55,6 +57,17 @@ export class AddInvoiceComponent implements OnInit {
 
   selection = new SelectionModel<Invoice>(true, []);
 
+  crNumberOptions = [
+    { crNumber: 'CR001', merchantName: 'SBC Holdings Pvt Ltd' },
+    { crNumber: 'CR002', merchantName: 'Janashakthi Pvt Ltd' },
+    { crNumber: 'CR003', merchantName: 'Emaar Pvt Ltd' }
+  ];
+
+  merchantOptions = [
+    { value: 'SBC Holdings Pvt Ltd', label: 'SBC Holdings Pvt Ltd' },
+    { value: 'Janashakthi Pvt Ltd', label: 'Janashakthi Pvt Ltd' },
+    { value: 'Emaar Pvt Ltd', label: 'Emaar Pvt Ltd' }
+  ];
 
   currencyOptions = [
     { value: 'USD', label: 'USD' },
@@ -81,7 +94,10 @@ export class AddInvoiceComponent implements OnInit {
     { value: 'B010', label: 'B010', name: 'Synergy Worldwide' }
   ];
 
-  displayedMainColumns: string[] = [
+  displayedColumns: string[] = [
+    'select',
+    'crNumber',
+    'merchantName',
     'buyerCode',
     'buyerName',
     'invoiceNumber',
@@ -93,8 +109,9 @@ export class AddInvoiceComponent implements OnInit {
     'actions'
   ];
 
-  displayedColumns: string[] = [
-    'select',
+  displayedMainColumns: string[] = [
+    'crNumber',
+    'merchantName',
     'buyerCode',
     'buyerName',
     'invoiceNumber',
@@ -105,6 +122,7 @@ export class AddInvoiceComponent implements OnInit {
     'paymentTerms',
     'actions'
   ];
+
 
   constructor(
     private fb: FormBuilder,
@@ -121,10 +139,23 @@ export class AddInvoiceComponent implements OnInit {
         this.invoiceForm.patchValue({ buyerName: buyer.name }, { emitEvent: false });
       }
     });
+
+    // Listen to crNumber changes to auto-populate merchantName
+    this.invoiceForm.get('crNumber')?.valueChanges.subscribe(crNumber => {
+      const crNumberMapping = this.crNumberOptions.find(option => option.crNumber === crNumber);
+      if (crNumberMapping) {
+        this.invoiceForm.patchValue({
+          merchantName: crNumberMapping.merchantName
+        }, { emitEvent: false });
+      }
+    });
   }
+
 
   createInvoiceForm(): FormGroup {
     return this.fb.group({
+      crNumber: ['', Validators.required],
+      merchantName: [{ value: '', disabled: true }],
       invoiceNumber: ['', Validators.required],
       invoiceDate: [null, Validators.required],
       dueDate: [null, Validators.required],
@@ -161,23 +192,40 @@ export class AddInvoiceComponent implements OnInit {
     }
   }
 
+  validateMerchantName(merchantName: string): string {
+    const match = this.merchantOptions.find(option =>
+      option.value.toLowerCase() === merchantName.toLowerCase() ||
+      option.label.toLowerCase() === merchantName.toLowerCase()
+    );
+    return match ? match.value : this.merchantOptions[0].value;
+  }
+
+
   mapCsvRowToInvoice(row: any[]): Invoice {
-    const buyerCode = this.validateBuyerCode(row[4] || '');
+    const buyerCode = this.validateBuyerCode(row[7] || '');
     const buyerName = this.getBuyerNameFromCode(buyerCode);
+    const crNumber = row[8] || ''; // Assuming CR Number is in the 9th column
+
+    // Find merchant name based on CR Number
+    const crNumberMapping = this.crNumberOptions.find(option => option.crNumber === crNumber);
+    const merchantName = crNumberMapping
+      ? crNumberMapping.merchantName
+      : this.validateMerchantName(row[0] || '');
 
     return {
       id: `invoice-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      invoiceNumber: row[0] || '',
-      invoiceDate: new Date(row[1] || Date.now()),
-      dueDate: new Date(row[2] || Date.now()),
-      currency: this.validateCurrency(row[3] || 'USD'),
+      crNumber: crNumber,
+      merchantName: merchantName,
+      invoiceNumber: row[1] || '',
+      invoiceDate: new Date(row[2] || Date.now()),
+      dueDate: new Date(row[3] || Date.now()),
+      currency: this.validateCurrency(row[4] || 'USD'),
       totalAmount: parseFloat(row[5] || '0'),
       paymentTerms: this.validatePaymentTerms(row[6] || 'net30'),
       buyerCode: buyerCode,
       buyerName: buyerName
     };
   }
-
 
   validateCurrency(currency: string): string {
     const match = this.currencyOptions.find(option =>
@@ -236,10 +284,19 @@ export class AddInvoiceComponent implements OnInit {
 
   onSubmit() {
     if (this.invoiceForm.valid) {
-      const formValue = { ...this.invoiceForm.value, buyerName: this.invoiceForm.get('buyerName')?.value };
+      // Ensure we get the merchant name, using the value or the predefined options
+      const merchantName = this.invoiceForm.get('merchantName')?.value ||
+        this.merchantOptions.find(m => m.value === this.invoiceForm.get('crNumber')?.value)?.label ||
+        this.merchantOptions[0].label;
+
+      const formValue = {
+        ...this.invoiceForm.value,
+        merchantName: merchantName,
+        buyerName: this.invoiceForm.get('buyerName')?.value
+      };
 
       if (this.editingInvoice) {
-        // Safely use non-null assertion operator or optional chaining
+        // Ensure editingInvoice has an id
         const editedInvoiceId = this.editingInvoice.id ||
           `invoice-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
@@ -252,6 +309,7 @@ export class AddInvoiceComponent implements OnInit {
 
         // Reset editing state
         this.editingInvoice = null;
+        this.snackBar.open('Invoice updated', 'Close', { duration: 2000 });
       } else {
         // Add new invoice
         const newInvoice: Invoice = {
@@ -259,15 +317,18 @@ export class AddInvoiceComponent implements OnInit {
           id: `invoice-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
         };
         this.mainInvoices = [...this.mainInvoices, newInvoice];
+        this.snackBar.open('Invoice added', 'Close', { duration: 2000 });
       }
 
       // Reset the form
       this.invoiceForm.reset();
     }
   }
+
   editInvoice(invoice: Invoice) {
     this.editingInvoice = invoice;
     this.invoiceForm.patchValue({
+      merchantName: invoice.merchantName,
       invoiceNumber: invoice.invoiceNumber,
       invoiceDate: invoice.invoiceDate,
       dueDate: invoice.dueDate,

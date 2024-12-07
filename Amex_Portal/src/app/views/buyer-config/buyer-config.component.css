@@ -269,3 +269,36 @@ mat-tab-group {
   padding: 10px;
   padding-bottom: 20px;
 }
+
+.prior-due-date-reminder-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+  padding-left: 20px;
+}
+
+.reminder-timing-inputs {
+  display: flex;
+  gap: 16px;
+}
+
+.repeat-reminder-settings {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.auto-finance-settings {
+  margin-top: 16px;
+}
+
+.auto-finance-inputs {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.auto-finance-inputs mat-form-field {
+  flex: 1;
+}

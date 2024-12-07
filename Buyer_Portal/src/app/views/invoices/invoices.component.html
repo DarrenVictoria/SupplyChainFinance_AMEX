@@ -27,7 +27,7 @@
 
       <!-- Status Filters -->
       <mat-form-field>
-        <mat-label>Buyer Status</mat-label>
+        <mat-label>Invoice Status</mat-label>
         <mat-select formControlName="status">
           <mat-option value="">All Statuses</mat-option>
           <mat-option *ngFor="let option of statusOptions" [value]="option.value">
@@ -35,6 +35,42 @@
           </mat-option>
         </mat-select>
       </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Payment Terms</mat-label>
+        <mat-select formControlName="paymentTerms">
+          <mat-option value="">All Payment Terms</mat-option>
+          <mat-option *ngFor="let option of paymentTermsOptions" [value]="option.value">
+            {{option.label}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- In the filter section, add Merchant Status filter -->
+      <mat-form-field>
+          <mat-label>Invoice Status</mat-label>
+          <mat-select formControlName="merchantStatus">
+            <mat-option value="">All Invoice Statuses</mat-option>
+            <mat-option *ngFor="let option of merchantStatusOptions" [value]="option.value">
+              {{option.label}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+<!-- In the table columns, add new columns -->
+<ng-container matColumnDef="buyerName">
+  <th mat-header-cell *matHeaderCellDef mat-sort-header>Supplier Name</th>
+  <td mat-cell *matCellDef="let merchant">{{ merchant.buyerName }}</td>
+</ng-container>
+
+<ng-container matColumnDef="merchantStatus">
+  <th mat-header-cell *matHeaderCellDef mat-sort-header>Merchant Status</th>
+  <td mat-cell *matCellDef="let merchant">
+    <span class="status-chip {{ getMerchantStatusClass(merchant.merchantStatus) }}">
+      {{ merchant.merchantStatus }}
+    </span>
+  </td>
+</ng-container>
 
       <mat-form-field>
         <mat-label>Payment Status</mat-label>
@@ -47,7 +83,7 @@
       </mat-form-field>
 
       <!-- Product Code Filter -->
-      <mat-form-field>
+      <!-- <mat-form-field>
         <mat-label>Product Code</mat-label>
         <mat-select formControlName="productCode">
           <mat-option value="">All Product Codes</mat-option>
@@ -55,8 +91,9 @@
             {{option.label}}
           </mat-option>
         </mat-select>
-      </mat-form-field>
+      </mat-form-field> -->
 
+      <br>
 
       <!-- Search Section -->
       <mat-form-field>
@@ -91,93 +128,133 @@
   </div>
 
   <div class="table-container">
-    <table mat-table [dataSource]="dataSource" matSort class="w-full">
-      <ng-container matColumnDef="requestId">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Request ID</th>
-        <td mat-cell *matCellDef="let merchant">{{ merchant.requestId }}</td>
-      </ng-container>
+      <table mat-table [dataSource]="dataSource" matSort class="w-full">
+        <!-- Request ID Column -->
+        <ng-container matColumnDef="requestId">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Request ID</th>
+          <td mat-cell *matCellDef="let merchant">{{ merchant.requestId }}</td>
+        </ng-container>
+    
+        <!-- Date Created Column -->
+        <ng-container matColumnDef="dateCreated">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Date Created</th>
+          <td mat-cell *matCellDef="let merchant">{{ merchant.dateCreated }}</td>
+        </ng-container>
+    
+        <!-- Buyer Name Column -->
+        <ng-container matColumnDef="buyerName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Supplier Name</th>
+          <td mat-cell *matCellDef="let merchant">{{ merchant.buyerName }}</td>
+        </ng-container>
+    
+        <!-- Merchant Status Column -->
+        
+    
+        <!-- Invoice Number Column -->
+        <ng-container matColumnDef="invoiceNumber">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Invoice Number</th>
+          <td mat-cell *matCellDef="let merchant">{{ merchant.invoiceNumber }}</td>
+        </ng-container>
 
-      <ng-container matColumnDef="dateCreated">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Date Created</th>
-        <td mat-cell *matCellDef="let merchant">{{ merchant.dateCreated }}</td>
-      </ng-container>
+        <!-- Add these ng-container definitions in the table columns section -->
+<ng-container matColumnDef="invoiceDate">
+<th mat-header-cell *matHeaderCellDef mat-sort-header>Invoice Date</th>
+<td mat-cell *matCellDef="let merchant">{{ merchant.invoiceDate }}</td>
+</ng-container>
 
-      <ng-container matColumnDef="merchant">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Supplier</th>
-        <td mat-cell *matCellDef="let merchant">{{ merchant.merchant }}</td>
-      </ng-container>
+<ng-container matColumnDef="invoiceDueDate">
+<th mat-header-cell *matHeaderCellDef mat-sort-header>Invoice Due Date</th>
+<td mat-cell *matCellDef="let merchant">{{ merchant.invoiceDueDate }}</td>
+</ng-container>
 
-      <ng-container matColumnDef="invoiceNumber">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Invoice Number</th>
-        <td mat-cell *matCellDef="let merchant">{{ merchant.invoiceNumber }}</td>
-      </ng-container>
+        <ng-container matColumnDef="paymentTerms">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Payment Terms</th>
+          <td mat-cell *matCellDef="let merchant">{{ merchant.paymentTerms }}</td>
+        </ng-container>
+    
+        <!-- Invoice Amount Column -->
+        <ng-container matColumnDef="invoiceAmount">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Invoice Amount</th>
+          <td mat-cell *matCellDef="let merchant">{{ merchant.invoiceAmount | currency }}</td>
+        </ng-container>
+    
+        <!-- Credit Amount Column -->
+        <ng-container matColumnDef="creditAmount">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Credit Amount</th>
+          <td mat-cell *matCellDef="let merchant">{{ merchant.creditAmount | currency }}</td>
+        </ng-container>
+    
+        <!-- Product Code Column -->
+        <ng-container matColumnDef="productCode">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Product Code</th>
+          <td mat-cell *matCellDef="let merchant">{{ merchant.productCode }}</td>
+        </ng-container>
 
-      
-
-      <ng-container matColumnDef="invoiceAmount">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Invoice Amount</th>
-        <td mat-cell *matCellDef="let merchant">{{ merchant.invoiceAmount | currency }}</td>
-      </ng-container>
-
-      <ng-container matColumnDef="creditAmount">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Credit Amount</th>
-        <td mat-cell *matCellDef="let merchant">{{ merchant.creditAmount | currency }}</td>
-      </ng-container>
-
-      <ng-container matColumnDef="productCode">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Product Code</th>
-        <td mat-cell *matCellDef="let merchant">{{ merchant.productCode }}</td>
-      </ng-container>
-
-      <ng-container matColumnDef="buyerStatus">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Buyer Status</th>
-        <td mat-cell *matCellDef="let merchant">
-          <span 
-            class="status-chip {{ getBuyerStatusClass(merchant.buyerStatus) }}"
-            matTooltip="{{ getApprovalDetails(merchant) }}"
-            matTooltipClass="approval-tooltip"
-          >
-            {{ merchant.buyerStatus }}
-          </span>
-        </td>
-      </ng-container>
-      
-      <ng-container matColumnDef="paymentStatus">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Payment Status</th>
-        <td mat-cell *matCellDef="let merchant">
-          <span class="status-chip {{ getPaymentStatusClass(merchant.paymentStatus) }}">
-            {{ merchant.paymentStatus }}
-          </span>
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef>Actions</th>
-        <td mat-cell *matCellDef="let merchant">
-          <ng-container *ngIf="getActionButtons(merchant) === 'info'">
-            <button mat-icon-button (click)="onInfo(merchant)">
-              <mat-icon>info</mat-icon>
+        <!-- <ng-container matColumnDef="merchantStatus">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Supplier Status</th>
+          <td mat-cell *matCellDef="let merchant">
+            <span 
+              class="status-chip {{ getMerchantStatusClass(merchant.merchantStatus) }}"
+              matTooltip="{{ merchant.merchantStatus }} Merchant Status"
+              matTooltipClass="status-tooltip"
+            >
+              {{ merchant.merchantStatus }}
+            </span>
+          </td>
+        </ng-container> -->
+    
+        <!-- Buyer Status Column -->
+        <ng-container matColumnDef="buyerStatus">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Invoice Status</th>
+          <td mat-cell *matCellDef="let merchant">
+            <span 
+              class="status-chip {{ getBuyerStatusClass(merchant.buyerStatus) }}"
+              matTooltip="{{ getApprovalDetails(merchant) }}"
+              matTooltipClass="approval-tooltip"
+            >
+              {{ merchant.buyerStatus }}
+            </span>
+          </td>
+        </ng-container>
+        
+        <!-- Payment Status Column -->
+        <ng-container matColumnDef="paymentStatus">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Payment Status</th>
+          <td mat-cell *matCellDef="let merchant">
+            <span class="status-chip {{ getPaymentStatusClass(merchant.paymentStatus) }}">
+              {{ merchant.paymentStatus }}
+            </span>
+          </td>
+        </ng-container>
+    
+        <!-- Actions Column -->
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let merchant">
+            <button
+              *ngIf="(merchant.paymentStatus === 'Requested')"
+              style="padding: 10px;"
+              mat-raised-button
+              color="primary"
+              [routerLink]="'/invoices'"
+            >
+              Confirm Program
             </button>
-          </ng-container>
-          <ng-container *ngIf="getActionButtons(merchant) === 'approve,reject,info'">
-            <button mat-icon-button color="primary" (click)="onAccept(merchant)">
-              <mat-icon>check</mat-icon>
-            </button>
-            <button mat-icon-button color="warn" (click)="onReject(merchant)">
-              <mat-icon>close</mat-icon>
-            </button>
-            <button mat-icon-button (click)="onInfo(merchant)">
-              <mat-icon>info</mat-icon>
-            </button>
-          </ng-container>
-        </td>
-      </ng-container>
+          </td>
+        </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
-
-    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons aria-label="Select page of merchants">
-    </mat-paginator>
-  </div>
+    
+        <!-- Table Row Definitions -->
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    
+      <!-- Paginator -->
+      <mat-paginator 
+        [pageSizeOptions]="[5, 10, 20]" 
+        showFirstLastButtons 
+        aria-label="Select page of merchants">
+      </mat-paginator>
+    </div>
 </div>

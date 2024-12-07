@@ -8,6 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { RouterModule } from '@angular/router';
+import { MatIcon } from '@angular/material/icon';
 
 interface ProductType {
   id: number;
@@ -30,7 +31,8 @@ interface ProductType {
     MatFormFieldModule,
     MatInputModule,
     FormsModule,
-    RouterModule
+    RouterModule,
+    MatIcon
   ]
 })
 export class ProgramsComponent {

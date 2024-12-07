@@ -15,6 +15,7 @@
         <th class="px-4 py-3">Created By</th>
         <th class="px-4 py-3">Date Created</th>
         <th class="px-4 py-3">No. of Buyers Assigned</th>
+        <th class="px-4 py-3" style="padding-left: 5rem;">Edit</th>
       </tr>
     </thead>
     <tbody>
@@ -30,6 +31,11 @@
         <td class="px-4 py-3">{{ product.createdBy }}</td>
         <td class="px-4 py-3">{{ product.dateCreated | date:'mediumDate' }}</td>
         <td class="px-4 py-3">{{ product.numberOfBuyersAssigned }}</td>
+        <td class="text-center px-4 py-3">
+          <button mat-icon-button color="primary" >
+            <mat-icon>edit</mat-icon>
+          </button>
+        </td>
       </tr>
     </tbody>
   </table>

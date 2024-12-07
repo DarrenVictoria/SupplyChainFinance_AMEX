@@ -2,15 +2,20 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 export interface InvoiceData {
+
     requestId: string;
     dateCreated: string;
-    merchant: string;
+    buyerName: string;
     invoiceNumber: string;
     invoiceAmount: number;
     creditAmount: number;
     productCode: string;
     buyerStatus: string;
     paymentStatus: string;
+    merchantStatus?: string; // Add this optional property
+    approvedBy?: string;
+    approvedDate?: string;
+    approvalStatus?: 'Approved' | 'Rejected' | 'Pending';
     paymentTerms: '30 days' | '60 days' | '90 days';
 }
 
@@ -23,12 +28,12 @@ export class InvoiceDataService {
 
     constructor() { }
 
-    updateInvoiceData(invoices: any[]) {
-        const processedInvoices: InvoiceData[] = invoices.flatMap(merchant =>
-            merchant.invoices.map((invoice: any, index: number) => ({
-                requestId: `REQ-${merchant.merchantName.toUpperCase()}-${Date.now()}-${index + 1}`,
+    updateInvoiceData(buyers: any[]) {
+        const processedInvoices: InvoiceData[] = buyers.flatMap(buyer =>
+            buyer.invoices.map((invoice: any, index: number) => ({
+                requestId: `REQ-${buyer.buyerName.toUpperCase().replace(/\s+/g, '')}-${Date.now()}-${index + 1}`,
                 dateCreated: new Date().toLocaleDateString(),
-                merchant: this.getMerchantFullName(merchant.merchantName),
+                buyerName: buyer.buyerName,
                 invoiceNumber: invoice.invoiceNumber,
                 invoiceAmount: invoice.totalAmount,
                 creditAmount: this.calculateCreditAmount(invoice.totalAmount),
@@ -44,17 +49,7 @@ export class InvoiceDataService {
         ]);
     }
 
-    private getMerchantFullName(shortName: string): string {
-        const merchantMap: { [key: string]: string } = {
-            'sbc': 'SBC Holdings Pvt Ltd',
-            'jana': 'Janashakthi Pvt Ltd',
-            'emaar': 'Emaar Pvt Ltd'
-        };
-        return merchantMap[shortName] || shortName;
-    }
-
     private calculateCreditAmount(totalAmount: number): number {
-        // Calculate credit amount (e.g., 97% of total amount)
         return Math.round(totalAmount * 0.97 * 100) / 100;
     }
 

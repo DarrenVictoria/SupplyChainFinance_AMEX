@@ -1,222 +1,224 @@
 /* merchants.component.scss */
 .container {
-    padding: 20px;
-  }
-  
-  .header-section {
-    h1 {
-     margin-bottom:2rem;
-     font-size: 2rem;
-    }
-  }
-  
-  .merchants-tabs {
-    ::ng-deep {
-      .mat-mdc-tab-header {
-        background-color: white;
-        border-bottom: 1px solid #e0e0e0;
-      }
-  
-      .mat-mdc-tab-labels {
-        background-color: white;
-      }
-  
-      .mat-mdc-tab {
-        color: #757575; 
-        opacity: 1;    
-        
-        &.mdc-tab--active {
-          color: #1976d2; 
-          background-color: transparent;
-  
-          .mdc-tab-indicator__content--underline {
-            border-color: #1976d2;
-          }
-        }
-  
-        .mdc-tab-indicator__content--underline {
-          border-color: transparent;
-        }
-  
-        &:hover {
-          background-color: rgba(0, 0, 0, 0.04);
-        }
-      }
-    }
-  }
-  
-  .filter-section {
-    background-color: #dedfe3;
-    padding: 20px;
-    border-radius: 0 1rem 0 1rem;
-    margin-bottom: 20px;
-  
-    .filter-header {
-      margin-bottom: 20px;
-    }
-  
-    .filter-controls {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-    }
-  
-    .search-section {
-      display: flex;
-      gap: 20px;
-    }
-  }
-  
-  .filter-actions {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 1rem;
-    
-    .reset-button {
-      background-color: rgb(74, 74, 178);
-      color: white;
-      border-radius: 0 1rem 0 1rem;
-      padding: 0.5rem 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      
-      mat-icon {
-        font-size: 18px;
-        width: 18px;
-        height: 18px;
-      }
-  
-      &:hover {
-        background-color: rgb(61, 61, 148);
-      }
-    }
-  }
-  
-  .status-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  
-    .status-chips {
-      .mat-chip {
-        margin-right: 8px;
-      }
-    }
-  
-    .add-button {
-      margin-left: auto;
-      border-radius: 0 1rem 0 1rem;
-    }
-  }
-  
-  .table-container {
-    background: white;
-    border-radius: 4px;
-    overflow: hidden;
-    width: 100%;
-  overflow-x: auto;  /* Allow horizontal scroll */
-  -webkit-overflow-scrolling: touch;  /* For smooth scrolling on iOS */
-  
-    table {
-      width: 100%;
-      min-width: 600px;
-    }
-  
-    th.mat-header-cell,
-    td.mat-cell {
-      padding: 16px;
-      text-align: left;
-    }
-  
-    th.mat-header-cell {
-      background-color: #e0e0e0;
-      font-weight: bold;
-      color: #424242;
-    }
-  
-    tr.mat-row:hover {
-      background-color: #f5f5f5;
-    }
+  padding: 20px;
+}
 
-    @media (max-width: 768px) {
-        .table-container {
-          padding: 0 15px; /* Optional: Add some padding on small screens */
-        }
-      
-        table {
-          min-width: 800px;  /* Adjust the min-width to be appropriate for your table's columns */
-        }
-    }
+.header-section {
+  h1 {
+   margin-bottom:2rem;
+   font-size: 2rem;
   }
-  
-  
+}
+
+.merchants-tabs {
   ::ng-deep {
-    .mat-form-field {
-      width: 100%;
+    .mat-mdc-tab-header {
+      background-color: white;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .mat-mdc-tab-labels {
+      background-color: white;
+    }
+
+    .mat-mdc-tab {
+      color: #757575; 
+      opacity: 1;    
+      
+      &.mdc-tab--active {
+        color: #1976d2; 
+        background-color: transparent;
+
+        .mdc-tab-indicator__content--underline {
+          border-color: #1976d2;
+        }
+      }
+
+      .mdc-tab-indicator__content--underline {
+        border-color: transparent;
+      }
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+      }
     }
   }
-  
-  .coming-text{
-    margin-top: 1rem;
+}
+
+.filter-section {
+  background-color: #dedfe3;
+  padding: 20px;
+  border-radius: 0 1rem 0 1rem;
+  margin-bottom: 20px;
+
+  .filter-header {
+    margin-bottom: 20px;
   }
+
+  .filter-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+
+  .search-section {
+    display: flex;
+    gap: 20px;
+  }
+}
+
+.filter-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
   
-  .status-chip {
-    padding: 4px 8px;
-    border-radius: 12px;
+  .reset-button {
+    background-color: rgb(74, 74, 178);
     color: white;
+    border-radius: 0 1rem 0 1rem;
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    &:hover {
+      background-color: rgb(61, 61, 148);
+    }
+  }
+}
+
+.status-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  .status-chips {
+    .mat-chip {
+      margin-right: 8px;
+    }
+  }
+
+  .add-button {
+    margin-left: auto;
+    border-radius: 0 1rem 0 1rem;
+  }
+}
+
+.table-container {
+  background: white;
+  border-radius: 4px;
+  overflow: hidden;
+  width: 100%;
+overflow-x: auto;  /* Allow horizontal scroll */
+-webkit-overflow-scrolling: touch;  /* For smooth scrolling on iOS */
+
+  table {
+    width: 100%;
+    min-width: 600px;
+  }
+
+  th.mat-header-cell,
+  td.mat-cell {
+    padding: 16px;
+    text-align: left;
+  }
+
+  th.mat-header-cell {
+    background-color: #e0e0e0;
     font-weight: bold;
-  }
-  
-  ::ng-deep .approved {
-    background-color: #4CAF50 !important; /* green */
-    color: white !important;
-  }
-  
-  ::ng-deep .rejected {
-    background-color: #D32F2F !important; /* red */
-    color: white !important;
-  }
-  
-  ::ng-deep .review {
-    background-color: #F57C00 !important; /* orange */
-    color: white !important;
-  }
-  
-  ::ng-deep .pending-approval {
-    background-color: #2196F3 !important; /* blue */
-    color: white !important;
-  }
-  
-  ::ng-deep .incomplete {
-    background-color: #00BCD4 !important; /* cyan */
-    color: white !important;
+    color: #424242;
   }
 
-  .mat-cell button {
-    margin-right: 8px;
+  tr.mat-row:hover {
+    background-color: #f5f5f5;
   }
 
-  .status-active {
-    color: #4CAF50; 
+  @media (max-width: 768px) {
+      .table-container {
+        padding: 0 15px; /* Optional: Add some padding on small screens */
+      }
+    
+      table {
+        min-width: 800px;  /* Adjust the min-width to be appropriate for your table's columns */
+      }
   }
-  
-  .status-inactive {
-    color: #D32F2F;
+}
+
+
+::ng-deep {
+  .mat-form-field {
+    width: 100%;
   }
-  
-  .status-approved {
-    color: #4CAF50; 
-  }
-  
-  .status-rejected {
-    color: #D32F2F; 
-  }
-  
-  .status-pending-approval {
-    color: #F57C00; 
-  }
-  
-  
-  
+}
+
+.coming-text{
+  margin-top: 1rem;
+}
+
+.status-chip {
+  padding: 4px 8px;
+  border-radius: 12px;
+  color: white;
+  font-weight: bold;
+}
+
+::ng-deep .approved {
+  background-color: #4CAF50 !important; /* green */
+  color: white !important;
+}
+
+::ng-deep .rejected {
+  background-color: #D32F2F !important; /* red */
+  color: white !important;
+}
+
+::ng-deep .review {
+  background-color: #F57C00 !important; /* orange */
+  color: white !important;
+}
+
+::ng-deep .pending-approval {
+  background-color: #2196F3 !important; /* blue */
+  color: white !important;
+}
+
+::ng-deep .incomplete {
+  background-color: #00BCD4 !important; /* cyan */
+  color: white !important;
+}
+
+.mat-cell button {
+  margin-right: 8px;
+}
+
+.deactivate-button{
+  margin-bottom: 10px;
+}
+
+.mdc-text-field--filled:not(.mdc-text-field--disabled){
+  min-width: 900px !important;
+}
+
+.text-green{
+  color: #4CAF50;
+}
+
+.text-red{
+  color: #D32F2F;
+}
+
+.text-orange{
+  color: #F57C00;
+}
+
+
+.add-supp-button{
+  margin-bottom: 2rem;
+}

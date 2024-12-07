@@ -1,0 +1,37 @@
+.manage-suppliers-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.suppliers-table {
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+.supplier-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.supplier-form mat-form-field {
+  width: 100%;
+}
+
+.supplier-form > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.supplier-form > div > mat-form-field {
+  flex: 1 1 calc(33% - 15px);
+  min-width: 250px;
+}
+
+@media (max-width: 768px) {
+  .supplier-form > div > mat-form-field {
+    flex: 1 1 100%;
+  }
+}

@@ -148,3 +148,11 @@
 .btn-confirm:hover {
   background-color: #3b9fac;
 }
+
+.early-day-input{
+  margin-left:1rem ;
+}
+
+.input-label{
+  margin-left: 1rem  !important; 
+}

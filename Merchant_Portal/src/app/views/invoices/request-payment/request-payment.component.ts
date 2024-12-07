@@ -39,6 +39,18 @@ export class RequestPaymentComponent {
     return Array.from({ length: Math.floor(this.paymentTerms / 10) + 1 }, (_, i) => i * 10);
   }
 
+  onEarlyPaymentDayChange(event: Event) {
+    const inputElement = event.target as HTMLInputElement;
+    const value = inputElement?.value;
+
+    if (value) {
+      const numValue = parseInt(value, 10);
+      if (!isNaN(numValue) && numValue >= 0 && numValue <= this.paymentTerms) {
+        this.earlyPaymentDay = numValue;
+      }
+    }
+  }
+
   requestPayment() {
     this.showConfirmModal = true;
   }

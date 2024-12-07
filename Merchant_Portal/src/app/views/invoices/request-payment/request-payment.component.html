@@ -29,26 +29,38 @@
         </span>
       </div>
     </div>
-    <span class="payment-value">Selected Day: {{ earlyPaymentDay }}</span>
+    <div class="early-payment-input">
+      <input 
+  type="number" 
+  [min]="0" 
+  [max]="paymentTerms"
+  [(ngModel)]="earlyPaymentDay"
+  (change)="onEarlyPaymentDayChange($event)"
+  class="early-day-input"
+>
+      <span class="input-label">Selected Day</span>
+    </div>
   </div>
 
   <div class="payment-section requested-early-payment-section">
-    <label class="payment-label">Requested Early Payment (days):</label>
+    <label class="payment-label">Advance Payment Request Prior to Due Date (days):</label>
     <span class="payment-value">{{ requestedEarlyPayment }} days</span>
   </div>
 
-  <div class="payment-section daily-rate-section">
-    <label class="payment-label">Daily Rate:</label>
-    <span class="payment-value">{{ dailyRate }}</span>
-  </div>
-
-  <div class="payment-section daily-rate-section">
-    <label class="payment-label">Annual Rate:</label>
-    <span class="payment-value">{{ annualRate }}%</span>
+  <div class="payment-section rate-section">
+    <div class="rate-details">
+      <label class="payment-label">Annual Rate:</label>
+      <span class="payment-value">{{ annualRate }}%</span>
+    </div>
+    <div class="rate-details">
+      <label class="payment-label">Daily Rate:</label>
+      <span class="payment-value">{{ dailyRate }}%</span>
+    </div>
+    
   </div>
 
   <div class="payment-section total-discount-section">
-    <label class="payment-label">Total Early Payment Discount:</label>
+    <label class="payment-label">Total Invoice Discount Offered:</label>
     <span class="payment-value">{{ totalEarlyPaymentDiscount | currency }}</span>
   </div>
 
@@ -58,7 +70,7 @@
   </div>
 
   <div class="payment-section">
-    <button class="request-payment-btn" (click)="requestPayment()">Request Payment</button>
+    <button class="request-payment-btn" (click)="requestPayment()">Request Early Payment</button>
   </div>
 
   <!-- Confirmation Modal -->
@@ -68,10 +80,11 @@
       <div class="modal-details">
         <p><strong>Invoice Amount:</strong> {{ invoiceAmount | currency }}</p>
         <p><strong>Early Payment Day:</strong> {{ earlyPaymentDay }}</p>
+        <p><strong>Total Invoice Discount Offered:</strong> {{ totalEarlyPaymentDiscount | currency }}</p>
         <p><strong>Calculated Amount:</strong> {{ calculatedAmount | currency }}</p>
       </div>
       <div class="modal-actions">
-        <button class="btn btn-edit" (click)="closeModal()">Edit</button>
+        <button class="btn btn-edit" (click)="closeModal()">Cancel</button>
         <button class="btn btn-confirm" (click)="confirmPayment()">Confirm</button>
       </div>
     </div>

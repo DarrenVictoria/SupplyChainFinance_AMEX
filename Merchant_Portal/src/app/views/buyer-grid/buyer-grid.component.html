@@ -1,5 +1,15 @@
 <div class="buyers-container">
-  <h1>Buyers</h1>
+  <div class="header">
+    <h1>Buyers</h1>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      class="add-buyer-button"
+      (click)="openAddBuyerDialog()"
+    >
+      Add Buyer
+    </button>
+  </div>
   
   <div class="buyer-grid">
     <mat-card class="buyer-card" *ngFor="let buyer of buyers">

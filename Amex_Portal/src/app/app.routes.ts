@@ -16,6 +16,7 @@ import { BuyerConfigComponent } from './views/buyer-config/buyer-config.componen
 import { ProgramsComponent } from './views/settings/programs/programs.component';
 import { AddProgramsComponent } from './views/settings/add-programs/add-programs.component';
 import { ManageSupplierComponent } from './views/customers/manage-suppliers/manage-suppliers.component';
+import { AddInvoiceComponent } from './views/customers/add-invoice/add-invoice.component';
 
 export const routes: Routes = [
   {
@@ -82,6 +83,10 @@ export const routes: Routes = [
       {
         path: 'managesuppliers',
         component: ManageSupplierComponent,
+      },
+      {
+        path: 'add-invoices',
+        component: AddInvoiceComponent,
       },
 
 

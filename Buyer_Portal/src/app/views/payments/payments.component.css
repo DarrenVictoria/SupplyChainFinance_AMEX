@@ -245,6 +245,11 @@ overflow-x: auto;  /* Allow horizontal scroll */
   background-color: #ffffff !important;
 }
 
+.due {
+  color: #d3792f !important; /* red */
+   background-color: #ffffff !important;
+ }
+
 .generate-statement-button {
   background-color: #2196F3;
   color: white;

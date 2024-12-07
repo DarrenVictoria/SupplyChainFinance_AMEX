@@ -1,173 +1,286 @@
-<!-- invoice-form.component.html -->
-<div class="invoice-form-container">
-  <h1>Add Invoice</h1>
-
-<!-- american-express.component.html -->
-<div class="credit-remainder">Your Credit Overview</div>
-<div class="american-express-card">
-  <img class="card-img" src="./american-express-card.png" alt="American Express Card">
-  <div class="card-text">
-    <div class="card-number">{{ cardNumber }}</div>
-    <div class="credit-limit">
-      <span class="value">Credit Limit:</span> ${{ creditLimit }}
-    </div>
-    <div class="available-credit">
-      <span class="value">Available Credit:</span> ${{ availableCredit }}
-    </div>
+<div class="invoice-container">
+  <!-- Main Invoices Table -->
+  <div class="main-invoices-section">
+    <h2>Added Invoices</h2>
+    <mat-table [dataSource]="mainInvoices" class="main-invoices-table">
+      <!-- CR Number Column -->
+      <ng-container matColumnDef="crNumber">
+        <mat-header-cell *matHeaderCellDef>CR Number</mat-header-cell>
+        <mat-cell *matCellDef="let element">{{ element.crNumber }}</mat-cell>
+      </ng-container>
+ 
+      <!-- Supplier Name Column -->
+      <ng-container matColumnDef="supplierName">
+        <mat-header-cell *matHeaderCellDef>Supplier</mat-header-cell>
+        <mat-cell *matCellDef="let element">{{ element.supplierName }}</mat-cell>
+      </ng-container>
+ 
+      <!-- Invoice Number Column -->
+      <ng-container matColumnDef="invoiceNumber">
+        <mat-header-cell *matHeaderCellDef>Invoice Number</mat-header-cell>
+        <mat-cell *matCellDef="let element">{{ element.invoiceNumber }}</mat-cell>
+      </ng-container>
+ 
+      <!-- Invoice Date Column -->
+      <ng-container matColumnDef="invoiceDate">
+        <mat-header-cell *matHeaderCellDef>Invoice Date</mat-header-cell>
+        <mat-cell *matCellDef="let element">{{ element.invoiceDate | date:'shortDate' }}</mat-cell>
+      </ng-container>
+ 
+      <!-- Due Date Column -->
+      <ng-container matColumnDef="dueDate">
+        <mat-header-cell *matHeaderCellDef>Due Date</mat-header-cell>
+        <mat-cell *matCellDef="let element">{{ element.dueDate | date:'shortDate' }}</mat-cell>
+      </ng-container>
+ 
+      <!-- Currency Column -->
+      <ng-container matColumnDef="currency">
+        <mat-header-cell *matHeaderCellDef>Currency</mat-header-cell>
+        <mat-cell *matCellDef="let element">{{ element.currency }}</mat-cell>
+      </ng-container>
+ 
+      <!-- Total Amount Column -->
+      <ng-container matColumnDef="totalAmount">
+        <mat-header-cell *matHeaderCellDef>Total Amount</mat-header-cell>
+        <mat-cell *matCellDef="let element">{{ element.totalAmount | currency }}</mat-cell>
+      </ng-container>
+ 
+      <!-- Payment Terms Column -->
+      <ng-container matColumnDef="paymentTerms">
+        <mat-header-cell *matHeaderCellDef>Payment Terms</mat-header-cell>
+        <mat-cell *matCellDef="let element">{{ element.paymentTerms }}</mat-cell>
+      </ng-container>
+ 
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <button mat-icon-button color="primary" (click)="editInvoice(element)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="removeInvoice(element)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-cell>
+      </ng-container>
+ 
+      <mat-header-row *matHeaderRowDef="displayedMainColumns"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedMainColumns"></mat-row>
+    </mat-table>
   </div>
+
+ <!-- CSV Upload Section -->
+ <div class="csv-upload-section">
+  <input 
+    type="file" 
+    #csvFileInput 
+    (change)="onFileSelected($event)"
+    accept=".csv"
+    style="display: none;"
+  >
+  <button 
+    mat-raised-button 
+    color="primary" 
+    (click)="triggerFileInput()"
+  >
+    <mat-icon>cloud_upload</mat-icon>
+    Upload CSV
+  </button>
 </div>
-  <div class="upload-section">
-    <input 
-      type="file" 
-      #csvFileInput 
-      (change)="onCsvUpload($event)" 
-      accept=".csv" 
-      style="display: none"
-    >
+
+<!-- Verification Table for Parsed Invoices -->
+<div *ngIf="verificationInvoices.length > 0" class="verification-table-section">
+  <h2>Verify Parsed Invoices</h2>
+  <mat-table [dataSource]="verificationInvoices" class="verification-table">
+    <!-- Checkbox Column -->
+    <ng-container matColumnDef="select">
+      <mat-header-cell *matHeaderCellDef>
+        <mat-checkbox 
+          (change)="$event ? masterToggle() : null"
+          [checked]="selection.hasValue() && isAllSelected()"
+          [indeterminate]="selection.hasValue() && !isAllSelected()"
+        >
+        </mat-checkbox>
+      </mat-header-cell>
+      <mat-cell *matCellDef="let row">
+        <mat-checkbox 
+          (click)="$event.stopPropagation()"
+          (change)="$event ? selection.toggle(row) : null"
+          [checked]="selection.isSelected(row)"
+        >
+        </mat-checkbox>
+      </mat-cell>
+    </ng-container>
+
+    <!-- CR Number Column -->
+    <ng-container matColumnDef="crNumber">
+      <mat-header-cell *matHeaderCellDef>CR Number</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.crNumber }}</mat-cell>
+    </ng-container>
+
+    <!-- Supplier Name Column -->
+    <ng-container matColumnDef="supplierName">
+      <mat-header-cell *matHeaderCellDef>Supplier</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.supplierName }}</mat-cell>
+    </ng-container>
+
+    <!-- Invoice Number Column -->
+    <ng-container matColumnDef="invoiceNumber">
+      <mat-header-cell *matHeaderCellDef>Invoice Number</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.invoiceNumber }}</mat-cell>
+    </ng-container>
+
+    <!-- Invoice Date Column -->
+    <ng-container matColumnDef="invoiceDate">
+      <mat-header-cell *matHeaderCellDef>Invoice Date</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.invoiceDate | date:'shortDate' }}</mat-cell>
+    </ng-container>
+
+    <!-- Due Date Column -->
+    <ng-container matColumnDef="dueDate">
+      <mat-header-cell *matHeaderCellDef>Due Date</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.dueDate | date:'shortDate' }}</mat-cell>
+    </ng-container>
+
+    <!-- Currency Column -->
+    <ng-container matColumnDef="currency">
+      <mat-header-cell *matHeaderCellDef>Currency</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.currency }}</mat-cell>
+    </ng-container>
+
+    <!-- Total Amount Column -->
+    <ng-container matColumnDef="totalAmount">
+      <mat-header-cell *matHeaderCellDef>Total Amount</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.totalAmount | currency }}</mat-cell>
+    </ng-container>
+
+    <!-- Payment Terms Column -->
+    <ng-container matColumnDef="paymentTerms">
+      <mat-header-cell *matHeaderCellDef>Payment Terms</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.paymentTerms }}</mat-cell>
+    </ng-container>
+
+    <!-- Actions Column -->
+    <ng-container matColumnDef="actions">
+      <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
+      <mat-cell *matCellDef="let element">
+        <!-- Optional column for future actions -->
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+  </mat-table>
+
+  <div class="verification-actions">
     <button 
       mat-raised-button 
       color="primary" 
-      (click)="csvFileInput.click()"
+      (click)="addSelectedInvoices()"
+      [disabled]="selection.selected.length === 0"
     >
-      Upload CSV
+      Add Selected Invoices
     </button>
   </div>
+</div>
 
-  <form [formGroup]="invoiceForm" (ngSubmit)="onSubmit()">
-    <div formArrayName="merchants">
-      <div *ngFor="let merchant of merchantsArray.controls; let merchantIndex = index" 
-           [formGroupName]="merchantIndex" class="merchant-block">
-        
-        <div class="merchant-header">
-          <!-- Merchant Select -->
-          <mat-form-field appearance="outline">
-            <mat-label>Select Supplier</mat-label>
-            <mat-select formControlName="merchantName">
-              <mat-option *ngFor="let option of merchantOptions" 
-                          [value]="option.value">
-                {{ option.label }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
+<!-- Invoice Form Section -->
+<form [formGroup]="invoiceForm" (ngSubmit)="onSubmit()" class="invoice-form">
+  <div class="form-grid">
+    <mat-form-field>
+      <mat-label>CR Number</mat-label>
+      <input matInput formControlName="crNumber" placeholder="Enter CR Number">
+      <mat-error *ngIf="invoiceForm.get('crNumber')?.invalid">
+        CR Number is required
+      </mat-error>
+    </mat-form-field>
 
-          <!-- Merchant Delete Button -->
-          <button *ngIf="merchantsArray.length > 1" 
-                  mat-mini-fab color="warn" type="button"
-                  (click)="removeMerchant(merchantIndex)">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </div>
+    <mat-form-field>
+      <mat-label>Supplier Name</mat-label>
+      <mat-select formControlName="supplierName">
+        <mat-option *ngFor="let supplier of supplierOptions" [value]="supplier.value">
+          {{ supplier.label }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="invoiceForm.get('supplierName')?.invalid">
+        Supplier Name is required
+      </mat-error>
+    </mat-form-field>
 
-        <!-- Invoices Section -->
-        <div formArrayName="invoices">
-          <div *ngFor="let invoice of getMerchantsInvoicesArray(merchantIndex).controls; let invoiceIndex = index"
-               [formGroupName]="invoiceIndex" class="invoice-block">
+    <mat-form-field>
+      <mat-label>Invoice Number</mat-label>
+      <input matInput formControlName="invoiceNumber" placeholder="Enter Invoice Number">
+      <mat-error *ngIf="invoiceForm.get('invoiceNumber')?.invalid">
+        Invoice Number is required
+      </mat-error>
+    </mat-form-field>
 
-               
-            
-            <div class="invoice-header">
+     <mat-form-field>
+       <mat-label>Due Date</mat-label>
+       <input matInput 
+              [matDatepicker]="dueDatePicker" 
+              formControlName="dueDate"
+              placeholder="Choose Due Date">
+       <mat-datepicker-toggle matSuffix [for]="dueDatePicker"></mat-datepicker-toggle>
+       <mat-datepicker #dueDatePicker></mat-datepicker>
+       <mat-error *ngIf="invoiceForm.get('dueDate')?.invalid">
+         Due Date is required
+       </mat-error>
+     </mat-form-field>
 
-             
+     <mat-form-field>
+       <mat-label>Currency</mat-label>
+       <mat-select formControlName="currency">
+         <mat-option *ngFor="let currency of currencyOptions" [value]="currency.value">
+           {{ currency.label }}
+         </mat-option>
+       </mat-select>
+       <mat-error *ngIf="invoiceForm.get('currency')?.invalid">
+         Currency is required
+       </mat-error>
+     </mat-form-field>
 
-              
-              <!-- Invoice Number -->
-              <mat-form-field appearance="outline">
-                <mat-label>Invoice Number</mat-label>
-                <input matInput formControlName="invoiceNumber" required>
-              </mat-form-field>
+     <mat-form-field>
+       <mat-label>Total Amount</mat-label>
+       <input matInput 
+              type="number" 
+              formControlName="totalAmount" 
+              placeholder="Enter Total Amount">
+       <mat-error *ngIf="invoiceForm.get('totalAmount')?.invalid">
+         Valid Total Amount is required
+       </mat-error>
+     </mat-form-field>
 
-              <!-- Invoice Date -->
-              <mat-form-field appearance="outline">
-                <mat-label>Invoice Date</mat-label>
-                <input matInput [matDatepicker]="invoiceDatePicker" formControlName="invoiceDate" required>
-                <mat-datepicker-toggle matSuffix [for]="invoiceDatePicker"></mat-datepicker-toggle>
-                <mat-datepicker #invoiceDatePicker></mat-datepicker>
-              </mat-form-field>
+     <mat-form-field>
+       <mat-label>Payment Terms</mat-label>
+       <mat-select formControlName="paymentTerms">
+         <mat-option *ngFor="let terms of paymentTermsOptions" [value]="terms.value">
+           {{ terms.label }}
+         </mat-option>
+       </mat-select>
+       <mat-error *ngIf="invoiceForm.get('paymentTerms')?.invalid">
+         Payment Terms are required
+       </mat-error>
+     </mat-form-field>
+   </div>
 
-              <!-- Due Date -->
-              <mat-form-field appearance="outline">
-                <mat-label>Due Date</mat-label>
-                <input matInput [matDatepicker]="dueDatePicker" formControlName="dueDate" required>
-                <mat-datepicker-toggle matSuffix [for]="dueDatePicker"></mat-datepicker-toggle>
-                <mat-datepicker #dueDatePicker></mat-datepicker>
-              </mat-form-field>
-
-              
-            </div>
-
-            <div class="invoice-details">
-              <!-- Currency -->
-              <mat-form-field appearance="outline">
-                <mat-label>Currency</mat-label>
-                <mat-select formControlName="currency" required>
-                  <mat-option *ngFor="let currency of currencyOptions" 
-                              [value]="currency.value">
-                    {{ currency.label }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-
-              <!-- Total Invoice Amount -->
-              <mat-form-field appearance="outline">
-                <mat-label>Total Invoice Amount</mat-label>
-                <input matInput type="number" formControlName="totalAmount" required>
-              </mat-form-field>
-
-              <!-- Payment Terms -->
-              <mat-form-field appearance="outline">
-                <mat-label>Payment Terms</mat-label>
-                <mat-select formControlName="paymentTerms" required>
-                  <mat-option *ngFor="let terms of paymentTermsOptions" 
-                              [value]="terms.value">
-                    {{ terms.label }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-
-              <!-- File Upload -->
-              <div class="file-upload">
-                <input type="file" 
-                       (change)="onFileSelected($event, merchantIndex, invoiceIndex)"
-                       style="display: none" 
-                       #fileInput>
-                <button mat-raised-button type="button" 
-                        (click)="fileInput.click()">
-                  Add Attachment
-                </button>
-              </div>
-               <!-- Invoice Delete Button -->
-               <button *ngIf="getMerchantsInvoicesArray(merchantIndex).length > 1"
-                mat-mini-fab color="warn" type="button"
-                (click)="removeInvoice(merchantIndex, invoiceIndex)">
-          <mat-icon>delete</mat-icon>
-        </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Merchant Action Buttons -->
-        <div class="merchant-actions">
-          <button mat-raised-button color="primary" type="button" 
-                  (click)="addInvoice(merchantIndex)">
-            Add Another Invoice
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Global Add Merchant Button -->
-    <div class="global-actions">
-      <button mat-raised-button color="primary" type="button" 
-              (click)="addMerchant()">
-        Add Another Merchant
-      </button>
-    </div>
-
-    <!-- Submit Button -->
-    <div class="submit-section">
-      <button mat-raised-button color="primary" type="submit">
-        Submit Invoices
-      </button>
-    </div>
-  </form>
+   <div class="form-actions">
+     <button 
+       mat-raised-button 
+       color="primary" 
+       type="submit"
+       [disabled]="invoiceForm.invalid"
+     >
+       {{ editingInvoice ? 'Update Invoice' : 'Add Invoice' }}
+     </button>
+     <button 
+       *ngIf="editingInvoice" 
+       mat-button 
+       type="button" 
+       (click)="cancelEdit()"
+     >
+       Cancel Edit
+     </button>
+   </div>
+ </form>
 </div>

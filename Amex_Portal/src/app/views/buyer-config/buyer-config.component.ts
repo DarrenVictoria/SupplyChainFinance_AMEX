@@ -124,7 +124,7 @@ const USER_DATASET = [
     MatCardModule,
     MatSnackBarModule,
     MatSelectModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
   ]
 })
 export class BuyerConfigComponent {
@@ -143,6 +143,16 @@ export class BuyerConfigComponent {
   mainActiveToggle = true;
   enableNotifications = true;
   enableMakerCheckerInvoice = false;
+  enablePriorDueDateReminders = false;
+  enableAutoFinance = false;
+  priorDueDateReminderDay: number = 0;
+  priorDueDateReminderHour: number = 0;
+  priorDueDateReminderMinute: number = 0;
+  enableRepeatReminder: boolean = false;
+  repeatReminderInterval: number = 0;
+  repeatReminderUnit: 'days' | 'hours' | 'minutes' = 'hours';
+  autoFinanceComparisonOperator: string = '<=';
+  autoFinanceInvoiceValue: number | null = null;
 
   constructor(
     private dialog: MatDialog,
@@ -176,6 +186,8 @@ export class BuyerConfigComponent {
       }
     });
   }
+
+
 
   openUserDetailsDialog(user: User) {
     const dialogRef = this.dialog.open(UserDetailsDialogComponent, {
@@ -271,6 +283,47 @@ export class BuyerConfigComponent {
 
   onMakerCheckerInvoiceToggleChange(checked: boolean) {
     this.enableMakerCheckerInvoice = checked;
+  }
+
+
+
+
+
+
+  onAutoFinance(checked: boolean) {
+    this.enableAutoFinance = checked;
+
+    // Optional: Reset values if disabled
+    if (!checked) {
+      this.autoFinanceComparisonOperator = '<=';
+      this.autoFinanceInvoiceValue = null;
+    }
+  }
+
+
+  onPriorDueDateReminders(checked: boolean) {
+    this.enablePriorDueDateReminders = checked;
+
+    // Reset values if disabled
+    if (!checked) {
+      this.priorDueDateReminderDay = 0;
+      this.priorDueDateReminderHour = 0;
+      this.priorDueDateReminderMinute = 0;
+      this.enableRepeatReminder = false;
+      this.repeatReminderInterval = 0;
+      this.repeatReminderUnit = 'hours';
+    }
+  }
+
+  // Add a method to handle repeat reminder toggle
+  onRepeatReminderToggle(checked: boolean) {
+    this.enableRepeatReminder = checked;
+
+    // Reset interval if disabled
+    if (!checked) {
+      this.repeatReminderInterval = 0;
+      this.repeatReminderUnit = 'hours';
+    }
   }
 
   getProgramDetails(): { name: string; value: string }[] {

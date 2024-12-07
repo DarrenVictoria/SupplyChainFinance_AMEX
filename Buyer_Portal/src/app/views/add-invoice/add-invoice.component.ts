@@ -1,49 +1,36 @@
-import { Component, OnInit } from '@angular/core';
-import {
-  FormBuilder,
-  FormArray,
-  FormGroup,
-  Validators,
-  ReactiveFormsModule,
-  NonNullableFormBuilder
-} from '@angular/forms';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatTableModule } from '@angular/material/table';
+import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { SelectionModel } from '@angular/cdk/collections';
 import * as Papa from 'papaparse';
-import { Router } from '@angular/router';
-import { InvoiceDataService } from '../../services/invoice-data.service';
-
-interface Merchant {
-  name: string;
-  invoices: Invoice[];
-}
-
-interface CsvInvoiceRow {
-  merchantName: string;
-  invoiceNumber: string;
-  invoiceDate: string;
-  dueDate: string;
-  currency: string;
-  totalAmount: string;
-  paymentTerms: string;
-}
-
+import { MatDatepicker } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 interface Invoice {
+  id?: string;
+  crNumber?: string;
+  supplierName: string;
   invoiceNumber: string;
   invoiceDate: Date;
   dueDate: Date;
   currency: string;
   totalAmount: number;
   paymentTerms: string;
-  attachment?: File | null;
 }
+
+const CR_NUMBER_MAPPING = {
+  'CR001': 'SBC Holdings Pvt Ltd',
+  'CR002': 'Janashakthi Pvt Ltd',
+  'CR003': 'Emaar Pvt Ltd'
+};
 
 @Component({
   selector: 'app-add-invoice',
@@ -53,33 +40,34 @@ interface Invoice {
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    MatTableModule,
+    MatButtonModule,
     MatInputModule,
     MatSelectModule,
-    MatButtonModule,
     MatDatepickerModule,
-    MatNativeDateModule,
-    MatIconModule
+    MatIconModule,
+    MatCheckboxModule,
+    MatDatepicker,
+    MatNativeDateModule
   ]
 })
 export class AddInvoiceComponent implements OnInit {
-  invoiceForm!: FormGroup;
+  @ViewChild('csvFileInput') csvFileInput!: ElementRef;
 
-  constructor(
-    private fb: NonNullableFormBuilder,
-    private snackBar: MatSnackBar,
-    private invoiceDataService: InvoiceDataService, // Inject the service
-    private router: Router // Inject Router
-  ) { }
+  invoiceForm: FormGroup;
+  verificationInvoices: Invoice[] = [];
+  mainInvoices: Invoice[] = [];
+  editingInvoice: Invoice | null = null;
 
-  cardNumber = '37XX XXXXXX XXXXX';
-  creditLimit = 600000;
-  availableCredit = 200000;
+  selection = new SelectionModel<Invoice>(true, []);
 
-  merchantOptions = [
-    { value: 'sbc', label: 'SBC Holdings Pvt Ltd' },
-    { value: 'jana', label: 'Janashakthi Pvt Ltd' },
-    { value: 'emaar', label: 'Emaar Pvt Ltd' }
+  supplierOptions = [
+    { value: 'SBC Holdings Pvt Ltd', label: 'SBC Holdings Pvt Ltd' },
+    { value: 'Janashakthi Pvt Ltd', label: 'Janashakthi Pvt Ltd' },
+    { value: 'Emaar Pvt Ltd', label: 'Emaar Pvt Ltd' }
   ];
+
+
 
   currencyOptions = [
     { value: 'USD', label: 'USD' },
@@ -88,126 +76,117 @@ export class AddInvoiceComponent implements OnInit {
   ];
 
   paymentTermsOptions = [
-    { value: 'net30', label: 'Net 30 - Payment due within 30 days of invoice date' },
-    { value: 'prepaid', label: 'Prepaid - Full payment required upfront before work begins' },
-    { value: '50depositnet15', label: '50% Deposit, Net 15 - 50% deposit due upfront, remaining balance due within 15 days' },
-    { value: 'progressbilling', label: 'Progress Billing - Payments due at specific milestones or project phases' }
+    { value: '30 days', label: '30 days' },
+    { value: '60 days', label: '60 days' },
+    { value: '90 days', label: '90 days' },
   ];
 
+  displayedColumns: string[] = [
+    'select',
+    'crNumber',
+    'supplierName',
+    'invoiceNumber',
+    'invoiceDate',
+    'dueDate',
+    'currency',
+    'totalAmount',
+    'paymentTerms',
+    'actions'
+  ];
 
+  displayedMainColumns: string[] = [
+    'crNumber',
+    'supplierName',
+    'invoiceNumber',
+    'invoiceDate',
+    'dueDate',
+    'currency',
+    'totalAmount',
+    'paymentTerms',
+    'actions'
+  ];
+
+  constructor(
+    private fb: FormBuilder,
+    private snackBar: MatSnackBar
+  ) {
+    this.invoiceForm = this.createInvoiceForm();
+  }
 
   ngOnInit() {
-    this.initForm();
-  }
-
-  initForm() {
-    this.invoiceForm = this.fb.group({
-      merchants: this.fb.array([this.createMerchantGroup()])
-    });
-  }
-
-  createMerchantGroup(): FormGroup {
-    return this.fb.group({
-      merchantName: ['', Validators.required],
-      invoices: this.fb.array([this.createInvoiceGroup()])
-    });
-  }
-
-  createInvoiceGroup(): FormGroup {
-    return this.fb.group({
-      invoiceNumber: ['', Validators.required],
-      invoiceDate: [null as any, Validators.required],
-      dueDate: [null as any, Validators.required],
-      currency: ['', Validators.required],
-      totalAmount: [0, [Validators.required, Validators.min(0)]],
-      paymentTerms: ['', Validators.required],
-      attachment: [null]
-    });
-  }
-
-  get merchantsArray(): FormArray {
-    return this.invoiceForm.get('merchants') as FormArray;
-  }
-
-  getMerchantsInvoicesArray(merchantIndex: number): FormArray {
-    const merchantGroup = this.merchantsArray.at(merchantIndex);
-    return merchantGroup.get('invoices') as FormArray;
-  }
-
-  // CSV Upload Method
-  onCsvUpload(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      const file = input.files[0];
-
-      // Validate file type
-      if (!file.name.endsWith('.csv')) {
-        this.snackBar.open('Please upload a CSV file', 'Close', { duration: 3000 });
-        return;
-      }
-
-      Papa.parse(file, {
-        header: true,
-        complete: (results) => {
-          if (results.errors.length > 0) {
-            this.snackBar.open('Error parsing CSV', 'Close', { duration: 3000 });
-            console.error(results.errors);
-            return;
-          }
-
-          this.populateFormFromCsv(results.data as CsvInvoiceRow[]);
+    // Add event listener for CR Number input
+    this.invoiceForm.get('crNumber')?.valueChanges.subscribe(crNumber => {
+      if (crNumber) {
+        const supplierName = CR_NUMBER_MAPPING[crNumber as keyof typeof CR_NUMBER_MAPPING];
+        if (supplierName) {
+          this.invoiceForm.get('supplierName')?.setValue(supplierName);
+          this.invoiceForm.get('supplierName')?.disable();
+        } else {
+          this.invoiceForm.get('supplierName')?.enable();
         }
-      });
-    }
-  }
-
-  populateFormFromCsv(data: CsvInvoiceRow[]) {
-    // Clear existing form
-    while (this.merchantsArray.length !== 0) {
-      this.merchantsArray.removeAt(0);
-    }
-
-    // Group invoices by merchant
-    const merchantGroups = this.groupInvoicesByMerchant(data);
-
-    // Populate form
-    merchantGroups.forEach(merchantInvoices => {
-      const merchantGroup = this.createMerchantGroup();
-
-      // Set merchant name
-      merchantGroup.get('merchantName')?.setValue(
-        this.validateMerchantName(merchantInvoices[0].merchantName)
-      );
-
-      // Create invoice groups
-      const invoicesArray = merchantGroup.get('invoices') as FormArray;
-      invoicesArray.clear(); // Remove default invoice
-
-      merchantInvoices.forEach(invoice => {
-        const invoiceGroup = this.createInvoiceGroup();
-
-        invoiceGroup.patchValue({
-          invoiceNumber: invoice.invoiceNumber,
-          invoiceDate: new Date(invoice.invoiceDate),
-          dueDate: new Date(invoice.dueDate),
-          currency: this.validateCurrency(invoice.currency),
-          totalAmount: parseFloat(invoice.totalAmount),
-          paymentTerms: this.validatePaymentTerms(invoice.paymentTerms)
-        });
-
-        invoicesArray.push(invoiceGroup);
-      });
-
-      this.merchantsArray.push(merchantGroup);
+      } else {
+        this.invoiceForm.get('supplierName')?.enable();
+      }
     });
   }
 
-  // Validation helpers
-  validateMerchantName(name: string): string {
-    const match = this.merchantOptions.find(option =>
-      option.label.toLowerCase().includes(name.toLowerCase())
-    );
-    return match ? match.value : '';
+  createInvoiceForm(): FormGroup {
+    return this.fb.group({
+      crNumber: ['', Validators.required],
+      supplierName: ['', Validators.required],
+      invoiceNumber: ['', Validators.required],
+      invoiceDate: [null, Validators.required],
+      dueDate: [null, Validators.required],
+      currency: ['', Validators.required],
+      totalAmount: [null, [Validators.required, Validators.min(0)]],
+      paymentTerms: ['', Validators.required]
+    });
+  }
+
+  triggerFileInput() {
+    this.csvFileInput.nativeElement.click();
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+
+    if (file) {
+      Papa.parse(file, {
+        complete: (results) => {
+          // Reset selection when new file is parsed
+          this.selection.clear();
+
+          this.verificationInvoices = (results.data as any[][])
+            .slice(1) // Skip header row
+            .filter((row: any[]) => row[0] && row[1]) // Require at least CR Number and invoice number
+            .map((row: any[]) => this.mapCsvRowToInvoice(row));
+
+          this.snackBar.open(`${this.verificationInvoices.length} Invoices Parsed`, 'Close', { duration: 3000 });
+        },
+        header: false
+      });
+    }
+  }
+
+  mapCsvRowToInvoice(row: any[]): Invoice {
+    const crNumber = row[0] || '';
+    return {
+      id: `invoice-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      crNumber: crNumber,
+      supplierName: this.validateSupplierName(crNumber),
+      invoiceNumber: row[1] || '',
+      invoiceDate: new Date(row[2] || Date.now()),
+      dueDate: new Date(row[3] || Date.now()),
+      currency: this.validateCurrency(row[4] || 'USD'),
+      totalAmount: parseFloat(row[5] || '0'),
+      paymentTerms: this.validatePaymentTerms(row[6] || 'net30')
+    };
+  }
+  validateSupplierName(crNumber: string): string {
+    // Use the CR Number mapping to get the supplier name
+    const supplierName = CR_NUMBER_MAPPING[crNumber as keyof typeof CR_NUMBER_MAPPING];
+    return supplierName || this.supplierOptions[0].value;
   }
 
   validateCurrency(currency: string): string {
@@ -215,95 +194,98 @@ export class AddInvoiceComponent implements OnInit {
       option.value.toLowerCase() === currency.toLowerCase() ||
       option.label.toLowerCase() === currency.toLowerCase()
     );
-    return match ? match.value : 'USD'; // Default to USD
+    return match ? match.value : 'USD';
   }
 
   validatePaymentTerms(terms: string): string {
     const match = this.paymentTermsOptions.find(option =>
       option.label.toLowerCase().includes(terms.toLowerCase())
     );
-    return match ? match.value : 'net30'; // Default to Net 30
+    return match ? match.value : 'net30';
   }
 
-  // Group invoices by merchant name to support multiple invoices per merchant
-  groupInvoicesByMerchant(data: CsvInvoiceRow[]): CsvInvoiceRow[][] {
-    const merchantMap = new Map<string, CsvInvoiceRow[]>();
-
-    data.forEach(invoice => {
-      const merchantKey = invoice.merchantName;
-      if (!merchantMap.has(merchantKey)) {
-        merchantMap.set(merchantKey, []);
-      }
-      merchantMap.get(merchantKey)?.push(invoice);
-    });
-
-    return Array.from(merchantMap.values());
+  isAllSelected() {
+    const numSelected = this.selection.selected.length;
+    const numRows = this.verificationInvoices.length;
+    return numSelected === numRows;
   }
 
-
-
-
-
-
-
-  addMerchant() {
-    this.merchantsArray.push(this.createMerchantGroup());
+  masterToggle() {
+    this.isAllSelected()
+      ? this.selection.clear()
+      : this.verificationInvoices.forEach(row => this.selection.select(row));
   }
 
-  addInvoice(merchantIndex: number) {
-    this.getMerchantsInvoicesArray(merchantIndex).push(this.createInvoiceGroup());
-  }
+  addSelectedInvoices() {
+    const selectedInvoices = this.selection.selected;
+    this.mainInvoices = [...this.mainInvoices, ...selectedInvoices];
 
-  removeMerchant(merchantIndex: number) {
-    if (this.merchantsArray.length > 1) {
-      this.merchantsArray.removeAt(merchantIndex);
-    }
-  }
 
-  removeInvoice(merchantIndex: number, invoiceIndex: number) {
-    const invoicesArray = this.getMerchantsInvoicesArray(merchantIndex);
-    if (invoicesArray.length > 1) {
-      invoicesArray.removeAt(invoiceIndex);
-    }
-  }
+    // Remove added invoices from verification table
+    this.verificationInvoices = this.verificationInvoices.filter(
+      invoice => !selectedInvoices.includes(invoice)
+    );
 
-  onFileSelected(event: Event, merchantIndex: number, invoiceIndex: number) {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      const file = input.files[0];
-      this.getMerchantsInvoicesArray(merchantIndex)
-        .at(invoiceIndex)
-        .get('attachment')
-        ?.setValue(file);
-    }
-  }
+    // Clear selection
+    this.selection.clear();
 
-  // Helper method to mark all controls as touched
-  private markFormGroupTouched(formGroup: FormGroup | FormArray) {
-    Object.values(formGroup.controls).forEach(control => {
-      if (control instanceof FormGroup || control instanceof FormArray) {
-        this.markFormGroupTouched(control);
-      } else {
-        control.markAsTouched();
-      }
-    });
+    this.snackBar.open(`${selectedInvoices.length} Invoices Added`, 'Close', { duration: 3000 });
   }
 
   onSubmit() {
     if (this.invoiceForm.valid) {
-      const formValue = this.invoiceForm.value;
+      const formValue = this.invoiceForm.value as Invoice;
 
-      // Send data to the service
-      this.invoiceDataService.updateInvoiceData(formValue.merchants);
+      if (this.editingInvoice) {
+        // Ensure editingInvoice has an id
+        const editedInvoiceId = this.editingInvoice.id ||
+          `invoice-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-      // Show success message
-      this.snackBar.open('Invoices added successfully', 'Close', { duration: 3000 });
+        // Update existing invoice
+        this.mainInvoices = this.mainInvoices.map(invoice =>
+          invoice.id === editedInvoiceId
+            ? { ...formValue, id: editedInvoiceId }
+            : invoice
+        );
 
-      // Navigate to invoices page
-      this.router.navigate(['/invoices']);
-    } else {
-      // Mark all fields as touched to show validation errors
-      this.markFormGroupTouched(this.invoiceForm);
+        // Reset editing state
+        this.editingInvoice = null;
+        this.snackBar.open('Invoice updated', 'Close', { duration: 2000 });
+      } else {
+        // Add new invoice
+        const newInvoice: Invoice = {
+          ...formValue,
+          id: `invoice-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+        };
+        this.mainInvoices = [...this.mainInvoices, newInvoice];
+        this.snackBar.open('Invoice added', 'Close', { duration: 2000 });
+      }
+
+      // Reset the form
+      this.invoiceForm.reset();
     }
+  }
+
+  editInvoice(invoice: Invoice) {
+    this.editingInvoice = invoice;
+    this.invoiceForm.patchValue({
+      supplierName: invoice.supplierName,
+      invoiceNumber: invoice.invoiceNumber,
+      invoiceDate: invoice.invoiceDate,
+      dueDate: invoice.dueDate,
+      currency: invoice.currency,
+      totalAmount: invoice.totalAmount,
+      paymentTerms: invoice.paymentTerms
+    });
+  }
+
+  removeInvoice(invoice: Invoice) {
+    this.mainInvoices = this.mainInvoices.filter(inv => inv.id !== invoice.id);
+    this.snackBar.open('Invoice removed', 'Close', { duration: 2000 });
+  }
+
+  cancelEdit() {
+    this.invoiceForm.reset();
+    this.editingInvoice = null;
   }
 }

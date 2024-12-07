@@ -43,18 +43,18 @@ export class SidebarComponent implements OnInit {
     },
     {
       iconType: 'local_atm',
-      text: 'Payments',
-      route: '/payments'
+      text: 'Settlements',
+      route: '/settlements'
     }
   ];
 
-  settingsTabs: Tab[] = [
-    {
-      iconType: 'manage_accounts',
-      text: 'User Management',
-      route: '/user-management'
-    }
-  ];
+  // settingsTabs: Tab[] = [
+  //   {
+  //     iconType: 'manage_accounts',
+  //     text: 'User Management',
+  //     route: '/user-management'
+  //   }
+  // ];
 
   constructor(private router: Router) { }
 
@@ -72,7 +72,7 @@ export class SidebarComponent implements OnInit {
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
       this.updateActiveStatus(this.tabs);
-      this.updateActiveStatus(this.settingsTabs);
+      // this.updateActiveStatus(this.settingsTabs);
     });
   }
 
