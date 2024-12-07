@@ -28,6 +28,7 @@ interface Invoice {
   buyerName: string;
 }
 
+
 @Component({
   selector: 'app-add-invoice',
   templateUrl: './add-invoice.component.html',
@@ -133,10 +134,15 @@ export class AddInvoiceComponent implements OnInit {
 
   ngOnInit() {
     // Listen to buyerCode changes to auto-populate buyerName
-    this.invoiceForm.get('buyerCode')?.valueChanges.subscribe(code => {
-      const buyer = this.buyerCodeOptions.find(option => option.value === code);
-      if (buyer) {
-        this.invoiceForm.patchValue({ buyerName: buyer.name }, { emitEvent: false });
+    this.invoiceForm.get('crNumber')?.valueChanges.subscribe(crNumber => {
+      const crNumberMapping = this.crNumberOptions.find(option =>
+        option.crNumber.toLowerCase() === crNumber.toUpperCase()
+      );
+
+      if (crNumberMapping) {
+        this.invoiceForm.patchValue({
+          merchantName: crNumberMapping.merchantName
+        }, { emitEvent: false });
       }
     });
 
@@ -154,7 +160,7 @@ export class AddInvoiceComponent implements OnInit {
 
   createInvoiceForm(): FormGroup {
     return this.fb.group({
-      crNumber: ['', Validators.required],
+      crNumber: ['', [Validators.required, Validators.pattern(/^CR\d{3}$/)]],
       merchantName: [{ value: '', disabled: true }],
       invoiceNumber: ['', Validators.required],
       invoiceDate: [null, Validators.required],
@@ -204,13 +210,14 @@ export class AddInvoiceComponent implements OnInit {
   mapCsvRowToInvoice(row: any[]): Invoice {
     const buyerCode = this.validateBuyerCode(row[7] || '');
     const buyerName = this.getBuyerNameFromCode(buyerCode);
-    const crNumber = row[8] || ''; // Assuming CR Number is in the 9th column
+    const crNumber = row[8] ? `CR${row[8].replace(/\D/g, '')}` : ''; // Ensure CR format
+    const crNumberMapping = this.crNumberOptions.find(option =>
+      option.crNumber === crNumber
+    );
 
-    // Find merchant name based on CR Number
-    const crNumberMapping = this.crNumberOptions.find(option => option.crNumber === crNumber);
     const merchantName = crNumberMapping
       ? crNumberMapping.merchantName
-      : this.validateMerchantName(row[0] || '');
+      : this.merchantOptions[0].value;
 
     return {
       id: `invoice-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,

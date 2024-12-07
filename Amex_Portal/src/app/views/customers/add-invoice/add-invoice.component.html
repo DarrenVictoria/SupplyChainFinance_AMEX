@@ -237,13 +237,17 @@
 
     <mat-form-field>
       <mat-label>CR Number</mat-label>
-      <mat-select formControlName="crNumber">
-        <mat-option *ngFor="let crOption of crNumberOptions" [value]="crOption.crNumber">
-          {{ crOption.crNumber }}
-        </mat-option>
-      </mat-select>
-      <mat-error *ngIf="invoiceForm.get('crNumber')?.invalid">
+      <input 
+        matInput 
+        formControlName="crNumber" 
+        placeholder="Enter CR Number (e.g., CR001)"
+      >
+      
+      <mat-error *ngIf="invoiceForm.get('crNumber')?.hasError('required')">
         CR Number is required
+      </mat-error>
+      <mat-error *ngIf="invoiceForm.get('crNumber')?.hasError('pattern')">
+        CR Number must be in format CR followed by 3 digits (e.g., CR001)
       </mat-error>
     </mat-form-field>
 

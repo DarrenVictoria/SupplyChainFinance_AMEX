@@ -115,7 +115,7 @@ export class BuyerGridComponent implements OnInit {
           mat-raised-button 
           color="primary" 
           (click)="onAdd()" 
-          [disabled]="!buyerCode?.trim()"
+          [disabled]="!buyerCode"
           class="dialog-button add-button"
         >
           Add Buyer
@@ -179,7 +179,7 @@ export class AddBuyerDialogComponent {
   }
 
   onAdd(): void {
-    const trimmedCode = this.buyerCode.trim();
+    const trimmedCode = this.buyerCode;
     if (trimmedCode) {
       this.dialogRef.close(trimmedCode);
     }
