@@ -51,6 +51,8 @@ export class CompanyRegistrationComponent implements OnInit {
   showOtpModal = false;
   otpInput = '';
   isNafthVerificationLoading = false;
+  wathqDetailsValidated = false;
+  isWathqValidationLoading = false;
 
 
   // IBAN Details
@@ -99,6 +101,27 @@ export class CompanyRegistrationComponent implements OnInit {
     this.buyerCompanyName = 'Acme Corporation';
   }
 
+  validateWathqDetails(): void {
+    // Validate company registration number
+    if (this.supplierDetails.companyRegistrationNumber) {
+      this.isWathqValidationLoading = true;
+
+      // Simulate API validation with setTimeout
+      setTimeout(() => {
+        // In a real scenario, this would be an actual API call
+        this.wathqDetailsValidated = true;
+
+        // Optionally pre-fill company name and address
+        this.supplierDetails.companyName = 'Example Company Name';
+        this.supplierDetails.companyAddress = 'Example Company Address';
+
+        this.isWathqValidationLoading = false;
+      }, 2000);
+    } else {
+      alert('Please enter a Company Registration Number');
+    }
+  }
+
   // New method for Nafth API verification
   openNafthVerificationModal(): void {
     this.showOtpModal = true;
@@ -121,9 +144,7 @@ export class CompanyRegistrationComponent implements OnInit {
   // Updated company details validation
   validateCompanyDetails(): boolean {
     return !!(
-      this.supplierDetails.companyRegistrationNumber &&
-      this.supplierDetails.companyName &&
-      this.supplierDetails.companyAddress &&
+      this.wathqDetailsValidated &&
       this.supplierDetails.selectedCountryCode &&
       this.supplierDetails.mobileNumber &&
       this.supplierDetails.nationalId &&

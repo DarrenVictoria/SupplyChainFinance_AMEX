@@ -157,3 +157,24 @@
   .mat-slide-toggle-content {
     font-size: 0.95rem;
   }
+
+  .invoice-redirection-time {
+    margin-top: 15px;
+  
+    .time-input-group {
+      display: flex;
+      gap: 15px;
+  
+      mat-form-field {
+        flex: 1;
+        max-width: 100px;
+      }
+    }
+  
+    mat-hint {
+      display: block;
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: rgba(0, 0, 0, 0.54);
+    }
+  }

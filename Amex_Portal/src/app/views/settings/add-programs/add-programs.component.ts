@@ -56,6 +56,20 @@ export class AddProgramsComponent implements OnInit {
     this.programForm.get('supplierExceptions')?.valueChanges.subscribe(() => {
       this.updateSupplierExceptionsDataSource();
     });
+
+    this.programForm.get('enableInvoiceRedirection')?.valueChanges.subscribe(enabled => {
+      if (enabled) {
+        this.programForm.addControl('invoiceRedirectionDays', new FormControl(0, [Validators.min(0), Validators.max(7)]));
+        this.programForm.addControl('invoiceRedirectionHours', new FormControl(0, [Validators.min(0), Validators.max(23)]));
+        this.programForm.addControl('invoiceRedirectionMinutes', new FormControl(0, [Validators.min(0), Validators.max(59)]));
+      } else {
+        this.programForm.removeControl('invoiceRedirectionDays');
+        this.programForm.removeControl('invoiceRedirectionHours');
+        this.programForm.removeControl('invoiceRedirectionMinutes');
+      }
+    });
+
+
   }
 
   createForm(): FormGroup {
@@ -86,6 +100,8 @@ export class AddProgramsComponent implements OnInit {
       financingDaysMax: [null, [Validators.min(0)]],
     });
   }
+
+
 
   getFormControl(name: string): AbstractControl | null {
     return this.programForm.get(name);

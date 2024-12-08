@@ -1,1 +1,144 @@
-<p>dashboard works!</p>
+<div class="dashboard-container">
+    <!-- Header -->
+    <header class="dashboard-header">
+        <h1>Amex Financing Portal Dashboard</h1>
+        <div class="header-actions">
+          <span>Current Date: {{ currentDate | date:'medium' }}</span>
+          <mat-form-field>
+            <mat-label>Date Range</mat-label>
+            <mat-select>
+              <mat-option value="last-6-months">Last 6 Months</mat-option>
+              <mat-option value="last-3-months">Last 3 Months</mat-option>
+              <mat-option value="this-year">This Year</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </header>
+  
+    <!-- Key Metrics Row -->
+    <div class="key-metrics-row">
+      <div class="metric-card">
+        <h3>Total Buyers</h3>
+        <p>{{ keyMetrics.totalBuyers }}</p>
+      </div>
+      <div class="metric-card">
+        <h3>Total Suppliers</h3>
+        <p>{{ keyMetrics.totalSuppliers }}</p>
+      </div>
+      <div class="metric-card">
+        <h3>Active Programs</h3>
+        <p>{{ keyMetrics.activePrograms }}</p>
+      </div>
+      <div class="metric-card">
+        <h3>Pending Approvals</h3>
+        <p>{{ keyMetrics.pendingApprovals }}</p>
+      </div>
+      <div class="metric-card">
+        <h3>Total Credit Utilized</h3>
+        <p>{{ formatCurrency(keyMetrics.totalCreditUtilized) }}</p>
+      </div>
+      <div class="metric-card">
+        <h3>Total Early Payments</h3>
+        <p>{{ formatCurrency(keyMetrics.totalEarlyPayments) }}</p>
+      </div>
+    </div>
+  
+    <!-- Charts Row -->
+    <div class="charts-row">
+        <!-- Financing Product Utilization Pie Chart -->
+        <div class="chart-card">
+          <canvas 
+            baseChart
+            [type]="pieChartType"
+            [data]="pieChartConfiguration.data"
+            [options]="pieChartConfiguration.options">
+          </canvas>
+        </div>
+      
+        <!-- Credit Utilization Bar Chart -->
+        <div class="chart-card">
+          <canvas 
+            baseChart
+            [type]="barChartType"
+            [data]="barChartConfiguration.data"
+            [options]="barChartConfiguration.options">
+          </canvas>
+        </div>
+      
+        <!-- Supplier Payment Trends Line Chart -->
+        <div class="chart-card">
+          <canvas 
+            baseChart
+            [type]="lineChartType"
+            [data]="lineChartConfiguration.data"
+            [options]="lineChartConfiguration.options">
+          </canvas>
+        </div>
+      </div>
+  
+    <!-- Reports Row -->
+    <div class="reports-row">
+      <!-- Program Performance Report -->
+      <div class="report-card">
+        <h2>Program Performance Report</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Program</th>
+              <th>Transactions</th>
+              <th>Total Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let report of programPerformanceReport">
+              <td>{{ report.program }}</td>
+              <td>{{ report.transactions }}</td>
+              <td>{{ formatCurrency(report.totalValue) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+  
+      <!-- Buyer Performance Report -->
+      <div class="report-card">
+        <h2>Buyer Performance Report</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Buyer</th>
+              <th>Program</th>
+              <th>Credit Used</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let report of buyerPerformanceReport">
+              <td>{{ report.buyer }}</td>
+              <td>{{ report.program }}</td>
+              <td>{{ formatCurrency(report.creditUsed) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+  
+      <!-- Supplier Payment Report -->
+      <div class="report-card">
+        <h2>Supplier Payment Report</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Supplier</th>
+              <th>Total Payments</th>
+              <th>Avg. Processing Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let report of supplierPaymentReport">
+              <td>{{ report.supplier }}</td>
+              <td>{{ formatCurrency(report.totalPayments) }}</td>
+              <td>{{ report.avgProcessingTime }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>

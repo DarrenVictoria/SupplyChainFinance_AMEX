@@ -33,10 +33,11 @@ interface Merchant {
   merchant: string;
   invoiceNumber: string;
   invoiceAmount: number;
-  productCode: string;
+  productCode: 'Approved Invoice Factoring' | 'Direct Payment';
   buyerStatus: string;
   paymentStatus: string;
 }
+
 @Component({
   selector: 'app-payments',
   imports: [
@@ -84,8 +85,8 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
   ];
 
   productCodeOptions = [
-    { value: 'ID', label: 'ID' },
-    { value: 'RF', label: 'RF' }
+    { value: 'Approved Invoice Factoring', label: 'Approved Invoice Factoring' },
+    { value: 'Direct Payment', label: 'Direct Payment' }
   ];
 
   searchTypeOptions = [
@@ -111,12 +112,12 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
       requestId: 'REQ-CS-576',
       dateCreated: '11/09/2024',
       invoiceDate: '11/09/2024',
-      invoiceDueDate: '12/09/2024', // 30 days from invoice date
+      invoiceDueDate: '12/09/2024',
       paymentTerms: '30 days',
       merchant: 'Compu Smart',
       invoiceNumber: 'INV-001',
       invoiceAmount: 10000.00,
-      productCode: 'ID',
+      productCode: 'Approved Invoice Factoring',
       buyerStatus: 'Approved',
       paymentStatus: 'Overdue',
     },
@@ -124,12 +125,12 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
       requestId: 'REQ-CS-577',
       dateCreated: '11/09/2024',
       invoiceDate: '11/09/2024',
-      invoiceDueDate: '10/12/2024', // 90 days from invoice date
+      invoiceDueDate: '10/12/2024',
       paymentTerms: '90 days',
       merchant: 'Compu Smart',
       invoiceNumber: 'INV-002',
       invoiceAmount: 100000.00,
-      productCode: 'RF',
+      productCode: 'Direct Payment',
       buyerStatus: 'Rejected',
       paymentStatus: 'Completed',
     },
@@ -137,12 +138,12 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
       requestId: 'REQ-CS-578',
       dateCreated: '11/10/2024',
       invoiceDate: '11/10/2024',
-      invoiceDueDate: '10/01/2025', // 60 days from invoice date
+      invoiceDueDate: '10/01/2025',
       paymentTerms: '60 days',
       merchant: 'Tech Solutions',
       invoiceNumber: 'INV-003',
       invoiceAmount: 25000.00,
-      productCode: 'ID',
+      productCode: 'Approved Invoice Factoring',
       buyerStatus: 'Pending Approval',
       paymentStatus: 'Due',
     }
@@ -280,13 +281,12 @@ export class PaymentsComponent implements AfterViewInit, OnInit {
   }
 
   getActionButtons(merchant: Merchant): string {
-    if (merchant.paymentStatus === 'Paid') {
+    if (merchant.paymentStatus === 'Completed') {
       return 'info';
     } else {
       return 'info,card';
     }
   }
-
 
 
   getBuyerStatusClass(status: string): string {

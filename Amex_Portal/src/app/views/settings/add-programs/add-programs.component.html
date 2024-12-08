@@ -121,11 +121,32 @@
 
           <!-- Enable Invoice Redirection Toggle -->
           <mat-slide-toggle 
-            formControlName="enableInvoiceRedirection"
-            matTooltip="Enable invoice redirection within 24 hours">
-            Enable Invoice Redirection
-          </mat-slide-toggle>
+      formControlName="enableInvoiceRedirection"
+      matTooltip="Enable invoice redirection within specified time">
+      Enable Invoice Redirection
+    </mat-slide-toggle>
 
+    <!-- Time Limit for Invoice Redirection (Conditional) -->
+    <div *ngIf="programForm.get('enableInvoiceRedirection')?.value" class="invoice-redirection-time">
+      <div class="time-input-group">
+        <mat-form-field appearance="outline">
+          <mat-label>Days</mat-label>
+          <input matInput type="number" formControlName="invoiceRedirectionDays" 
+                 min="0" max="7">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Hours</mat-label>
+          <input matInput type="number" formControlName="invoiceRedirectionHours" 
+                 min="0" max="23">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Minutes</mat-label>
+          <input matInput type="number" formControlName="invoiceRedirectionMinutes" 
+                 min="0" max="59">
+        </mat-form-field>
+      </div>
+    </div>
+ 
           <!-- Time Limit for Invoice Redirection -->
           <!-- <mat-form-field appearance="outline" *ngIf="programForm.get('enableInvoiceRedirection')?.value">
             <mat-label>Invoice Redirection Time Limit (Hours)</mat-label>
