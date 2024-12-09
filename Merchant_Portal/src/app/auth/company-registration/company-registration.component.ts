@@ -134,6 +134,8 @@ export class CompanyRegistrationComponent implements OnInit {
       setTimeout(() => {
         this.supplierDetails.nafthVerified = true;
         this.showOtpModal = false;
+        this.companyDetailsApproved = true;
+        this.stages[0].completed = true;
         this.isNafthVerificationLoading = false;
       }, 2000);
     } else {
@@ -147,22 +149,20 @@ export class CompanyRegistrationComponent implements OnInit {
       this.wathqDetailsValidated &&
       this.supplierDetails.selectedCountryCode &&
       this.supplierDetails.mobileNumber &&
-      this.supplierDetails.nationalId &&
-      this.supplierDetails.nafthVerified
+      this.supplierDetails.nationalId
     );
   }
+
 
   // Rename method to match the HTML template
   approveCompanyDetails(): void {
     if (this.validateCompanyDetails()) {
       this.isCompanyDetailsLoading = true;
-      setTimeout(() => {
-        this.companyDetailsApproved = true;
-        this.stages[0].completed = true;
-        this.isCompanyDetailsLoading = false;
-      }, 2000);
+      // Open Nafth OTP modal
+      this.showOtpModal = true;
+      this.isCompanyDetailsLoading = false;
     } else {
-      alert('Please fill in all supplier details and verify mobile number');
+      alert('Please fill in all supplier details');
     }
   }
 

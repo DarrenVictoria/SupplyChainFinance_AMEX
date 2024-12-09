@@ -27,9 +27,9 @@
         </mat-error>
       </mat-form-field>
 
-      <ng-container *ngIf="isProductTypeSelected('Approve Invoice Factoring')">
+      <ng-container *ngIf="isProductTypeSelected('Approved Invoice Factoring')">
         <div class="conditional-section">
-          <div class="section-title">Invoice Factoring Details</div>
+          <div class="section-title">Approved Invoice Factoring Details</div>
           <mat-form-field appearance="outline">
             <mat-label>Daily Rate (Factoring)</mat-label>
             <input matInput type="number" formControlName="dailyRateFactoring">
@@ -40,13 +40,7 @@
             <input matInput type="number" formControlName="profitSharingWithBuyers">
           </mat-form-field>
 
-          <!-- Enable Auto Financing Toggle -->
-          <mat-slide-toggle 
           
-            formControlName="enableAutoFinancing"
-            matTooltip="Automatically finance eligible invoices">
-            Enable Auto Financing
-          </mat-slide-toggle>
 
         <!-- Supplier Exceptions Table -->
         <mat-card>
@@ -121,31 +115,28 @@
 
           <!-- Enable Invoice Redirection Toggle -->
           <mat-slide-toggle 
-      formControlName="enableInvoiceRedirection"
-      matTooltip="Enable invoice redirection within specified time">
-      Enable Invoice Redirection
-    </mat-slide-toggle>
+        formControlName="enableInvoiceRedirection"
+        matTooltip="Enable invoice redirection within specified time">
+        Enable Invoice Redirection
+      </mat-slide-toggle>
 
-    <!-- Time Limit for Invoice Redirection (Conditional) -->
-    <div *ngIf="programForm.get('enableInvoiceRedirection')?.value" class="invoice-redirection-time">
-      <div class="time-input-group">
-        <mat-form-field appearance="outline">
-          <mat-label>Days</mat-label>
-          <input matInput type="number" formControlName="invoiceRedirectionDays" 
-                 min="0" max="7">
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Hours</mat-label>
-          <input matInput type="number" formControlName="invoiceRedirectionHours" 
-                 min="0" max="23">
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Minutes</mat-label>
-          <input matInput type="number" formControlName="invoiceRedirectionMinutes" 
-                 min="0" max="59">
-        </mat-form-field>
+      <!-- Invoice Redirection Time Limit (Conditional) -->
+     <div *ngIf="programForm.get('enableInvoiceRedirection')?.value" class="invoice-redirection-condition">
+  <div class="condition-input-group">
+    <mat-form-field appearance="outline" class="comparison-operator">
+      <mat-label>Comparison</mat-label>
+      <mat-select formControlName="invoiceRedirectionOperator">
+        <mat-option value="<=">Less Than or Equal To (<=)</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="invoice-value">
+      <mat-label>Invoice Value</mat-label>
+      <input matInput type="number" formControlName="invoiceRedirectionValue" min="0">
+    </mat-form-field>
+  </div>
+
       </div>
-    </div>
  
           <!-- Time Limit for Invoice Redirection -->
           <!-- <mat-form-field appearance="outline" *ngIf="programForm.get('enableInvoiceRedirection')?.value">
@@ -155,6 +146,32 @@
           </mat-form-field> -->
         </div>
       </ng-container>
+
+       <!-- Enable Auto Financing Toggle -->
+       <mat-slide-toggle 
+       formControlName="enableAutoFinancing"
+       matTooltip="Automatically finance eligible invoices">
+       Enable Auto Financing
+     </mat-slide-toggle>
+
+     <!-- Time Input Group (Only visible when Auto Financing is disabled) -->
+     <div *ngIf="!programForm.get('enableAutoFinancing')?.value" class="time-input-group">
+       <mat-form-field appearance="outline">
+         <mat-label>Days</mat-label>
+         <input matInput type="number" formControlName="invoiceRedirectionDays" 
+                min="0" max="7">
+       </mat-form-field>
+       <mat-form-field appearance="outline">
+         <mat-label>Hours</mat-label>
+         <input matInput type="number" formControlName="invoiceRedirectionHours" 
+                min="0" max="23">
+       </mat-form-field>
+       <mat-form-field appearance="outline">
+         <mat-label>Minutes</mat-label>
+         <input matInput type="number" formControlName="invoiceRedirectionMinutes" 
+                min="0" max="59">
+       </mat-form-field>
+     </div>
 
       <mat-form-field appearance="outline">
         <mat-label>Monthly Supplier Subscription Fee</mat-label>

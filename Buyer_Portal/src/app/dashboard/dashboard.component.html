@@ -1,1 +1,112 @@
 <p>dashboard works!</p>
+<div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <div class="bg-white shadow">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+          <div class="flex items-center">
+            <img src="/assets/logo.png" alt="Logo" class="h-8 w-8" />
+            <span class="ml-2 text-xl font-semibold">Buyer Portal</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Summary Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div *ngFor="let metric of summaryMetrics" class="metric-card">
+          <div>
+            <p>{{ metric.label }}</p>
+            <p>{{ metric.label === 'Total Amount' ? formatCurrency(metric.value) : metric.value }}</p>
+            <p [ngClass]="{
+              'text-green-600': metric.changeType === 'positive',
+              'text-red-600': metric.changeType === 'negative'
+            }">
+              {{ metric.change }}
+              {{ metric.changeType === 'positive' ? 'from last month' : '' }}
+            </p>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Quick Actions -->
+      <div class="chart-card mb-8">
+        <div class="p-6">
+          <h2 class="text-lg font-semibold mb-4">Quick Actions</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button class="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700">
+              New Invoice
+            </button>
+            <button class="flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700">
+              Approve Pending
+            </button>
+            <button class="flex items-center justify-center gap-2 bg-purple-600 text-white px-4 py-3 rounded-lg hover:bg-purple-700">
+              Generate Report
+            </button>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Charts Section -->
+      <div class="charts-row mb-8">
+        <!-- Monthly Trends -->
+        <div class="chart-card">
+          <h2 class="text-lg font-semibold mb-4">Monthly Trends</h2>
+          <div style="height: 300px;">
+            <canvas baseChart 
+              [data]="monthlyTrendsChartConfig.data"
+              [options]="monthlyTrendsChartConfig.options"
+              [type]="monthlyTrendsChartConfig.type">
+            </canvas>
+          </div>
+        </div>
+  
+        <!-- Status Distribution -->
+        <div class="chart-card">
+          <h2 class="text-lg font-semibold mb-4">Status Distribution</h2>
+          <div style="height: 300px;">
+            <canvas baseChart 
+              [data]="statusDistributionChartConfig.data"
+              [options]="statusDistributionChartConfig.options"
+              [type]="statusDistributionChartConfig.type">
+            </canvas>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Recent Transactions -->
+      <div class="report-card">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-lg font-semibold">Recent Transactions</h2>
+          <button class="text-blue-600 hover:text-blue-800">View All</button>
+        </div>
+        
+        <table>
+          <thead>
+            <tr>
+              <th>Invoice ID</th>
+              <th>Supplier</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Due Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let invoice of invoiceData">
+              <td>{{ invoice.id }}</td>
+              <td>{{ invoice.supplier }}</td>
+              <td>{{ formatCurrency(invoice.amount) }}</td>
+              <td>
+                <span class="status-badge" [ngClass]="getStatusColor(invoice.status)">
+                  {{ invoice.status }}
+                </span>
+              </td>
+              <td>{{ invoice.dueDate }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>

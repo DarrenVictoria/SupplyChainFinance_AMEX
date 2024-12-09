@@ -120,7 +120,7 @@ export class DashboardComponent implements OnInit {
       plugins: {
         title: {
           display: true,
-          text: 'Supplier Payment Trends'
+          text: 'Invoices Financed'
         }
       }
     }
@@ -129,12 +129,12 @@ export class DashboardComponent implements OnInit {
   // Reports Data
   programPerformanceReport = [
     { program: 'Direct Payment', transactions: 120, totalValue: 3000000 },
-    { program: 'Invoice Factoring', transactions: 80, totalValue: 2000000 }
+    { program: 'Approved Invoice Factoring', transactions: 80, totalValue: 2000000 }
   ];
 
   buyerPerformanceReport = [
     { buyer: 'Buyer A', program: 'Direct Payment', creditUsed: 1000000 },
-    { buyer: 'Buyer B', program: 'Invoice Factoring', creditUsed: 750000 }
+    { buyer: 'Buyer B', program: 'Approved Invoice Factoring', creditUsed: 750000 }
   ];
 
   supplierPaymentReport = [

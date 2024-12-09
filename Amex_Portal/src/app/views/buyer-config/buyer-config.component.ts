@@ -36,6 +36,7 @@ interface Program {
   productTypes: string[];
   dailyRateFactoring: number | null;
   dailyRateDirect: number | null;
+  invoiceRedirectionPeriod: number | null; // New property for Direct Payment
   gracePeriod: number | null;
   monthlySupplierSubscriptionFee: number | null;
   monthlyBuyerSubscriptionFee: number | null;
@@ -52,13 +53,14 @@ interface Program {
 const SAMPLE_PROGRAMS: Program[] = [
   {
     programName: 'Program A',
-    productTypes: ['Approve Invoice Factoring', 'Direct Payment'],
+    productTypes: ['Approved Invoice Factoring', 'Direct Payment'],
     dailyRateFactoring: 1.5,
     dailyRateDirect: 1.2,
     gracePeriod: 30,
     monthlySupplierSubscriptionFee: 500,
     monthlyBuyerSubscriptionFee: 750,
     invoiceAmountMin: 10000,
+    invoiceRedirectionPeriod: 24, // New property for Direct Payment
     invoiceAmountMax: 500000,
     financingDaysMin: 30,
     financingDaysMax: 120,
@@ -78,6 +80,7 @@ const SAMPLE_PROGRAMS: Program[] = [
     gracePeriod: 15,
     monthlySupplierSubscriptionFee: 250,
     monthlyBuyerSubscriptionFee: 500,
+    invoiceRedirectionPeriod: 24,
     invoiceAmountMin: 5000,
     invoiceAmountMax: 250000,
     financingDaysMin: 20,
@@ -326,19 +329,40 @@ export class BuyerConfigComponent {
     }
   }
 
-  getProgramDetails(): { name: string; value: string }[] {
+  getProgramDetails(): { name: string; value: string; group?: string }[] {
     if (!this.selectedProgram) {
       return [];
     }
     const program = this.selectedProgram;
     return [
-
       { name: 'Program Name', value: program.programName },
       { name: 'Product Types', value: program.productTypes.join(', ') },
-      { name: 'Daily Rate (Factoring)', value: program.dailyRateFactoring ? `${program.dailyRateFactoring}%` : 'N/A' },
-      { name: 'Supplier Exceptions', value: 'See below' },
-      { name: 'Daily Rate (Direct)', value: program.dailyRateDirect ? `${program.dailyRateDirect}%` : 'N/A' },
-      { name: 'Grace Period', value: program.gracePeriod ? `${program.gracePeriod} days` : 'N/A' },
+      { name: 'Auto Financing', value: 'Yes' },
+      {
+        name: 'Daily Rate (Approved Invoice Factoring)',
+        value: program.dailyRateFactoring ? `${program.dailyRateFactoring}%` : 'N/A',
+        group: 'daily-rate-factoring-group'
+      },
+      { name: 'Supplier Exceptions', value: 'See below', group: 'daily-rate-factoring-group' },
+
+      // Direct Payment group - now including Invoice Redirection Period
+      {
+        name: 'Daily Rate (Direct)',
+        value: program.dailyRateDirect ? `${program.dailyRateDirect}%` : 'N/A',
+        group: 'daily-rate-direct-group'
+      },
+      {
+        name: 'Grace Period',
+        value: program.gracePeriod ? `${program.gracePeriod} days` : 'N/A',
+        group: 'daily-rate-direct-group'
+      },
+      {
+        name: 'Invoice Redirection Period',
+        value: program.invoiceRedirectionPeriod ? `${program.invoiceRedirectionPeriod} hours` : 'N/A',
+        group: 'daily-rate-direct-group'  // Added to the same group as other Direct settings
+      },
+
+      // Rest of the details remain the same
       { name: 'Monthly Supplier Subscription Fee', value: program.monthlySupplierSubscriptionFee ? `$${program.monthlySupplierSubscriptionFee}` : 'N/A' },
       { name: 'Monthly Buyer Subscription Fee', value: program.monthlyBuyerSubscriptionFee ? `$${program.monthlyBuyerSubscriptionFee}` : 'N/A' },
       { name: 'Invoice Amount (Min)', value: program.invoiceAmountMin ? `$${program.invoiceAmountMin}` : 'N/A' },

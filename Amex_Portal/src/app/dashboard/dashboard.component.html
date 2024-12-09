@@ -1,7 +1,7 @@
 <div class="dashboard-container">
     <!-- Header -->
     <header class="dashboard-header">
-        <h1>Amex Financing Portal Dashboard</h1>
+        <h1>Dashboard</h1>
         <div class="header-actions">
           <span>Current Date: {{ currentDate | date:'medium' }}</span>
           <mat-form-field>
@@ -30,15 +30,15 @@
         <p>{{ keyMetrics.activePrograms }}</p>
       </div>
       <div class="metric-card">
-        <h3>Pending Approvals</h3>
+        <h3>Pending Supplier Reviews</h3>
         <p>{{ keyMetrics.pendingApprovals }}</p>
       </div>
       <div class="metric-card">
-        <h3>Total Credit Utilized</h3>
+        <h3>Total Invoices Financed</h3>
         <p>{{ formatCurrency(keyMetrics.totalCreditUtilized) }}</p>
       </div>
       <div class="metric-card">
-        <h3>Total Early Payments</h3>
+        <h3>Total Settlements Pending</h3>
         <p>{{ formatCurrency(keyMetrics.totalEarlyPayments) }}</p>
       </div>
     </div>

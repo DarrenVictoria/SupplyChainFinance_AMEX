@@ -42,7 +42,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 })
 export class AddProgramsComponent implements OnInit {
   programForm: FormGroup;
-  productTypes = ['Approve Invoice Factoring', 'Direct Payment'];
+  productTypes = ['Approved Invoice Factoring', 'Direct Payment'];
   supplierNames = ['Supplier 1', 'Supplier 2', 'Supplier 3'];
   supplierExceptionsColumns = ['name', 'dailyRate', 'actions'];
   supplierExceptionsDataSource = new MatTableDataSource<FormGroup>([]);
@@ -57,8 +57,22 @@ export class AddProgramsComponent implements OnInit {
       this.updateSupplierExceptionsDataSource();
     });
 
+    // Handle invoice redirection controls
     this.programForm.get('enableInvoiceRedirection')?.valueChanges.subscribe(enabled => {
       if (enabled) {
+        // Existing time limit control
+        this.programForm.addControl('invoiceRedirectionTimeLimit', new FormControl(24, [Validators.min(1), Validators.max(168)]));
+      } else {
+        // Remove time limit control
+        this.programForm.removeControl('invoiceRedirectionTimeLimit');
+        this.programForm.removeControl('invoiceRedirectionOperator');
+        this.programForm.removeControl('invoiceRedirectionValue');
+      }
+    });
+
+    // Handle auto financing toggle
+    this.programForm.get('enableAutoFinancing')?.valueChanges.subscribe(enabled => {
+      if (!enabled) {
         this.programForm.addControl('invoiceRedirectionDays', new FormControl(0, [Validators.min(0), Validators.max(7)]));
         this.programForm.addControl('invoiceRedirectionHours', new FormControl(0, [Validators.min(0), Validators.max(23)]));
         this.programForm.addControl('invoiceRedirectionMinutes', new FormControl(0, [Validators.min(0), Validators.max(59)]));
@@ -68,9 +82,8 @@ export class AddProgramsComponent implements OnInit {
         this.programForm.removeControl('invoiceRedirectionMinutes');
       }
     });
-
-
   }
+
 
   createForm(): FormGroup {
     return this.fb.group({
@@ -87,6 +100,8 @@ export class AddProgramsComponent implements OnInit {
       dailyRateDirect: [null, [Validators.min(0), Validators.max(100)]],
       gracePeriod: [null, [Validators.min(0)]],
       enableInvoiceRedirection: [false],
+      invoiceRedirectionOperator: [{ value: '<=', disabled: true }], // Disabled with <= as the only option
+      invoiceRedirectionValue: [null, [Validators.min(0)]],
       invoiceRedirectionTimeLimit: [24, [Validators.min(1), Validators.max(168)]], // Max 1 week
 
       // Common Fields
